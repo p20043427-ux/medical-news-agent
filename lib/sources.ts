@@ -77,6 +77,7 @@ export const SOURCES: SourceConfig[] = [
     type: "rss",
     urls: [
       "https://news.google.com/rss/headlines/section/topic/HEALTH?hl=en-US&gl=US&ceid=US:en",
+      "https://news.google.com/rss/search?q=health+OR+disease+when:7d&hl=en-US&gl=US&ceid=US:en",
     ],
     limit: 15,
   },
