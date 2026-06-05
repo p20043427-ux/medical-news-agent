@@ -3,6 +3,8 @@
 최신 **질병 정보**를 7개 소스에서 자동 수집하고 `openrouter/auto` LLM으로 **한국어 요약**하는 에이전트입니다.
 Next.js로 만들어 **Vercel**에 배포하고, 데이터는 **Supabase(Postgres)**에 저장합니다.
 
+🔗 **라이브 데모**: https://medical-news-agent-puce.vercel.app
+
 ## 수집 소스
 
 | 소스 | 방식 |
