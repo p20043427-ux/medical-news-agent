@@ -14,7 +14,10 @@ export interface CrawlResult {
 }
 
 /** 한 번의 수집 사이클에서 LLM 요약할 최대 기사 수 (서버리스 시간 제한 고려) */
-const MAX_SUMMARIES_PER_RUN = 18;
+const MAX_SUMMARIES_PER_RUN = 40;
+
+/** 요약 동시 처리 개수 (처리량 향상). OpenRouter 동시 요청 한도 내. */
+const SUMMARY_CONCURRENCY = 4;
 
 /**
  * 소프트 데드라인(ms). 이 시간을 넘으면 새 요약을 시작하지 않고 정상 종료한다.
@@ -100,31 +103,40 @@ export async function runCrawl(): Promise<CrawlResult> {
     .order("published_at", { ascending: false, nullsFirst: false })
     .limit(MAX_SUMMARIES_PER_RUN);
 
-  for (const row of pending ?? []) {
-    // 시간 예산 초과 시 정상 종료 (나머지는 다음 실행에서 처리)
-    if (Date.now() - startedAt > SOFT_DEADLINE_MS) break;
-    try {
-      const summary = await summarizeArticle({
-        title: row.title,
-        body: row.content || row.original_summary,
-        source: row.source,
-      });
-      await supabase
-        .from("articles")
-        .update({
-          summary_ko: summary.summary_ko,
-          diseases: summary.diseases,
-          category: summary.category,
-          llm_model: summary.model,
-          processed: true,
-        })
-        .eq("id", row.id);
-      summarized += 1;
-    } catch (e) {
-      console.error(`[crawl] 요약 실패 (id=${row.id}):`, e);
-      // 요약 실패 기사는 processed=false 로 남겨 다음 실행에서 재시도
+  // 동시 처리 워커 풀: SUMMARY_CONCURRENCY 개 워커가 큐에서 기사를 꺼내 요약
+  const queue = [...(pending ?? [])];
+  async function worker() {
+    while (queue.length > 0) {
+      // 시간 예산 초과 시 정상 종료 (나머지는 다음 실행에서 처리)
+      if (Date.now() - startedAt > SOFT_DEADLINE_MS) return;
+      const row = queue.shift();
+      if (!row) return;
+      try {
+        const summary = await summarizeArticle({
+          title: row.title,
+          body: row.content || row.original_summary,
+          source: row.source,
+        });
+        await supabase
+          .from("articles")
+          .update({
+            summary_ko: summary.summary_ko,
+            diseases: summary.diseases,
+            category: summary.category,
+            llm_model: summary.model,
+            processed: true,
+          })
+          .eq("id", row.id);
+        summarized += 1;
+      } catch (e) {
+        console.error(`[crawl] 요약 실패 (id=${row.id}):`, e);
+        // 요약 실패 기사는 processed=false 로 남겨 다음 실행에서 재시도
+      }
     }
   }
+  await Promise.all(
+    Array.from({ length: SUMMARY_CONCURRENCY }, () => worker())
+  );
 
   const durationMs = Date.now() - startedAt;
 
