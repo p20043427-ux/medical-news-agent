@@ -16,6 +16,13 @@ export interface CrawlResult {
 /** 한 번의 수집 사이클에서 LLM 요약할 최대 기사 수 (서버리스 시간 제한 고려) */
 const MAX_SUMMARIES_PER_RUN = 18;
 
+/**
+ * 소프트 데드라인(ms). 이 시간을 넘으면 새 요약을 시작하지 않고 정상 종료한다.
+ * Vercel 함수 maxDuration(60s)보다 충분히 앞에 두어 FUNCTION_INVOCATION_TIMEOUT 방지.
+ * 남은 미요약 기사는 다음 실행/수동 수집에서 이어서 처리된다.
+ */
+const SOFT_DEADLINE_MS = 45_000;
+
 async function collectItems(src: SourceConfig): Promise<FeedItem[]> {
   if (src.type === "pubmed") {
     return (await fetchPubMed(src.limit)).slice(0, src.limit);
@@ -94,6 +101,8 @@ export async function runCrawl(): Promise<CrawlResult> {
     .limit(MAX_SUMMARIES_PER_RUN);
 
   for (const row of pending ?? []) {
+    // 시간 예산 초과 시 정상 종료 (나머지는 다음 실행에서 처리)
+    if (Date.now() - startedAt > SOFT_DEADLINE_MS) break;
     try {
       const summary = await summarizeArticle({
         title: row.title,
