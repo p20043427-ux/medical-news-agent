@@ -217,5 +217,20 @@ export function useProgress() {
     setProgress(EMPTY);
   }, []);
 
-  return { progress, ready, markSkim, grade, setGoalDate, reset };
+  const exportJson = useCallback(() => JSON.stringify(progress), [progress]);
+
+  const importJson = useCallback((json: string): boolean => {
+    try {
+      const p = JSON.parse(json) as Progress;
+      if (!p || typeof p !== "object" || !p.cards) return false;
+      const next: Progress = { ...EMPTY, ...p };
+      save(next);
+      setProgress(next);
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
+  return { progress, ready, markSkim, grade, setGoalDate, reset, exportJson, importJson };
 }

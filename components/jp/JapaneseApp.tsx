@@ -21,7 +21,8 @@ interface Session {
 }
 
 export default function JapaneseApp() {
-  const { progress, ready, markSkim, grade, setGoalDate, reset } = useProgress();
+  const { progress, ready, markSkim, grade, setGoalDate, reset, exportJson, importJson } =
+    useProgress();
   const [tab, setTab] = useState<Tab>("home");
   const [session, setSession] = useState<Session | null>(null);
   const [showFurigana, setShowFurigana] = useState(true);
@@ -113,7 +114,13 @@ export default function JapaneseApp() {
       )}
       {tab === "verbs" && <VerbView showFurigana={showFurigana} />}
       {tab === "stats" && (
-        <Stats progress={progress} onSetGoal={setGoalDate} onReset={reset} />
+        <Stats
+          progress={progress}
+          onSetGoal={setGoalDate}
+          onReset={reset}
+          onExport={exportJson}
+          onImport={importJson}
+        />
       )}
 
       <BottomNav tab={tab} onChange={setTab} />

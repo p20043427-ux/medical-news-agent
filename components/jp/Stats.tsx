@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { VOCAB } from "@/lib/jp/vocab";
 import {
   type Progress,
@@ -9,6 +10,8 @@ import {
   daysUntilGoal,
   todayKey,
 } from "@/lib/jp/progress";
+import { useTheme, type Theme } from "@/lib/jp/theme";
+import { getRate, setRate as saveRate, speakJa } from "@/lib/jp/speech";
 
 const WD = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -16,11 +19,46 @@ export default function Stats({
   progress,
   onSetGoal,
   onReset,
+  onExport,
+  onImport,
 }: {
   progress: Progress;
   onSetGoal: (date: string | undefined) => void;
   onReset: () => void;
+  onExport: () => string;
+  onImport: (json: string) => boolean;
 }) {
+  const { theme, change } = useTheme();
+  const [rate, setRateState] = useState(getRate());
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  function changeRate(v: number) {
+    setRateState(v);
+    saveRate(v);
+  }
+
+  function exportFile() {
+    const blob = new Blob([onExport()], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `일본어-진도-${todayKey()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const ok = onImport(String(reader.result));
+      alert(ok ? "진도를 가져왔어요!" : "파일을 읽을 수 없어요.");
+    };
+    reader.readAsText(f);
+    e.target.value = "";
+  }
+
   const total = VOCAB.length;
   const known = knownCount(progress);
   const reviews = Object.values(progress.daily).reduce((a, b) => a + b, 0);
@@ -109,6 +147,78 @@ export default function Stats({
               해제
             </button>
           )}
+        </div>
+      </div>
+
+      {/* 설정 */}
+      <div className="mb-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+        <p className="mb-4 font-bold text-slate-900">설정</p>
+
+        {/* 테마 */}
+        <div className="mb-4">
+          <p className="mb-2 text-sm text-slate-500">화면 테마</p>
+          <div className="grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1">
+            {([
+              ["light", "라이트"],
+              ["dark", "다크"],
+              ["system", "시스템"],
+            ] as [Theme, string][]).map(([t, label]) => (
+              <button
+                key={t}
+                onClick={() => change(t)}
+                className={`rounded-lg py-2 text-sm font-semibold transition ${
+                  theme === t ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 음성 속도 */}
+        <div className="mb-2">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-sm text-slate-500">음성 속도</p>
+            <button
+              onClick={() => speakJa("こんにちは。はじめまして。", rate)}
+              className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"
+            >
+              ▶ 미리듣기 ({rate.toFixed(1)}x)
+            </button>
+          </div>
+          <input
+            type="range"
+            min={0.5}
+            max={1.2}
+            step={0.1}
+            value={rate}
+            onChange={(e) => changeRate(Number(e.target.value))}
+            className="w-full accent-slate-900"
+          />
+        </div>
+      </div>
+
+      {/* 진도 백업 */}
+      <div className="mb-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+        <p className="mb-1 font-bold text-slate-900">진도 백업</p>
+        <p className="mb-3 text-xs text-slate-400">
+          기기를 바꾸기 전에 내보내고, 새 기기에서 가져오세요.
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={exportFile}
+            className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700"
+          >
+            ⬇ 내보내기
+          </button>
+          <button
+            onClick={() => fileRef.current?.click()}
+            className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700"
+          >
+            ⬆ 가져오기
+          </button>
+          <input ref={fileRef} type="file" accept="application/json,.json" onChange={importFile} className="hidden" />
         </div>
       </div>
 

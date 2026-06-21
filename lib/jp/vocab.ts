@@ -1,5 +1,6 @@
 import type { Word, Category } from "./types";
 import { EXTRAS } from "./extras";
+import { EXTRA_VOCAB } from "./vocab-extra";
 
 export const VOCAB_CATEGORIES: Category[] = [
   { key: "greeting", label: "인사·표현", emoji: "👋" },
@@ -10,6 +11,10 @@ export const VOCAB_CATEGORIES: Category[] = [
   { key: "place", label: "장소·교통", emoji: "🚉" },
   { key: "adjective", label: "형용사", emoji: "✨" },
   { key: "daily", label: "생활·사물", emoji: "🏠" },
+  { key: "nature", label: "자연·날씨", emoji: "🌿" },
+  { key: "body", label: "신체·건강", emoji: "🩺" },
+  { key: "hobby", label: "취미·활동", emoji: "🎵" },
+  { key: "color", label: "색·모양", emoji: "🎨" },
   { key: "adverb", label: "부사·기타", emoji: "💬" },
 ];
 
@@ -423,7 +428,7 @@ function highlightExample(w: Word): Word {
   return { ...w, example: { ...w.example, tokens } };
 }
 
-// 본 데이터에 유사어·팁(extras)과 레벨 기본값(N5), 예문 강조를 병합한다.
-export const VOCAB: Word[] = RAW_VOCAB.map((w) =>
+// 본 데이터 + 확장 데이터에 유사어·팁(extras)·레벨 기본값(N5)·예문 강조를 병합한다.
+export const VOCAB: Word[] = [...RAW_VOCAB, ...EXTRA_VOCAB].map((w) =>
   highlightExample({ level: "N5", ...w, ...EXTRAS[w.id] }),
 );

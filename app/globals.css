@@ -9,3 +9,91 @@
 body {
   background: #f5f6f8;
 }
+
+/* ───── 다크 모드 ─────
+   컴포넌트는 라이트용 Tailwind 클래스를 쓰고, .dark 스코프에서 팔레트를 덮어쓴다. */
+html.dark {
+  color-scheme: dark;
+}
+html.dark body {
+  background: #0b1120;
+  color: #e2e8f0;
+}
+
+.dark .bg-\[\#f5f6f8\] {
+  background-color: #0b1120;
+}
+.dark .bg-white {
+  background-color: #1e293b;
+}
+.dark .bg-white\/90 {
+  background-color: rgb(30 41 59 / 0.92);
+}
+.dark .bg-white\/85,
+.dark .bg-white\/80 {
+  background-color: rgb(30 41 59 / 0.85);
+}
+.dark .bg-slate-50,
+.dark .bg-slate-50\/60 {
+  background-color: #111a2e;
+}
+.dark .bg-slate-100 {
+  background-color: #334155;
+}
+.dark .bg-slate-200\/70 {
+  background-color: #334155;
+}
+.dark .bg-slate-900 {
+  background-color: #475569;
+}
+
+/* 텍스트 */
+.dark .text-slate-900 {
+  color: #f1f5f9;
+}
+.dark .text-slate-800 {
+  color: #e2e8f0;
+}
+.dark .text-slate-700,
+.dark .text-slate-600 {
+  color: #cbd5e1;
+}
+.dark .text-slate-500,
+.dark .text-slate-400 {
+  color: #94a3b8;
+}
+.dark .text-slate-300 {
+  color: #64748b;
+}
+
+/* 테두리 / 링 */
+.dark .border-slate-300 {
+  border-color: #475569;
+}
+.dark .border-slate-200 {
+  border-color: #334155;
+}
+.dark .border-slate-100,
+.dark .divide-slate-100 > * + * {
+  border-color: #273449;
+}
+.dark .ring-black\/5 {
+  --tw-ring-color: rgb(255 255 255 / 0.08);
+}
+
+/* 하단 액션 페이드 그라데이션 (스키밍/복습/퀴즈) */
+.dark .from-\[\#f5f6f8\] {
+  --tw-gradient-from: #0b1120 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(11 17 32 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.dark .via-\[\#f5f6f8\] {
+  --tw-gradient-to: rgb(11 17 32 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), #0b1120 var(--tw-gradient-via-position),
+    var(--tw-gradient-to);
+}
+
+/* 카드 아트 위 글래스 배지는 밝게 유지 */
+.dark .bg-white\/80.text-xl {
+  background-color: rgb(30 41 59 / 0.7);
+}

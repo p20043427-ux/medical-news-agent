@@ -22,6 +22,10 @@ const SCENES: Record<string, Scene> = {
   place: { sky: ["#2dd4bf", "#5eead4", "#99f6e4"], glow: "#f0fdfa", hill: "#0f766e", particle: "#f0fdfa", motif: "city", outfit: ["#0d9488", "#2dd4bf"] },
   adjective: { sky: ["#e879f9", "#f0abfc", "#f5d0fe"], glow: "#fdf4ff", hill: "#a21caf", particle: "#fdf4ff", motif: "sparkle", outfit: ["#c026d3", "#e879f9"] },
   daily: { sky: ["#60a5fa", "#93c5fd", "#bfdbfe"], glow: "#eff6ff", hill: "#1d4ed8", particle: "#eff6ff", motif: "lantern", outfit: ["#2563eb", "#60a5fa"] },
+  nature: { sky: ["#4ade80", "#86efac", "#bbf7d0"], glow: "#f0fdf4", hill: "#15803d", particle: "#f0fdf4", motif: "cloud", outfit: ["#16a34a", "#4ade80"] },
+  body: { sky: ["#fb923c", "#fdba74", "#fed7aa"], glow: "#fff7ed", hill: "#c2410c", particle: "#fff7ed", motif: "sun", outfit: ["#ea580c", "#fb923c"] },
+  hobby: { sky: ["#818cf8", "#a5b4fc", "#c7d2fe"], glow: "#eef2ff", hill: "#4338ca", particle: "#eef2ff", motif: "sparkle", outfit: ["#4f46e5", "#818cf8"] },
+  color: { sky: ["#f472b6", "#f9a8d4", "#fbcfe8"], glow: "#fdf2f8", hill: "#be185d", particle: "#fdf2f8", motif: "bubble", outfit: ["#db2777", "#f472b6"] },
   adverb: { sky: ["#fb7185", "#c4b5fd", "#a5b4fc"], glow: "#fef2f2", hill: "#4338ca", particle: "#fff", motif: "lantern", outfit: ["#e11d48", "#fb7185"] },
 };
 
