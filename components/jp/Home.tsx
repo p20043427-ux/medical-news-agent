@@ -5,6 +5,7 @@ import { VERBS } from "@/lib/jp/verbs";
 import { CONVERSATIONS } from "@/lib/jp/conversations";
 import type { Progress } from "@/lib/jp/progress";
 import { todayKey } from "@/lib/jp/progress";
+import CardArt from "./CardArt";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -118,25 +119,9 @@ export default function Home({
 
       {/* 오늘의 학습 카드 (바로 시작) */}
       <div className="mb-6 overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5">
-        {/* 이미지 콜라주 */}
-        <div className="flex h-24 gap-0.5 p-1">
-          {recWords.slice(0, 6).map((w, i) => (
-            <div
-              key={w.id}
-              className={`flex flex-1 items-center justify-center rounded-lg bg-gradient-to-br text-2xl ${
-                [
-                  "from-rose-300 to-orange-200",
-                  "from-violet-300 to-indigo-200",
-                  "from-sky-300 to-cyan-200",
-                  "from-emerald-300 to-lime-200",
-                  "from-amber-300 to-yellow-200",
-                  "from-fuchsia-300 to-pink-200",
-                ][i % 6]
-              }`}
-            >
-              {i === 0 ? recommend.emoji : ""}
-            </div>
-          ))}
+        {/* 일러스트 배너 */}
+        <div className="h-28">
+          <CardArt category={recommend.key} emoji={recommend.emoji} />
         </div>
         <div className="p-5">
           <div className="flex items-center justify-between">

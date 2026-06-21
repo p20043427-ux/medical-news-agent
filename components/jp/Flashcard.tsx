@@ -5,19 +5,7 @@ import type { Word } from "@/lib/jp/types";
 import { posTag } from "@/lib/jp/extras";
 import Furigana, { tokensToText } from "./Furigana";
 import SpeakerButton from "./SpeakerButton";
-
-// 카테고리별 카드 헤더 그라데이션 (이미지 영역 대체)
-const GRADIENTS: Record<string, string> = {
-  greeting: "from-rose-400 via-orange-300 to-amber-200",
-  people: "from-violet-400 via-purple-300 to-indigo-200",
-  number: "from-sky-400 via-cyan-300 to-blue-200",
-  time: "from-amber-400 via-yellow-300 to-orange-200",
-  food: "from-emerald-400 via-green-300 to-lime-200",
-  place: "from-teal-400 via-emerald-300 to-cyan-200",
-  adjective: "from-fuchsia-400 via-pink-300 to-rose-200",
-  daily: "from-blue-400 via-indigo-300 to-sky-200",
-  adverb: "from-slate-400 via-slate-300 to-gray-200",
-};
+import CardArt from "./CardArt";
 
 export default function Flashcard({
   word,
@@ -103,13 +91,9 @@ export default function Flashcard({
       ) : (
         /* ───── 앞면 ───── */
         <>
-          {/* 이미지 헤더 */}
-          <div
-            className={`relative flex h-44 items-center justify-center bg-gradient-to-br ${
-              GRADIENTS[word.category] ?? "from-slate-400 to-slate-200"
-            }`}
-          >
-            <span className="text-7xl drop-shadow-md">{emoji}</span>
+          {/* 이미지 헤더 (일러스트 아트) */}
+          <div className="relative h-44">
+            <CardArt category={word.category} emoji={emoji} />
             <button
               onClick={() => setMarked((m) => !m)}
               aria-label="북마크"
