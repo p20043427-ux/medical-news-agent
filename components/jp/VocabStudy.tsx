@@ -3,21 +3,26 @@
 import { useMemo, useState } from "react";
 import type { Word, Category } from "@/lib/jp/types";
 import Flashcard from "./Flashcard";
+import SwipeCard from "./SwipeCard";
 
 export default function VocabStudy({
   category,
   words,
   showFurigana,
   onToggleFurigana,
-  onMark,
+  onSkim,
   onExit,
+  onReview,
+  onQuiz,
 }: {
   category: Category;
   words: Word[];
   showFurigana: boolean;
   onToggleFurigana: () => void;
-  onMark: (id: string, known: boolean) => void;
+  onSkim: (id: string, known: boolean) => void;
   onExit: () => void;
+  onReview: () => void;
+  onQuiz: () => void;
 }) {
   const [index, setIndex] = useState(0);
   const [known, setKnown] = useState(0);
@@ -31,7 +36,7 @@ export default function VocabStudy({
 
   function next(isKnown: boolean) {
     if (!word) return;
-    onMark(word.id, isKnown);
+    onSkim(word.id, isKnown);
     if (isKnown) setKnown((k) => k + 1);
     else setUnknown((u) => u + 1);
     if (index + 1 >= total) setDone(true);
@@ -45,16 +50,28 @@ export default function VocabStudy({
 
   if (done) {
     return (
-      <div className="flex flex-col items-center justify-center gap-5 px-6 py-20 text-center">
+      <div className="flex flex-col items-center justify-center gap-5 px-6 py-16 text-center">
         <div className="text-6xl">🎉</div>
         <h2 className="text-2xl font-bold text-slate-900">스키밍 완료!</h2>
         <p className="text-slate-500">
           {category.label} · 총 {total}개 중{" "}
           <strong className="text-emerald-600">{known}개</strong> 알고 있어요.
           <br />
-          <strong className="text-slate-700">{unknown}개</strong>는 더 학습해요.
+          모르는 <strong className="text-slate-700">{unknown}개</strong>를 복습·퀴즈로 익혀요.
         </p>
-        <div className="flex gap-3">
+        <div className="mt-2 grid w-full max-w-xs gap-2.5">
+          <button
+            onClick={onReview}
+            className="rounded-2xl bg-slate-900 py-3.5 font-bold text-white shadow-sm"
+          >
+            🔁 복습 카드 시작
+          </button>
+          <button
+            onClick={onQuiz}
+            className="rounded-2xl border border-slate-300 bg-white py-3.5 font-bold text-slate-700"
+          >
+            📝 퀴즈로 점검
+          </button>
           <button
             onClick={() => {
               setIndex(0);
@@ -62,17 +79,14 @@ export default function VocabStudy({
               setUnknown(0);
               setDone(false);
             }}
-            className="rounded-full border border-slate-300 bg-white px-6 py-3 font-semibold text-slate-700"
+            className="rounded-2xl py-2 text-sm font-semibold text-slate-400"
           >
-            다시 하기
-          </button>
-          <button
-            onClick={onExit}
-            className="rounded-full bg-slate-900 px-6 py-3 font-semibold text-white"
-          >
-            홈으로
+            다시 스키밍
           </button>
         </div>
+        <button onClick={onExit} className="text-sm font-semibold text-slate-400">
+          홈으로
+        </button>
       </div>
     );
   }
@@ -110,15 +124,12 @@ export default function VocabStudy({
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
         </button>
 
-        {/* 설정 드롭다운 */}
         {menuOpen && (
           <>
             <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
             <div className="absolute right-4 top-12 z-30 w-44 overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/5">
               <button
-                onClick={() => {
-                  onToggleFurigana();
-                }}
+                onClick={onToggleFurigana}
                 className="flex w-full items-center justify-between px-4 py-3 text-sm text-slate-700 hover:bg-slate-50"
               >
                 후리가나
@@ -139,23 +150,25 @@ export default function VocabStudy({
       {/* 진행 바 */}
       <div className="px-5 pb-2">
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200/70">
-          <div
-            className="h-full rounded-full bg-slate-900 transition-all"
-            style={{ width: `${progressPct}%` }}
-          />
+          <div className="h-full rounded-full bg-slate-900 transition-all" style={{ width: `${progressPct}%` }} />
         </div>
       </div>
 
-      {/* 카드 */}
+      {/* 카드 (스와이프) */}
       <div className="flex-1 px-4">
         {word && (
-          <Flashcard
-            word={word}
-            showFurigana={showFurigana}
-            emoji={category.emoji}
-            hideMeaningDefault={hideMeaning}
-          />
+          <SwipeCard swipeKey={word.id} onSwipe={(k) => next(k)}>
+            <Flashcard
+              word={word}
+              showFurigana={showFurigana}
+              emoji={category.emoji}
+              hideMeaningDefault={hideMeaning}
+            />
+          </SwipeCard>
         )}
+        <p className="mt-3 text-center text-xs text-slate-400">
+          ← 알고 있어요 · 학습할게요 → · 카드를 좌우로 밀어보세요
+        </p>
       </div>
 
       {/* 하단 액션 */}
@@ -179,12 +192,8 @@ export default function VocabStudy({
 
 function Toggle({ on }: { on: boolean }) {
   return (
-    <span
-      className={`relative h-5 w-9 rounded-full transition ${on ? "bg-emerald-500" : "bg-slate-300"}`}
-    >
-      <span
-        className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${on ? "left-4" : "left-0.5"}`}
-      />
+    <span className={`relative h-5 w-9 rounded-full transition ${on ? "bg-emerald-500" : "bg-slate-300"}`}>
+      <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${on ? "left-4" : "left-0.5"}`} />
     </span>
   );
 }

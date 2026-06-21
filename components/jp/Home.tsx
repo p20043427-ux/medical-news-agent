@@ -3,8 +3,14 @@
 import { VOCAB, VOCAB_CATEGORIES } from "@/lib/jp/vocab";
 import { VERBS } from "@/lib/jp/verbs";
 import { CONVERSATIONS } from "@/lib/jp/conversations";
-import type { Progress } from "@/lib/jp/progress";
-import { todayKey } from "@/lib/jp/progress";
+import {
+  type Progress,
+  todayKey,
+  isKnown,
+  knownCount,
+  streak,
+  daysUntilGoal,
+} from "@/lib/jp/progress";
 import CardArt from "./CardArt";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
@@ -35,9 +41,11 @@ export default function Home({
   onGo: (tab: "conversation" | "verbs") => void;
 }) {
   const totalWords = VOCAB.length;
-  const knownCount = progress.knownWords.length;
-  const pct = totalWords ? Math.round((knownCount / totalWords) * 100) : 0;
+  const known = knownCount(progress);
+  const pct = totalWords ? Math.round((known / totalWords) * 100) : 0;
   const todayCount = progress.daily[todayKey()] ?? 0;
+  const str = streak(progress);
+  const dday = daysUntilGoal(progress);
 
   // Day N (학습 시작일로부터 경과일)
   const start = new Date(progress.startedAt);
@@ -58,10 +66,10 @@ export default function Home({
   const recommend =
     VOCAB_CATEGORIES.find((cat) => {
       const ws = VOCAB.filter((w) => w.category === cat.key);
-      return ws.some((w) => !progress.knownWords.includes(w.id));
+      return ws.some((w) => !isKnown(progress, w.id));
     }) ?? VOCAB_CATEGORIES[0];
   const recWords = VOCAB.filter((w) => w.category === recommend.key);
-  const recKnown = recWords.filter((w) => progress.knownWords.includes(w.id)).length;
+  const recKnown = recWords.filter((w) => isKnown(progress, w.id)).length;
 
   return (
     <div className="px-4 pb-24 pt-3">
@@ -72,10 +80,16 @@ export default function Home({
           <span className="text-slate-300">🌸</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            {pct}%
-          </span>
+          {str > 0 && (
+            <span className="rounded-full bg-orange-50 px-3 py-1.5 text-xs font-bold text-orange-500 shadow-sm">
+              🔥 {str}
+            </span>
+          )}
+          {dday !== null && (
+            <span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm">
+              {dday > 0 ? `D-${dday}` : dday === 0 ? "D-DAY" : `D+${-dday}`}
+            </span>
+          )}
           <span className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white">
             오늘 {todayCount}장
           </span>
@@ -154,7 +168,7 @@ export default function Home({
       <div className="mb-7 grid grid-cols-2 gap-3">
         {VOCAB_CATEGORIES.map((cat) => {
           const words = VOCAB.filter((w) => w.category === cat.key);
-          const known = words.filter((w) => progress.knownWords.includes(w.id)).length;
+          const known = words.filter((w) => isKnown(progress, w.id)).length;
           return (
             <button
               key={cat.key}
