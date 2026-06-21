@@ -1,4 +1,5 @@
 import type { Word, Category } from "./types";
+import { EXTRAS } from "./extras";
 
 export const VOCAB_CATEGORIES: Category[] = [
   { key: "greeting", label: "인사·표현", emoji: "👋" },
@@ -12,7 +13,7 @@ export const VOCAB_CATEGORIES: Category[] = [
   { key: "adverb", label: "부사·기타", emoji: "💬" },
 ];
 
-export const VOCAB: Word[] = [
+const RAW_VOCAB: Word[] = [
   // ── 인사·표현 ────────────────────────────────
   {
     id: "g1", word: "おはようございます", reading: "おはようございます", romaji: "ohayou gozaimasu",
@@ -411,3 +412,18 @@ export const VOCAB: Word[] = [
     example: { tokens: [{ t: "もちろん、いいですよ。" }], ko: "물론, 좋아요." },
   },
 ];
+
+/** 예문 토큰 중 표제어와 일치하는 부분을 자동으로 강조(hl) 처리한다. */
+function highlightExample(w: Word): Word {
+  const tokens = w.example.tokens.map((tok) =>
+    !tok.hl && (tok.t.includes(w.word) || (tok.r && tok.r === w.reading))
+      ? { ...tok, hl: true }
+      : tok,
+  );
+  return { ...w, example: { ...w.example, tokens } };
+}
+
+// 본 데이터에 유사어·팁(extras)과 레벨 기본값(N5), 예문 강조를 병합한다.
+export const VOCAB: Word[] = RAW_VOCAB.map((w) =>
+  highlightExample({ level: "N5", ...w, ...EXTRAS[w.id] }),
+);

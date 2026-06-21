@@ -6,6 +6,8 @@ export interface Token {
   t: string;
   /** 한자 위에 올라가는 후리가나(읽는 법). 없으면 가나/기호 그대로. */
   r?: string;
+  /** 핵심어 강조 여부 (예문 속 표제어) */
+  hl?: boolean;
 }
 
 /** 예문 한 문장 */
@@ -13,6 +15,15 @@ export interface Sentence {
   tokens: Token[];
   /** 한국어 번역 */
   ko: string;
+}
+
+/** 유사어 항목 */
+export interface Synonym {
+  word: string;
+  reading: string;
+  meaning: string;
+  /** 품사 약어 (n / adj / v / adv ...) */
+  pos: string;
 }
 
 /** 단어 카드 */
@@ -32,6 +43,12 @@ export interface Word {
   category: string;
   /** 예문 */
   example: Sentence;
+  /** JLPT 레벨 (예: N5). 미지정 시 N5 로 간주. */
+  level?: string;
+  /** 유사어 목록 */
+  synonyms?: Synonym[];
+  /** 학습 팁 (한국어) */
+  tip?: string;
 }
 
 /** 동사 카드 */

@@ -12,16 +12,19 @@ export default function Furigana({
 }) {
   return (
     <span className={className}>
-      {tokens.map((tok, i) =>
-        tok.r && showFurigana ? (
-          <ruby key={i}>
+      {tokens.map((tok, i) => {
+        const hl = tok.hl ? "font-bold text-slate-900" : "";
+        return tok.r && showFurigana ? (
+          <ruby key={i} className={hl}>
             {tok.t}
             <rt className="text-[0.6em] font-normal text-slate-400">{tok.r}</rt>
           </ruby>
         ) : (
-          <span key={i}>{tok.t}</span>
-        ),
-      )}
+          <span key={i} className={hl}>
+            {tok.t}
+          </span>
+        );
+      })}
     </span>
   );
 }

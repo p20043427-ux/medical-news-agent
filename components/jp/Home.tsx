@@ -6,17 +6,19 @@ import { CONVERSATIONS } from "@/lib/jp/conversations";
 import type { Progress } from "@/lib/jp/progress";
 import { todayKey } from "@/lib/jp/progress";
 
+const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+
 function ProgressRing({ pct }: { pct: number }) {
-  const r = 30;
+  const r = 26;
   const c = 2 * Math.PI * r;
   const off = c - (pct / 100) * c;
   return (
-    <svg viewBox="0 0 72 72" className="h-20 w-20 -rotate-90">
-      <circle cx="36" cy="36" r={r} fill="none" stroke="#e2e8f0" strokeWidth="7" />
+    <svg viewBox="0 0 64 64" className="h-16 w-16 -rotate-90">
+      <circle cx="32" cy="32" r={r} fill="none" stroke="#e2e8f0" strokeWidth="6" />
       <circle
-        cx="36" cy="36" r={r} fill="none" stroke="#0f172a" strokeWidth="7"
+        cx="32" cy="32" r={r} fill="none" stroke="#0f172a" strokeWidth="6"
         strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off}
-        className="transition-all duration-500"
+        className="transition-all duration-700"
       />
     </svg>
   );
@@ -35,63 +37,129 @@ export default function Home({
   const knownCount = progress.knownWords.length;
   const pct = totalWords ? Math.round((knownCount / totalWords) * 100) : 0;
   const todayCount = progress.daily[todayKey()] ?? 0;
-  const learnedDays = Object.keys(progress.daily).length;
-  const dateLabel = new Date().toLocaleDateString("ko-KR", {
-    month: "long",
-    day: "numeric",
-    weekday: "short",
+
+  // Day N (학습 시작일로부터 경과일)
+  const start = new Date(progress.startedAt);
+  const now = new Date();
+  const dayN =
+    Math.floor((now.getTime() - start.getTime()) / 86400000) + 1;
+
+  // 이번 주 캘린더 (일~토)
+  const week = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(now);
+    d.setDate(now.getDate() - now.getDay() + i);
+    return d;
   });
+  const isStudied = (d: Date) =>
+    (progress.daily[d.toISOString().slice(0, 10)] ?? 0) > 0;
+
+  // 추천 카테고리: 미완료 중 첫 번째
+  const recommend =
+    VOCAB_CATEGORIES.find((cat) => {
+      const ws = VOCAB.filter((w) => w.category === cat.key);
+      return ws.some((w) => !progress.knownWords.includes(w.id));
+    }) ?? VOCAB_CATEGORIES[0];
+  const recWords = VOCAB.filter((w) => w.category === recommend.key);
+  const recKnown = recWords.filter((w) => progress.knownWords.includes(w.id)).length;
 
   return (
     <div className="px-4 pb-24 pt-3">
       {/* 헤더 */}
-      <div className="mb-5 flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="rounded-full bg-slate-900 px-2.5 py-1 text-xs font-bold text-white">
-              JLPT N5
-            </span>
-            <span className="text-xs text-slate-400">{dateLabel}</span>
-          </div>
-          <h1 className="mt-2 text-2xl font-extrabold text-slate-900">
-            오늘도 일본어 한 걸음 🌸
-          </h1>
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          <span className="text-xl font-extrabold text-slate-900">JLPT N5</span>
+          <span className="text-slate-300">🌸</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            {pct}%
+          </span>
+          <span className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white">
+            오늘 {todayCount}장
+          </span>
         </div>
       </div>
 
-      {/* 진도 카드 */}
-      <div className="mb-5 flex items-center gap-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
-        <div className="relative grid place-items-center">
-          <ProgressRing pct={pct} />
-          <span className="absolute text-sm font-bold text-slate-900">{pct}%</span>
+      {/* 주간 캘린더 */}
+      <div className="mb-3 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-black/5">
+        <div className="grid grid-cols-7 text-center text-xs text-slate-400">
+          {WEEKDAYS.map((w) => (
+            <span key={w}>{w}</span>
+          ))}
         </div>
-        <div className="flex-1">
-          <p className="text-sm text-slate-400">학습한 단어</p>
-          <p className="text-2xl font-extrabold text-slate-900">
-            {knownCount}
-            <span className="text-base font-medium text-slate-400"> / {totalWords}</span>
-          </p>
-          <div className="mt-1 flex gap-4 text-xs text-slate-400">
-            <span>오늘 {todayCount}장</span>
-            <span>학습일 {learnedDays}일</span>
-          </div>
+        <div className="mt-2 grid grid-cols-7 text-center">
+          {week.map((d, i) => {
+            const today = d.toDateString() === now.toDateString();
+            const studied = isStudied(d);
+            return (
+              <div key={i} className="flex flex-col items-center gap-1">
+                <span
+                  className={`grid h-9 w-9 place-items-center rounded-full text-sm font-semibold ${
+                    today
+                      ? "bg-slate-900 text-white"
+                      : studied
+                        ? "text-slate-900"
+                        : "text-slate-400"
+                  }`}
+                >
+                  {d.getDate()}
+                </span>
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${studied ? "bg-emerald-500" : "bg-transparent"}`}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* 오늘의 학습 */}
-      <button
-        onClick={() => onStudyCategory("greeting")}
-        className="mb-6 flex w-full items-center justify-between rounded-3xl bg-gradient-to-br from-slate-900 to-slate-700 p-5 text-left text-white shadow-lg transition active:scale-[0.98]"
-      >
-        <div>
-          <p className="text-xs font-medium text-white/60">오늘의 추천 학습</p>
-          <p className="mt-1 text-lg font-bold">인사·표현부터 시작하기</p>
-          <p className="mt-0.5 text-sm text-white/70">단어 카드 · 약 3분</p>
+      <p className="mb-3 px-1 text-lg font-extrabold text-slate-900">Day {dayN}</p>
+
+      {/* 오늘의 학습 카드 (바로 시작) */}
+      <div className="mb-6 overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5">
+        {/* 이미지 콜라주 */}
+        <div className="flex h-24 gap-0.5 p-1">
+          {recWords.slice(0, 6).map((w, i) => (
+            <div
+              key={w.id}
+              className={`flex flex-1 items-center justify-center rounded-lg bg-gradient-to-br text-2xl ${
+                [
+                  "from-rose-300 to-orange-200",
+                  "from-violet-300 to-indigo-200",
+                  "from-sky-300 to-cyan-200",
+                  "from-emerald-300 to-lime-200",
+                  "from-amber-300 to-yellow-200",
+                  "from-fuchsia-300 to-pink-200",
+                ][i % 6]
+              }`}
+            >
+              {i === 0 ? recommend.emoji : ""}
+            </div>
+          ))}
         </div>
-        <span className="grid h-12 w-12 place-items-center rounded-full bg-white/15 text-xl">
-          ▶
-        </span>
-      </button>
+        <div className="p-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ProgressRing pct={recWords.length ? Math.round((recKnown / recWords.length) * 100) : 0} />
+              <div>
+                <p className="text-lg font-bold text-slate-900">
+                  {recommend.emoji} {recommend.label}
+                </p>
+                <p className="text-sm text-slate-400">
+                  {recKnown === 0 ? "시작 전" : `${recKnown}/${recWords.length} 학습`} · 약 3분
+                </p>
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => onStudyCategory(recommend.key)}
+            className="mt-4 w-full rounded-2xl bg-slate-900 py-3.5 font-bold text-white shadow-sm transition active:scale-[0.98]"
+          >
+            바로 시작
+          </button>
+        </div>
+      </div>
 
       {/* 단어 카테고리 */}
       <div className="mb-3 flex items-center justify-between">
@@ -101,9 +169,7 @@ export default function Home({
       <div className="mb-7 grid grid-cols-2 gap-3">
         {VOCAB_CATEGORIES.map((cat) => {
           const words = VOCAB.filter((w) => w.category === cat.key);
-          const known = words.filter((w) =>
-            progress.knownWords.includes(w.id),
-          ).length;
+          const known = words.filter((w) => progress.knownWords.includes(w.id)).length;
           return (
             <button
               key={cat.key}
