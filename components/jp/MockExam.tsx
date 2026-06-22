@@ -17,6 +17,8 @@ const ROUNDS: Round[] = [
   { id: "random", label: "랜덤 모의", seed: undefined },
 ];
 
+const LIMIT_SEC = 15 * 60; // 제한 시간 15분
+
 function fmt(sec: number) {
   const m = Math.floor(sec / 60), s = sec % 60;
   return `${m}:${s.toString().padStart(2, "0")}`;
@@ -60,6 +62,12 @@ export default function MockExam({
       return () => { if (timer.current) window.clearInterval(timer.current); };
     }
   }, [phase]);
+
+  // 제한 시간 초과 시 자동 제출
+  useEffect(() => {
+    if (phase === "run" && elapsed >= LIMIT_SEC) finish();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [elapsed, phase]);
 
   const q = questions[idx];
   useEffect(() => {
@@ -170,8 +178,30 @@ export default function MockExam({
           ))}
         </div>
         {wrong.length > 0 && (
-          <p className="mt-4 text-center text-xs" style={{ color: "var(--text-3)" }}>틀린 {wrong.length}문항의 단어를 오답노트에 담았어요.</p>
+          <p className="mt-4 text-center text-xs" style={{ color: "var(--text-3)" }}>틀린 단어는 오답노트에 담았어요.</p>
         )}
+
+        {/* 오답 해설 */}
+        {wrong.length > 0 && (
+          <div className="mt-5">
+            <p className="mb-2 px-1 text-sm font-extrabold" style={{ color: "var(--text-1)" }}>오답 해설 ({wrong.length})</p>
+            <div className="space-y-2">
+              {wrong.map((qq) => (
+                <div key={qq.key} className="rounded-2xl p-3.5" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+                  <p className="text-[11px]" style={{ color: "var(--text-3)" }}>{qq.section} · {qq.question}</p>
+                  {qq.passage && <p className="mt-1 text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>{qq.passage}</p>}
+                  {qq.prompt && qq.prompt !== "🔊" && <p className="mt-1 text-base font-bold" style={{ color: "var(--text-1)" }}>{qq.prompt}</p>}
+                  {qq.audio && <p className="mt-1 text-sm" style={{ color: "var(--text-2)" }}>🔊 {qq.audio}</p>}
+                  <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-0.5 text-sm font-semibold">
+                    <span style={{ color: "#10B981" }}>정답: {qq.answer}</span>
+                    <span style={{ color: "#E63946" }}>내 답: {answers[qq.key] ?? "미응답"}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="mt-5 grid gap-2.5">
           <Button variant="brand" size="free" onClick={retry} className="py-3.5">다시 풀기</Button>
           <Button variant="surface" size="free" onClick={toSelect} className="py-3.5">다른 회차</Button>
@@ -188,7 +218,15 @@ export default function MockExam({
       <div className="mb-3 flex items-center justify-between">
         <span className="rounded-full px-2.5 py-1 text-xs font-bold text-white" style={{ background: "#E63946" }}>{q.section}</span>
         <span className="text-sm font-bold" style={{ color: "var(--text-2)" }}>{idx + 1} / {questions.length}</span>
-        <span className="rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "var(--surface)", color: "var(--text-2)" }}>⏱ {fmt(elapsed)}</span>
+        {(() => {
+          const rem = Math.max(0, LIMIT_SEC - elapsed);
+          const low = rem <= 60;
+          return (
+            <span className="rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: low ? "#E63946" : "var(--surface)", color: low ? "#fff" : "var(--text-2)" }}>
+              ⏱ {fmt(rem)}
+            </span>
+          );
+        })()}
       </div>
       <div className="mb-5 h-1.5 overflow-hidden rounded-full" style={{ background: "var(--surface)" }}>
         <div className="h-full rounded-full transition-all" style={{ width: `${(idx / questions.length) * 100}%`, background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
