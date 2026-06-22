@@ -4,11 +4,12 @@ import { EN_VOCAB } from "@/lib/en/vocab";
 import { GRAMMAR_POINTS } from "@/lib/en/grammar";
 import { PHRASAL_VERBS } from "@/lib/en/phrasal-verbs";
 
-export type EnLearnView = "vocab" | "grammar";
+export type EnLearnView = "vocab" | "grammar" | "exam";
 
 const CARDS: { key: EnLearnView; glyph: string; title: string; desc: string; grad: string; shadow: string }[] = [
   { key: "vocab", glyph: "A", title: "단어 학습", desc: `${EN_VOCAB.length}개 어휘 · 스키밍·복습`, grad: "linear-gradient(135deg,#4361EE,#7209B7)", shadow: "rgba(67,97,238,.35)" },
   { key: "grammar", glyph: "G", title: "문법 · 구동사", desc: `문법 ${GRAMMAR_POINTS.length} · 구동사 ${PHRASAL_VERBS.length}`, grad: "linear-gradient(135deg,#7209B7,#a29bfe)", shadow: "rgba(114,9,183,.35)" },
+  { key: "exam", glyph: "T", title: "모의시험 (CEFR)", desc: "20문항 · 어휘/구동사/독해/청해 · 회차", grad: "linear-gradient(135deg,#4361EE,#3A0CA3)", shadow: "rgba(58,12,163,.35)" },
 ];
 
 export default function EnLearnHub({ onOpen }: { onOpen: (v: EnLearnView) => void }) {

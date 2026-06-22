@@ -8,6 +8,7 @@ import EnVocabStudy from "./VocabStudy";
 import EnReviewMode from "./ReviewMode";
 import EnQuizMode from "./QuizMode";
 import EnGrammarView from "./GrammarView";
+import EnMockExam from "./MockExam";
 import EnStats from "./Stats";
 import EnBottomNav, { type EnTab } from "./BottomNav";
 import EnLearnHub, { type EnLearnView } from "./LearnHub";
@@ -154,7 +155,9 @@ export default function EnglishApp({ onBack }: { onBack?: () => void }) {
         <EnHome progress={progress} onStudyCategory={startStudy} onGrammar={() => { setTab("learn"); setLearnSub("grammar"); }} />
       )}
       {tab === "learn" && (
-        learnSub ? (
+        learnSub === "exam" ? (
+          <EnMockExam onExit={() => setLearnSub(null)} />
+        ) : learnSub ? (
           <div>
             <div className="px-4 pt-3">
               <button
