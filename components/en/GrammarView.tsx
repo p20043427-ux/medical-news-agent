@@ -14,6 +14,31 @@ const CEFR_COLORS: Record<string, string> = {
 
 const BASE_VERBS = ["break", "come", "get", "give", "go", "look", "make", "put", "run", "take", "turn", "work", "figure", "carry", "set", "point"];
 
+function SpeakBtn({ text }: { text: string }) {
+  return (
+    <button
+      onClick={(e) => { e.stopPropagation(); speakEn(text); }}
+      aria-label="발음 듣기"
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition active:scale-90"
+      style={{ background: "var(--surface)", color: "#4361EE" }}
+    >
+      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M11 5 6 9H2v6h4l5 4V5z" /><path d="M15.5 8.5a5 5 0 0 1 0 7" />
+      </svg>
+    </button>
+  );
+}
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 transition-transform"
+      style={{ color: "var(--text-3)", transform: open ? "rotate(180deg)" : "none" }}
+      fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
 function GrammarCard({ gp }: { gp: GrammarPoint }) {
   const [open, setOpen] = useState(false);
   return (
@@ -30,7 +55,7 @@ function GrammarCard({ gp }: { gp: GrammarPoint }) {
             <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>{gp.brief}</p>
           </div>
         </div>
-        <span style={{ color: "var(--text-3)" }}>{open ? "▲" : "▼"}</span>
+        <Chevron open={open} />
       </button>
 
       {open && (
@@ -50,7 +75,7 @@ function GrammarCard({ gp }: { gp: GrammarPoint }) {
                     <p className="text-xs mt-1" style={{ color: "var(--text-3)" }}>{ex.ko}</p>
                     {ex.note && <p className="text-xs mt-1 italic" style={{ color: "#4361EE" }}>({ex.note})</p>}
                   </div>
-                  <button onClick={() => speakEn(ex.en)} className="shrink-0 text-sm">🔊</button>
+                  <SpeakBtn text={ex.en} />
                 </div>
               </div>
             ))}
@@ -79,7 +104,7 @@ function PhrasalVerbCard({ pv }: { pv: PhrasalVerb }) {
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <h3 className="font-extrabold text-lg" style={{ color: "#4361EE" }}>{pv.phrase}</h3>
-          <button onClick={() => speakEn(pv.phrase)} className="text-sm">🔊</button>
+          <SpeakBtn text={pv.phrase} />
         </div>
         <span className="rounded-full px-2 py-0.5 text-xs font-bold text-white"
           style={{ background: CEFR_COLORS[pv.cefrLevel] ?? "#4361EE" }}>
