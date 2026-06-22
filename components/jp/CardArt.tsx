@@ -423,8 +423,9 @@ export default function CardArt({
         <Mascot s={s} id={id} />
       </svg>
 
-      <div className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-2xl bg-white/80 text-xl shadow-md ring-1 ring-white/60 backdrop-blur-sm">
-        <span className="drop-shadow-sm">{emoji}</span>
+      <div className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-2xl text-xl backdrop-blur-md"
+        style={{ background: "rgba(255,255,255,0.88)", boxShadow: "0 4px 16px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.9)" }}>
+        <span style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,.15))" }}>{emoji}</span>
       </div>
     </div>
   );

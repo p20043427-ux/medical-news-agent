@@ -181,14 +181,18 @@ export default function VocabStudy({
       <div className="sticky bottom-16 z-10 flex gap-3 bg-gradient-to-t from-[#f5f6f8] via-[#f5f6f8] to-transparent px-4 pb-4 pt-6">
         <button
           onClick={() => next(true)}
-          className="flex-1 rounded-2xl border border-slate-300 bg-white py-4 font-bold text-slate-700 shadow-sm transition active:scale-95"
+          className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 py-4 font-bold shadow-sm transition active:scale-95"
+          style={{ borderColor: "#10B981", background: "#f0fdf4", color: "#065f46" }}
         >
+          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
           알고 있어요
         </button>
         <button
           onClick={() => next(false)}
-          className="flex-1 rounded-2xl bg-slate-900 py-4 font-bold text-white shadow-sm transition active:scale-95"
+          className="flex flex-1 items-center justify-center gap-2 rounded-2xl py-4 font-bold text-white shadow-sm transition active:scale-95"
+          style={{ background: "linear-gradient(135deg,#2d3436,#1a1a2e)" }}
         >
+          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           학습할게요
         </button>
       </div>

@@ -115,15 +115,21 @@ export default function Home({ progress, onStudyCategory, onGo }: {
         <button onClick={() => onGo("conversation")}
           className="rounded-2xl p-4 text-left shadow-sm transition active:scale-95"
           style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
-          <span className="text-2xl">💬</span>
-          <p className="mt-2 font-bold" style={{ color: "var(--text-1)" }}>생활 회화</p>
+          <div className="grid h-11 w-11 place-items-center rounded-2xl text-xl"
+            style={{ background: "linear-gradient(135deg,#a29bfe,#6c5ce7)", boxShadow: "0 4px 12px rgba(108,92,231,.3)" }}>
+            💬
+          </div>
+          <p className="mt-3 font-bold" style={{ color: "var(--text-1)" }}>생활 회화</p>
           <p className="text-xs" style={{ color: "var(--text-3)" }}>{CONVERSATIONS.length}개 상황</p>
         </button>
         <button onClick={() => onGo("verbs")}
           className="rounded-2xl p-4 text-left shadow-sm transition active:scale-95"
           style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
-          <span className="text-2xl">🔤</span>
-          <p className="mt-2 font-bold" style={{ color: "var(--text-1)" }}>필수 동사</p>
+          <div className="grid h-11 w-11 place-items-center rounded-2xl text-xl"
+            style={{ background: "linear-gradient(135deg,#fd79a8,#e84393)", boxShadow: "0 4px 12px rgba(232,67,147,.3)" }}>
+            🔤
+          </div>
+          <p className="mt-3 font-bold" style={{ color: "var(--text-1)" }}>필수 동사</p>
           <p className="text-xs" style={{ color: "var(--text-3)" }}>{VERBS.length}개 동사</p>
         </button>
       </div>

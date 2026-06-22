@@ -6,11 +6,11 @@ import type { Grade } from "@/lib/jp/progress";
 import Furigana from "./Furigana";
 import SpeakerButton from "./SpeakerButton";
 
-const GRADE_CONFIG: Record<Grade, { label: string; sub: string; bg: string; xp: string }> = {
-  again: { label: "다시",  sub: "1일",    bg: "#EF4444", xp: "+2" },
-  hard:  { label: "어려움", sub: "짧게",   bg: "#F97316", xp: "+10" },
-  good:  { label: "좋음",  sub: "며칠 뒤", bg: "#3B82F6", xp: "+15" },
-  easy:  { label: "쉬움",  sub: "길게",   bg: "#10B981", xp: "+20" },
+const GRADE_CONFIG: Record<Grade, { label: string; sub: string; grad: [string, string]; xp: string; icon: string }> = {
+  again: { label: "다시",   sub: "1일",   grad: ["#ff7675", "#d63031"], xp: "+2",  icon: "↺" },
+  hard:  { label: "어려움", sub: "짧게",  grad: ["#fdcb6e", "#e17055"], xp: "+10", icon: "△" },
+  good:  { label: "좋음",   sub: "며칠",  grad: ["#74b9ff", "#0984e3"], xp: "+15", icon: "○" },
+  easy:  { label: "쉬움",   sub: "길게",  grad: ["#55efc4", "#00b894"], xp: "+20", icon: "✦" },
 };
 
 export default function ReviewMode({
@@ -39,16 +39,19 @@ export default function ReviewMode({
   if (!word) {
     return (
       <div className="flex flex-col items-center justify-center gap-5 px-6 py-20 text-center">
-        <div className="text-6xl">✅</div>
+        <div className="grid h-20 w-20 place-items-center rounded-full" style={{ background: "linear-gradient(135deg,#55efc4,#00b894)" }}>
+          <svg viewBox="0 0 24 24" className="h-10 w-10" fill="none" stroke="white" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+        </div>
         <h2 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>복습 완료!</h2>
         <p style={{ color: "var(--text-3)" }}>
           {category.label} 카드 <strong style={{ color: "var(--text-1)" }}>{reviewed}회</strong> 복습했어요.
         </p>
         <div className="mt-2 grid w-full max-w-xs gap-2.5">
           <button onClick={onQuiz}
-            className="rounded-2xl py-3.5 font-bold text-white shadow-sm"
+            className="flex items-center justify-center gap-2 rounded-2xl py-3.5 font-bold text-white shadow-md"
             style={{ background: "linear-gradient(135deg,#E63946,#F4A261)" }}>
-            📝 퀴즈로 점검
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            퀴즈로 점검
           </button>
           <button onClick={onExit}
             className="rounded-2xl border py-3.5 font-bold"
@@ -85,8 +88,9 @@ export default function ReviewMode({
             strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
         </button>
         <div className="mx-auto flex items-center gap-2">
-          <span className="rounded-full px-3 py-1 text-xs font-bold text-white" style={{ background: "#E63946" }}>
-            🔁 SM-2 복습
+          <span className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold text-white" style={{ background: "linear-gradient(135deg,#E63946,#c0392b)" }}>
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            SM-2 복습
           </span>
           <span className="rounded-full px-2.5 py-1 text-sm font-bold"
             style={{ background: "var(--card)", color: "var(--text-3)", boxShadow: "0 1px 3px rgba(0,0,0,.1)" }}>
@@ -130,10 +134,14 @@ export default function ReviewMode({
               </div>
             </div>
           ) : (
-            <p className="mt-4 rounded-full px-4 py-2 text-sm"
+            <div className="mt-4 flex items-center gap-2 rounded-2xl px-4 py-3"
               style={{ background: "var(--surface)", color: "var(--text-3)" }}>
-              👆 탭하면 답이 보여요
-            </p>
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: "#E63946" }} />
+              </span>
+              <span className="text-sm">탭하면 답이 보여요</span>
+            </div>
           )}
         </button>
       </div>
@@ -152,23 +160,30 @@ export default function ReviewMode({
       <div className="sticky bottom-16 z-10 px-4 pb-4 pt-6"
         style={{ background: `linear-gradient(to top, var(--bg) 70%, transparent)` }}>
         {revealed ? (
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-2.5">
             {(["again", "hard", "good", "easy"] as Grade[]).map((g) => {
               const cfg = GRADE_CONFIG[g];
               return (
                 <button key={g} onClick={() => handleGrade(g)}
-                  className="rounded-2xl py-3.5 font-bold text-white shadow-sm active:scale-95 transition"
-                  style={{ background: cfg.bg }}>
-                  <span className="block text-sm">{cfg.label}</span>
-                  <span className="block text-[10px] font-medium text-white/70">{cfg.sub}</span>
+                  className="relative flex flex-col items-center rounded-2xl px-1 py-3 shadow-lg active:scale-95 transition"
+                  style={{ background: `linear-gradient(150deg,${cfg.grad[0]},${cfg.grad[1]})` }}>
+                  <span className="absolute right-1.5 top-1.5 rounded-full bg-white/30 px-1 py-px text-[8px] font-extrabold text-white">
+                    {cfg.xp}
+                  </span>
+                  <span className="mb-0.5 text-base font-black text-white/90">{cfg.icon}</span>
+                  <span className="text-sm font-bold leading-tight text-white">{cfg.label}</span>
+                  <span className="mt-0.5 text-[10px] text-white/70">{cfg.sub}</span>
                 </button>
               );
             })}
           </div>
         ) : (
           <button onClick={() => setRevealed(true)}
-            className="w-full rounded-2xl py-4 font-bold text-white shadow-sm active:scale-95"
-            style={{ background: "linear-gradient(135deg,#E63946,#F4A261)" }}>
+            className="flex w-full items-center justify-center gap-2.5 rounded-2xl py-4 font-bold text-white shadow-lg active:scale-[0.98] transition"
+            style={{ background: "linear-gradient(135deg,#E63946 0%,#F4A261 100%)" }}>
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+            </svg>
             답 확인
           </button>
         )}
