@@ -3,10 +3,20 @@
 import { useEffect, useState } from "react";
 import JapaneseApp from "@/components/jp/JapaneseApp";
 import EnglishApp from "@/components/en/EnglishApp";
+import { AuthProvider } from "@/lib/auth";
+import AccountButton from "@/components/auth/AccountButton";
 
 type Lang = "jp" | "en";
 
 export default function Root() {
+  return (
+    <AuthProvider>
+      <RootInner />
+    </AuthProvider>
+  );
+}
+
+function RootInner() {
   const [lang, setLang] = useState<Lang | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -38,9 +48,13 @@ export default function Root() {
 function LandingPage({ onSelect }: { onSelect: (l: Lang) => void }) {
   return (
     <div
-      className="flex min-h-screen flex-col items-center justify-center px-5 py-12"
+      className="relative flex min-h-screen flex-col items-center justify-center px-5 py-12"
       style={{ background: "var(--bg)" }}
     >
+      <div className="absolute right-5 top-5">
+        <AccountButton />
+      </div>
+
       <div className="mb-10 text-center">
         <div className="mb-3 text-5xl">🎓</div>
         <h1 className="text-3xl font-extrabold" style={{ color: "var(--text-1)" }}>
@@ -111,8 +125,8 @@ function LandingPage({ onSelect }: { onSelect: (l: Lang) => void }) {
         </button>
       </div>
 
-      <p className="mt-8 text-xs" style={{ color: "var(--text-3)" }}>
-        학습 내역은 기기에 자동 저장됩니다
+      <p className="mt-8 text-center text-xs" style={{ color: "var(--text-3)" }}>
+        로그인하면 진도가 계정에 저장되어<br />어느 기기에서나 이어서 학습할 수 있어요
       </p>
     </div>
   );

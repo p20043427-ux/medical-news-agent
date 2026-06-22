@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { queueRemotePush, HYDRATED_EVENT } from "@/lib/sync";
 
 const KEY = "jp-app-progress-v3";
 
@@ -106,6 +107,7 @@ function load(): Progress {
 
 function save(p: Progress) {
   try { window.localStorage.setItem(KEY, JSON.stringify(p)); } catch { /* ignore */ }
+  queueRemotePush("jp", p);
 }
 
 function bumpDaily(daily: Record<string, number>): Record<string, number> {
@@ -191,6 +193,13 @@ export function useProgress() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => { setProgress(load()); setReady(true); }, []);
+
+  // 로그인 후 원격 진도가 로컬에 반영되면 다시 읽어들임
+  useEffect(() => {
+    const reload = () => setProgress(load());
+    window.addEventListener(HYDRATED_EVENT, reload);
+    return () => window.removeEventListener(HYDRATED_EVENT, reload);
+  }, []);
 
   const markNew = useCallback((id: string, known: boolean) => {
     setProgress((prev) => { const next = applyMarkNew(prev, id, known); save(next); return next; });
