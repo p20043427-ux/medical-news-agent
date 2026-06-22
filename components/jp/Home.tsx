@@ -3,8 +3,10 @@
 import { VOCAB, VOCAB_CATEGORIES } from "@/lib/jp/vocab";
 import { type Progress as JpProgress, isKnown, todayKey } from "@/lib/jp/progress";
 import { TRAVEL_PHRASEBOOK } from "@/lib/jp/phrasebook";
+import { CONVERSATIONS } from "@/lib/jp/conversations";
 import { speakJa } from "@/lib/jp/speech";
 import { useFavorites } from "@/lib/favorites";
+import { useRoleplay } from "@/lib/roleplay-progress";
 import WordImage from "./WordImage";
 import { Button, Progress } from "@/components/ui";
 
@@ -20,6 +22,9 @@ export default function Home({ progress, onStudyCategory }: {
   onStudyCategory: (key: string) => void;
 }) {
   const { has, toggle } = useFavorites("jp-phrase");
+  const { data: rpData } = useRoleplay("jp-roleplay");
+  const rpDone = Object.keys(rpData).length;
+  const rpTotal = CONVERSATIONS.length;
   const todayPhrase = ALL_PHRASES[dailyIndex(todayKey(), ALL_PHRASES.length)];
   const goal = progress.dailyGoal ?? 20;
   const todayCount = progress.daily?.[todayKey()] ?? 0;
@@ -90,6 +95,19 @@ export default function Home({ progress, onStudyCategory }: {
               <p className="mt-0.5 text-xs" style={{ color: "var(--text-3)" }}>{todayPhrase.reading}</p>
               <p className="mt-1 text-sm" style={{ color: "var(--text-2)" }}>{todayPhrase.ko} · 🔊 눌러 듣기</p>
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* 회화 롤플레이 진행 */}
+      {rpDone > 0 && (
+        <div className="px-5 pb-2 pt-1">
+          <div className="rounded-2xl p-4" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>🗣️ 회화 롤플레이</span>
+              <span className="text-sm font-bold" style={{ color: "var(--text-2)" }}>{rpDone} / {rpTotal} 완료</span>
+            </div>
+            <Progress value={rpTotal ? (rpDone / rpTotal) * 100 : 0} indicatorStyle={{ background: "linear-gradient(90deg,#6c5ce7,#a29bfe)" }} />
           </div>
         </div>
       )}

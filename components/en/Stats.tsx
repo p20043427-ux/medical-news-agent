@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EN_VOCAB, EN_CATEGORIES } from "@/lib/en/vocab";
 import {
   type EnProgress, learnedCount, enStreak, enRecentDaily, totalEnReviews, todayKey,
 } from "@/lib/en/progress";
 import { useTheme, type Theme } from "@/lib/jp/theme";
 import { getEnRate, setEnRate, speakEn } from "@/lib/en/speech";
+import { getExamHistory, type ExamAttempt } from "@/lib/exam-history";
 import ReminderSetting from "@/components/ReminderSetting";
 import { Button, Progress } from "@/components/ui";
 
@@ -23,6 +24,8 @@ export default function EnStats({
 }) {
   const { theme, change } = useTheme();
   const [rate, setRateState] = useState(getEnRate());
+  const [examHist, setExamHist] = useState<ExamAttempt[]>([]);
+  useEffect(() => { setExamHist(getExamHistory("en")); }, []);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const total = EN_VOCAB.length;
@@ -146,6 +149,28 @@ export default function EnStats({
           })}
         </div>
       </div>
+
+      {/* 모의시험 이력 */}
+      {examHist.length > 0 && (
+        <div className="mb-4 rounded-3xl p-5 shadow-sm" style={{ background: "var(--card)" }}>
+          <div className="mb-3 flex items-center justify-between">
+            <span className="font-bold" style={{ color: "var(--text-1)" }}>모의시험 이력</span>
+            <span className="text-xs" style={{ color: "var(--text-3)" }}>{examHist.length}회 · 평균 {Math.round(examHist.reduce((a, b) => a + b.pct, 0) / examHist.length)}점</span>
+          </div>
+          <div className="flex h-24 items-end justify-between gap-1">
+            {examHist.slice(-12).map((h, i, arr) => (
+              <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                <div className="flex h-16 w-full items-end">
+                  <div className="w-full rounded-md" title={`${h.pct}점`}
+                    style={{ height: `${Math.max(h.pct, 4)}%`, background: i === arr.length - 1 ? "linear-gradient(180deg,#4361EE,#7209B7)" : h.pct >= 60 ? "#10B981" : "var(--surface)" }} />
+                </div>
+                <span className="text-[9px]" style={{ color: "var(--text-3)" }}>{h.diff === "easy" ? "입" : h.diff === "hard" ? "도" : "표"}</span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-center text-[11px]" style={{ color: "var(--text-3)" }}>최근 {Math.min(12, examHist.length)}회 · 60점 이상 합격(초록)</p>
+        </div>
+      )}
 
       {/* 주간 리포트 */}
       <div className="mb-4 rounded-3xl p-5 shadow-sm" style={{ background: "var(--card)" }}>

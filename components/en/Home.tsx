@@ -3,8 +3,10 @@
 import { EN_VOCAB, EN_CATEGORIES } from "@/lib/en/vocab";
 import { type EnProgress, isLearned, todayKey } from "@/lib/en/progress";
 import { EN_TRAVEL_PHRASEBOOK } from "@/lib/en/phrasebook";
+import { EN_CONVERSATIONS } from "@/lib/en/conversations";
 import { speakEn } from "@/lib/en/speech";
 import { useFavorites } from "@/lib/favorites";
+import { useRoleplay } from "@/lib/roleplay-progress";
 import { Button, Progress } from "@/components/ui";
 
 const EN_ALL_PHRASES = EN_TRAVEL_PHRASEBOOK.flatMap((s) => s.phrases);
@@ -31,6 +33,9 @@ export default function EnHome({ progress, onStudyCategory, onGrammar }: {
   const start = new Date(progress.startedAt);
   const dayN = Math.floor((Date.now() - start.getTime()) / 86400000) + 1;
   const { has, toggle } = useFavorites("en-phrase");
+  const { data: rpData } = useRoleplay("en-roleplay");
+  const rpDone = Object.keys(rpData).length;
+  const rpTotal = EN_CONVERSATIONS.length;
   const todayPhrase = EN_ALL_PHRASES[enDailyIndex(todayKey(), EN_ALL_PHRASES.length)];
 
   const ordered = [...EN_CATEGORIES].sort((a, b) => {
@@ -68,6 +73,19 @@ export default function EnHome({ progress, onStudyCategory, onGrammar }: {
           Day {dayN}
         </h1>
       </div>
+
+      {/* 회화 롤플레이 진행 */}
+      {rpDone > 0 && (
+        <div className="px-5 pb-3">
+          <div className="rounded-2xl p-4" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>🗣️ 회화 롤플레이</span>
+              <span className="text-sm font-bold" style={{ color: "var(--text-2)" }}>{rpDone} / {rpTotal} 완료</span>
+            </div>
+            <Progress value={rpTotal ? (rpDone / rpTotal) * 100 : 0} indicatorStyle={{ background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
+          </div>
+        </div>
+      )}
 
       {/* 오늘의 표현 */}
       {todayPhrase && (

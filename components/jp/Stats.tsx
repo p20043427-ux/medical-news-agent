@@ -7,6 +7,7 @@ import {
 } from "@/lib/jp/progress";
 import { useTheme, type Theme } from "@/lib/jp/theme";
 import { getRate, setRate as saveRate, speakJa } from "@/lib/jp/speech";
+import { getExamHistory, type ExamAttempt } from "@/lib/exam-history";
 import ReminderSetting from "@/components/ReminderSetting";
 import { Button, Progress } from "@/components/ui";
 
@@ -25,6 +26,8 @@ export default function Stats({
   const { theme, change } = useTheme();
   const [rate, setRateState] = useState(getRate());
   const [textScale, setTextScale] = useState<"sm" | "md" | "lg">("md");
+  const [examHist, setExamHist] = useState<ExamAttempt[]>([]);
+  useEffect(() => { setExamHist(getExamHistory("jp")); }, []);
   const fileRef = useRef<HTMLInputElement>(null);
   const dailyGoal = progress.dailyGoal ?? 20;
 
@@ -183,6 +186,28 @@ export default function Stats({
           {weakCats[0] && weakCats[0].pct < 1 ? ` · 보완 추천: ${weakCats[0].emoji} ${weakCats[0].label}` : ""}
         </p>
       </div>
+
+      {/* 모의시험 이력 */}
+      {examHist.length > 0 && (
+        <div className="mb-4 rounded-3xl p-5 shadow-sm" style={{ background: "var(--card)" }}>
+          <div className="mb-3 flex items-center justify-between">
+            <span className="font-bold" style={{ color: "var(--text-1)" }}>모의시험 이력</span>
+            <span className="text-xs" style={{ color: "var(--text-3)" }}>{examHist.length}회 · 평균 {Math.round(examHist.reduce((a, b) => a + b.pct, 0) / examHist.length)}점</span>
+          </div>
+          <div className="flex h-24 items-end justify-between gap-1">
+            {examHist.slice(-12).map((h, i, arr) => (
+              <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                <div className="flex h-16 w-full items-end">
+                  <div className="w-full rounded-md" title={`${h.pct}점`}
+                    style={{ height: `${Math.max(h.pct, 4)}%`, background: i === arr.length - 1 ? "linear-gradient(180deg,#E63946,#F4A261)" : h.pct >= 60 ? "#10B981" : "var(--surface)" }} />
+                </div>
+                <span className="text-[9px]" style={{ color: "var(--text-3)" }}>{h.diff === "easy" ? "입" : h.diff === "hard" ? "도" : "표"}</span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-center text-[11px]" style={{ color: "var(--text-3)" }}>최근 {Math.min(12, examHist.length)}회 · 60점 이상 합격(초록)</p>
+        </div>
+      )}
 
       {/* 최근 2주 그래프 */}
       <div className="mb-4 rounded-3xl p-5 shadow-sm" style={{ background: "var(--card)" }}>

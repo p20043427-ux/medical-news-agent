@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { buildEnExam, EN_PASS_RATIO, type EnExamQuestion, type EnSection, type EnDifficulty } from "@/lib/en/exam";
 import { speakEn } from "@/lib/en/speech";
+import { getExamHistory, pushExamHistory } from "@/lib/exam-history";
 import { Button } from "@/components/ui";
 
 const SECTIONS: EnSection[] = ["어휘", "구동사", "독해", "청해"];
@@ -26,9 +27,7 @@ const DIFFS: { key: EnDifficulty; label: string; desc: string }[] = [
 const fmt = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 function getBest(): Record<string, number> { try { return JSON.parse(localStorage.getItem("en-exam-best") || "{}"); } catch { return {}; } }
 function saveBest(id: string, pct: number) { try { const b = getBest(); if (!b[id] || pct > b[id]) { b[id] = pct; localStorage.setItem("en-exam-best", JSON.stringify(b)); } } catch { /* ignore */ } }
-type Attempt = { t: number; round: string; diff: string; pct: number };
-function getHistory(): Attempt[] { try { return JSON.parse(localStorage.getItem("en-exam-history") || "[]"); } catch { return []; } }
-function pushHistory(a: Attempt) { try { const arr = getHistory(); arr.push(a); localStorage.setItem("en-exam-history", JSON.stringify(arr.slice(-100))); } catch { /* ignore */ } }
+const getHistory = () => getExamHistory("en");
 
 export default function EnMockExam({ onExit }: { onExit: () => void }) {
   const [round, setRound] = useState<Round | null>(null);
@@ -61,7 +60,7 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
     if (round) {
       const pct = Math.round((correct / questions.length) * 100);
       saveBest(`${round.id}-${difficulty}`, pct);
-      pushHistory({ t: Date.now(), round: round.id, diff: difficulty, pct });
+      pushExamHistory("en", { t: Date.now(), round: round.id, diff: difficulty, pct });
     }
     setPhase("result");
   }

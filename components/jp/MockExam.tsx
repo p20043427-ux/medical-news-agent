@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { buildExam, PASS_RATIO, type ExamQuestion, type Section, type Difficulty } from "@/lib/jp/exam";
+import { getExamHistory, pushExamHistory } from "@/lib/exam-history";
 import { speakJa } from "@/lib/jp/speech";
 import { Button } from "@/components/ui";
 
@@ -39,13 +40,7 @@ function saveBest(id: string, pct: number) {
   } catch { /* ignore */ }
 }
 
-type Attempt = { t: number; round: string; diff: string; pct: number };
-function getHistory(): Attempt[] {
-  try { return JSON.parse(window.localStorage.getItem("jp-exam-history") || "[]"); } catch { return []; }
-}
-function pushHistory(a: Attempt) {
-  try { const arr = getHistory(); arr.push(a); window.localStorage.setItem("jp-exam-history", JSON.stringify(arr.slice(-100))); } catch { /* ignore */ }
-}
+const getHistory = () => getExamHistory("jp");
 
 export default function MockExam({
   onExit,
@@ -101,7 +96,7 @@ export default function MockExam({
     if (round) {
       const pct = Math.round((correct / questions.length) * 100);
       saveBest(`${round.id}-${difficulty}`, pct);
-      pushHistory({ t: Date.now(), round: round.id, diff: difficulty, pct });
+      pushExamHistory("jp", { t: Date.now(), round: round.id, diff: difficulty, pct });
     }
     setPhase("result");
   }
