@@ -101,7 +101,7 @@ function load(): Progress {
           interval: c.box ? (c.box <= 1 ? 1 : c.box <= 3 ? 4 : 15) : 0,
         };
       }
-      return { cards, daily: o.daily ?? {}, startedAt: o.startedAt ?? todayKey(), xp: 0, achievements: [] };
+      return { cards, daily: o.daily ?? {}, startedAt: o.startedAt ?? todayKey(), xp: 0, achievements: [], bookmarks: [] };
     }
   } catch { /* ignore */ }
   return EMPTY;
