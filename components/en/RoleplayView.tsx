@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { EN_CONVERSATIONS, type EnConversation } from "@/lib/en/conversations";
 import { speakEn } from "@/lib/en/speech";
+import { useRoleplay } from "@/lib/roleplay-progress";
 import { Button } from "@/components/ui";
 import PronounceButton from "@/components/PronounceButton";
 
@@ -18,6 +19,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 export default function EnRoleplayView() {
   const [convo, setConvo] = useState<EnConversation | null>(null);
+  const { data, record } = useRoleplay("en-roleplay");
 
   if (!convo) {
     return (
@@ -25,28 +27,37 @@ export default function EnRoleplayView() {
         <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>회화 롤플레이</h1>
         <p className="mb-5 text-sm" style={{ color: "var(--text-3)" }}>당신은 <b>B</b> 역할이에요. 상황에 맞는 영어를 골라 대화를 완성하세요.</p>
         <div className="space-y-2.5">
-          {EN_CONVERSATIONS.map((c) => (
-            <button key={c.id} onClick={() => setConvo(c)}
-              className="flex w-full items-center gap-3 rounded-2xl p-4 text-left shadow-sm transition active:scale-[0.98]"
-              style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-xl"
-                style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>{c.emoji}</span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-bold" style={{ color: "var(--text-1)" }}>{c.title}</span>
-                <span className="block text-xs" style={{ color: "var(--text-3)" }}>{c.situation} · {c.level}</span>
-              </span>
-              <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" style={{ color: "var(--text-3)" }} fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-            </button>
-          ))}
+          {EN_CONVERSATIONS.map((c) => {
+            const done = data[c.id] !== undefined;
+            return (
+              <button key={c.id} onClick={() => setConvo(c)}
+                className="flex w-full items-center gap-3 rounded-2xl p-4 text-left shadow-sm transition active:scale-[0.98]"
+                style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+                <span className="relative grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-xl"
+                  style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
+                  {c.emoji}
+                  {done && <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full text-[11px] font-bold text-white" style={{ background: "#10B981", border: "2px solid var(--card)" }}>✓</span>}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-bold" style={{ color: "var(--text-1)" }}>{c.title}</span>
+                  <span className="block text-xs" style={{ color: "var(--text-3)" }}>
+                    {c.situation} · {c.level}
+                    {done && <span style={{ color: "#10B981" }}> · {data[c.id] === 0 ? "완벽 클리어 🎉" : `최소 실수 ${data[c.id]}`}</span>}
+                  </span>
+                </span>
+                <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" style={{ color: "var(--text-3)" }} fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+              </button>
+            );
+          })}
         </div>
       </div>
     );
   }
 
-  return <Runner key={convo.id} convo={convo} onExit={() => setConvo(null)} />;
+  return <Runner key={convo.id} convo={convo} onExit={() => setConvo(null)} onComplete={(m) => record(convo.id, m)} />;
 }
 
-function Runner({ convo, onExit }: { convo: EnConversation; onExit: () => void }) {
+function Runner({ convo, onExit, onComplete }: { convo: EnConversation; onExit: () => void; onComplete: (mistakes: number) => void }) {
   const lines = convo.lines;
   const [revealed, setRevealed] = useState(0);
   const [wrong, setWrong] = useState<string | null>(null);
@@ -62,6 +73,7 @@ function Runner({ convo, onExit }: { convo: EnConversation; onExit: () => void }
   }, [revealed, convo.id]);
 
   const done = revealed >= lines.length;
+  useEffect(() => { if (done) onComplete(mistakes); /* eslint-disable-next-line */ }, [done]);
 
   function advanceNpc() { const l = lines[revealed]; if (l) speakEn(l.en); setRevealed((r) => r + 1); }
   function pick(opt: string) {

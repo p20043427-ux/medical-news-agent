@@ -16,9 +16,11 @@ import EnStats from "./Stats";
 import EnBottomNav, { type EnTab } from "./BottomNav";
 import EnLearnHub, { type EnLearnView } from "./LearnHub";
 import { EN_VOCAB, EN_CATEGORIES } from "@/lib/en/vocab";
+import { useReminderScheduler } from "@/lib/reminder";
 
 export default function EnglishApp({ onBack }: { onBack?: () => void }) {
   const { progress, ready, markNew, grade, setGoalDate, reset, exportJson, importJson } = useEnProgress();
+  useReminderScheduler();
   const [tab, setTab] = useState<EnTab>("home");
   const [learnSub, setLearnSub] = useState<EnLearnView | null>(null);
   const [studyCategory, setStudyCategory] = useState<string | null>(null);

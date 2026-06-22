@@ -7,6 +7,7 @@ import {
 } from "@/lib/jp/progress";
 import { useTheme, type Theme } from "@/lib/jp/theme";
 import { getRate, setRate as saveRate, speakJa } from "@/lib/jp/speech";
+import ReminderSetting from "@/components/ReminderSetting";
 import { Button, Progress } from "@/components/ui";
 
 const WD = ["일", "월", "화", "수", "목", "금", "토"];
@@ -305,6 +306,8 @@ export default function Stats({
           </div>
         </div>
       </div>
+
+      <ReminderSetting accent="#E63946" />
 
       {/* 진도 백업 */}
       <div className="mb-4 rounded-3xl p-5 shadow-sm" style={{ background: "var(--card)" }}>

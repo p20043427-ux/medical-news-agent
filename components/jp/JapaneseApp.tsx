@@ -18,6 +18,7 @@ import PhrasebookView from "./PhrasebookView";
 import RoleplayView from "./RoleplayView";
 import LearnHub, { type LearnView } from "./LearnHub";
 import LibraryView from "./LibraryView";
+import { useReminderScheduler } from "@/lib/reminder";
 
 const FURIGANA_KEY = "jp-app-furigana";
 
@@ -26,6 +27,7 @@ interface Session { category: string; mode: Mode; wordIds?: string[] }
 
 export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
   const { progress, ready, markNew, grade, setGoalDate, setDailyGoal, reset, exportJson, importJson, toggleBookmark, addMistakes } = useProgress();
+  useReminderScheduler();
   const [tab, setTab] = useState<Tab>("home");
   const [session, setSession] = useState<Session | null>(null);
   const [learnView, setLearnView] = useState<LearnView | null>(null);

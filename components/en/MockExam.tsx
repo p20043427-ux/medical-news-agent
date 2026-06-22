@@ -26,6 +26,9 @@ const DIFFS: { key: EnDifficulty; label: string; desc: string }[] = [
 const fmt = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 function getBest(): Record<string, number> { try { return JSON.parse(localStorage.getItem("en-exam-best") || "{}"); } catch { return {}; } }
 function saveBest(id: string, pct: number) { try { const b = getBest(); if (!b[id] || pct > b[id]) { b[id] = pct; localStorage.setItem("en-exam-best", JSON.stringify(b)); } } catch { /* ignore */ } }
+type Attempt = { t: number; round: string; diff: string; pct: number };
+function getHistory(): Attempt[] { try { return JSON.parse(localStorage.getItem("en-exam-history") || "[]"); } catch { return []; } }
+function pushHistory(a: Attempt) { try { const arr = getHistory(); arr.push(a); localStorage.setItem("en-exam-history", JSON.stringify(arr.slice(-100))); } catch { /* ignore */ } }
 
 export default function EnMockExam({ onExit }: { onExit: () => void }) {
   const [round, setRound] = useState<Round | null>(null);
@@ -55,7 +58,11 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
   function finish() {
     if (timer.current) window.clearInterval(timer.current);
     const correct = questions.filter((qq) => answers[qq.key] === qq.answer).length;
-    if (round) saveBest(`${round.id}-${difficulty}`, Math.round((correct / questions.length) * 100));
+    if (round) {
+      const pct = Math.round((correct / questions.length) * 100);
+      saveBest(`${round.id}-${difficulty}`, pct);
+      pushHistory({ t: Date.now(), round: round.id, diff: difficulty, pct });
+    }
     setPhase("result");
   }
   function retry() { setAttempt((a) => a + 1); setIdx(0); setAnswers({}); setElapsed(0); setPhase("run"); }
@@ -122,6 +129,26 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
             </div>
           ))}
         </div>
+        {(() => {
+          const hist = getHistory().filter((h) => h.round === round?.id && h.diff === difficulty).slice(-8);
+          if (hist.length < 2) return null;
+          return (
+            <div className="mt-4 rounded-2xl p-4" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>점수 추이</span>
+                <span className="text-xs" style={{ color: "var(--text-3)" }}>{round?.label} · 최근 {hist.length}회</span>
+              </div>
+              <div className="flex h-20 items-end justify-between gap-1.5">
+                {hist.map((h, i) => (
+                  <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                    <span className="text-[10px] font-bold" style={{ color: "var(--text-3)" }}>{h.pct}</span>
+                    <div className="w-full rounded-md" style={{ height: `${Math.max(h.pct, 4)}%`, background: i === hist.length - 1 ? GRAD : "var(--surface)" }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
         {wrong.length > 0 && (
           <div className="mt-5">
             <p className="mb-2 px-1 text-sm font-extrabold" style={{ color: "var(--text-1)" }}>오답 해설 ({wrong.length})</p>

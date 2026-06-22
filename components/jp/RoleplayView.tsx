@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CONVERSATIONS, CONVERSATION_CATEGORIES } from "@/lib/jp/conversations";
 import type { Conversation, DialogueLine } from "@/lib/jp/types";
 import { speakJa } from "@/lib/jp/speech";
+import { useRoleplay } from "@/lib/roleplay-progress";
 import { Button } from "@/components/ui";
 import PronounceButton from "@/components/PronounceButton";
 
@@ -22,6 +23,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 export default function RoleplayView() {
   const [convo, setConvo] = useState<Conversation | null>(null);
+  const { data, record } = useRoleplay("jp-roleplay");
 
   if (!convo) {
     return (
@@ -31,15 +33,22 @@ export default function RoleplayView() {
         <div className="space-y-2.5">
           {CONVERSATIONS.map((c) => {
             const cat = CONVERSATION_CATEGORIES.find((k) => k.key === c.category);
+            const done = data[c.id] !== undefined;
             return (
               <button key={c.id} onClick={() => setConvo(c)}
                 className="flex w-full items-center gap-3 rounded-2xl p-4 text-left shadow-sm transition active:scale-[0.98]"
                 style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-xl"
-                  style={{ background: "linear-gradient(135deg,#6c5ce7,#a29bfe)" }}>{c.emoji}</span>
+                <span className="relative grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-xl"
+                  style={{ background: "linear-gradient(135deg,#6c5ce7,#a29bfe)" }}>
+                  {c.emoji}
+                  {done && <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full text-[11px] font-bold text-white" style={{ background: "#10B981", border: "2px solid var(--card)" }}>✓</span>}
+                </span>
                 <span className="min-w-0 flex-1">
                   <span className="block font-bold" style={{ color: "var(--text-1)" }}>{c.title}</span>
-                  <span className="block text-xs" style={{ color: "var(--text-3)" }}>{cat ? `${cat.emoji} ${cat.label}` : ""} · {c.level ?? "N5"}</span>
+                  <span className="block text-xs" style={{ color: "var(--text-3)" }}>
+                    {cat ? `${cat.emoji} ${cat.label}` : ""} · {c.level ?? "N5"}
+                    {done && <span style={{ color: "#10B981" }}> · {data[c.id] === 0 ? "완벽 클리어 🎉" : `최소 실수 ${data[c.id]}`}</span>}
+                  </span>
                 </span>
                 <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" style={{ color: "var(--text-3)" }} fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
               </button>
@@ -50,14 +59,17 @@ export default function RoleplayView() {
     );
   }
 
-  return <RoleplayRunner key={convo.id} convo={convo} onExit={() => setConvo(null)} />;
+  return <RoleplayRunner key={convo.id} convo={convo} onExit={() => setConvo(null)} onComplete={(m) => record(convo.id, m)} />;
 }
 
-function RoleplayRunner({ convo, onExit }: { convo: Conversation; onExit: () => void }) {
+function RoleplayRunner({ convo, onExit, onComplete }: { convo: Conversation; onExit: () => void; onComplete: (mistakes: number) => void }) {
   const lines = convo.lines;
   const [revealed, setRevealed] = useState(0); // 공개된 대사 수
   const [wrong, setWrong] = useState<string | null>(null);
   const [mistakes, setMistakes] = useState(0);
+
+  const done = revealed >= lines.length;
+  useEffect(() => { if (done) onComplete(mistakes); /* eslint-disable-next-line */ }, [done]);
 
   // 현재 B 턴의 보기(정답 + 오답 2)
   const cur = lines[revealed];
@@ -68,8 +80,6 @@ function RoleplayRunner({ convo, onExit }: { convo: Conversation; onExit: () => 
     return shuffle([answer, ...distractors]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [revealed, convo.id]);
-
-  const done = revealed >= lines.length;
 
   function advanceNpc() {
     const l = lines[revealed];

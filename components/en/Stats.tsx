@@ -7,6 +7,7 @@ import {
 } from "@/lib/en/progress";
 import { useTheme, type Theme } from "@/lib/jp/theme";
 import { getEnRate, setEnRate, speakEn } from "@/lib/en/speech";
+import ReminderSetting from "@/components/ReminderSetting";
 import { Button, Progress } from "@/components/ui";
 
 const WD = ["일", "월", "화", "수", "목", "금", "토"];
@@ -288,6 +289,8 @@ export default function EnStats({
             className="w-full" style={{ accentColor: "#4361EE" }} />
         </div>
       </div>
+
+      <ReminderSetting accent="#4361EE" />
 
       {/* 진도 백업 */}
       <div className="mb-4 rounded-3xl p-5 shadow-sm" style={{ background: "var(--card)" }}>

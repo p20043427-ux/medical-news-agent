@@ -39,6 +39,14 @@ function saveBest(id: string, pct: number) {
   } catch { /* ignore */ }
 }
 
+type Attempt = { t: number; round: string; diff: string; pct: number };
+function getHistory(): Attempt[] {
+  try { return JSON.parse(window.localStorage.getItem("jp-exam-history") || "[]"); } catch { return []; }
+}
+function pushHistory(a: Attempt) {
+  try { const arr = getHistory(); arr.push(a); window.localStorage.setItem("jp-exam-history", JSON.stringify(arr.slice(-100))); } catch { /* ignore */ }
+}
+
 export default function MockExam({
   onExit,
   onMistake,
@@ -90,7 +98,11 @@ export default function MockExam({
     const wrongIds = questions.filter((qq) => qq.wordId && answers[qq.key] !== qq.answer).map((qq) => qq.wordId!) as string[];
     if (wrongIds.length && onMistake) onMistake([...new Set(wrongIds)]);
     const correct = questions.filter((qq) => answers[qq.key] === qq.answer).length;
-    if (round) saveBest(`${round.id}-${difficulty}`, Math.round((correct / questions.length) * 100));
+    if (round) {
+      const pct = Math.round((correct / questions.length) * 100);
+      saveBest(`${round.id}-${difficulty}`, pct);
+      pushHistory({ t: Date.now(), round: round.id, diff: difficulty, pct });
+    }
     setPhase("result");
   }
   function retry() { setAttempt((a) => a + 1); setIdx(0); setAnswers({}); setElapsed(0); setPhase("run"); }
@@ -200,6 +212,26 @@ export default function MockExam({
             </div>
           ))}
         </div>
+        {(() => {
+          const hist = getHistory().filter((h) => h.round === round?.id && h.diff === difficulty).slice(-8);
+          if (hist.length < 2) return null;
+          return (
+            <div className="mt-4 rounded-2xl p-4" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>점수 추이</span>
+                <span className="text-xs" style={{ color: "var(--text-3)" }}>{round?.label} · 최근 {hist.length}회</span>
+              </div>
+              <div className="flex h-20 items-end justify-between gap-1.5">
+                {hist.map((h, i) => (
+                  <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                    <span className="text-[10px] font-bold" style={{ color: "var(--text-3)" }}>{h.pct}</span>
+                    <div className="w-full rounded-md" style={{ height: `${Math.max(h.pct, 4)}%`, background: i === hist.length - 1 ? "linear-gradient(180deg,#E63946,#F4A261)" : "var(--surface)" }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
         {wrong.length > 0 && (
           <p className="mt-4 text-center text-xs" style={{ color: "var(--text-3)" }}>틀린 단어는 오답노트에 담았어요.</p>
         )}
