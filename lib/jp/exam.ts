@@ -1,5 +1,7 @@
 import { VOCAB } from "./vocab";
 import { VERBS } from "./verbs";
+import { CONVERSATIONS } from "./conversations";
+import type { Token } from "./types";
 
 export type Section = "문자·어휘" | "문법" | "독해" | "청해";
 
@@ -8,7 +10,7 @@ export interface ExamQuestion {
   wordId?: string;        // 오답노트 연동용
   section: Section;
   passage?: string;       // 독해 지문
-  prompt: string;         // 큰 표시
+  prompt: string;
   sub?: string;
   question: string;
   audio?: string;         // 청해용 TTS
@@ -37,29 +39,32 @@ function makeShuffle(seed?: number) {
   };
 }
 
+const PARTICLES = ["を", "に", "が", "は", "で", "へ", "と", "も"];
+const tokensToText = (t: Token[]) => t.map((x) => x.t).join("");
+
 // ── 독해 지문 (직접 작성한 원본 · N5 수준, 저작권 없음) ──
 const READINGS: { text: string; question: string; options: string[]; answer: string }[] = [
-  { text: "わたしは まいあさ 六時に おきます。七時に あさごはんを たべて、八時に 学校へ 行きます。",
-    question: "이 사람은 몇 시에 학교에 갑니까?", options: ["6시", "7시", "8시", "9시"], answer: "8시" },
-  { text: "きのうは 雨でした。だから、わたしは 家で 本を 読みました。とても おもしろかったです。",
-    question: "어제 이 사람은 무엇을 했습니까?", options: ["산책을 했다", "집에서 책을 읽었다", "영화를 봤다", "친구를 만났다"], answer: "집에서 책을 읽었다" },
-  { text: "わたしの かぞくは 四人です。父と 母と 兄が います。兄は 大学生です。",
-    question: "이 사람의 가족은 몇 명입니까?", options: ["3명", "4명", "5명", "6명"], answer: "4명" },
-  { text: "あした 友だちと えいがを 見に 行きます。十時に 駅の 前で 会います。",
-    question: "내일 몇 시에 역 앞에서 만납니까?", options: ["9시", "10시", "11시", "12시"], answer: "10시" },
-  { text: "この みせの ラーメンは 安くて おいしいです。いつも 人が おおいです。",
-    question: "이 가게의 라멘은 어떻습니까?", options: ["비싸고 맛없다", "싸고 맛있다", "비싸지만 맛있다", "싸지만 맛없다"], answer: "싸고 맛있다" },
-  { text: "わたしは コーヒーが すきです。でも、夜は 飲みません。ねむれませんから。",
-    question: "이 사람은 왜 밤에 커피를 마시지 않습니까?", options: ["맛이 없어서", "잠을 못 자서", "비싸서", "배가 아파서"], answer: "잠을 못 자서" },
-  { text: "週末に 海へ 行きました。天気が よくて、とても たのしかったです。",
-    question: "주말에 어디에 갔습니까?", options: ["산", "바다", "공원", "학교"], answer: "바다" },
-  { text: "わたしは 毎日 日本語を 勉強します。むずかしいですが、おもしろいです。",
-    question: "이 사람에게 일본어는 어떻습니까?", options: ["쉽고 지루하다", "어렵지만 재미있다", "쉽고 재미있다", "어렵고 지루하다"], answer: "어렵지만 재미있다" },
+  { text: "わたしは まいあさ 六時に おきます。七時に あさごはんを たべて、八時に 学校へ 行きます。", question: "이 사람은 몇 시에 학교에 갑니까?", options: ["6시", "7시", "8시", "9시"], answer: "8시" },
+  { text: "きのうは 雨でした。だから、わたしは 家で 本を 読みました。とても おもしろかったです。", question: "어제 이 사람은 무엇을 했습니까?", options: ["산책을 했다", "집에서 책을 읽었다", "영화를 봤다", "친구를 만났다"], answer: "집에서 책을 읽었다" },
+  { text: "わたしの かぞくは 四人です。父と 母と 兄が います。兄は 大学生です。", question: "이 사람의 가족은 몇 명입니까?", options: ["3명", "4명", "5명", "6명"], answer: "4명" },
+  { text: "あした 友だちと えいがを 見に 行きます。十時に 駅の 前で 会います。", question: "내일 몇 시에 역 앞에서 만납니까?", options: ["9시", "10시", "11시", "12시"], answer: "10시" },
+  { text: "この みせの ラーメンは 安くて おいしいです。いつも 人が おおいです。", question: "이 가게의 라멘은 어떻습니까?", options: ["비싸고 맛없다", "싸고 맛있다", "비싸지만 맛있다", "싸지만 맛없다"], answer: "싸고 맛있다" },
+  { text: "わたしは コーヒーが すきです。でも、夜は 飲みません。ねむれませんから。", question: "이 사람은 왜 밤에 커피를 마시지 않습니까?", options: ["맛이 없어서", "잠을 못 자서", "비싸서", "배가 아파서"], answer: "잠을 못 자서" },
+  { text: "週末に 海へ 行きました。天気が よくて、とても たのしかったです。", question: "주말에 어디에 갔습니까?", options: ["산", "바다", "공원", "학교"], answer: "바다" },
+  { text: "わたしは 毎日 日本語を 勉強します。むずかしいですが、おもしろいです。", question: "이 사람에게 일본어는 어떻습니까?", options: ["쉽고 지루하다", "어렵지만 재미있다", "쉽고 재미있다", "어렵고 지루하다"], answer: "어렵지만 재미있다" },
+  { text: "デパートで あたらしい かばんを 買いました。すこし たかかったですが、とても きにいって います。", question: "이 사람은 가방을 어떻게 생각합니까?", options: ["마음에 든다", "별로다", "너무 싸다", "색이 싫다"], answer: "마음에 든다" },
+  { text: "あねは びょういんで はたらいて います。しごとは いそがしいですが、たのしいと 言って います。", question: "누나의 일은 어떻습니까?", options: ["한가하다", "바쁘지만 즐겁다", "바쁘고 힘들다", "쉽다"], answer: "바쁘지만 즐겁다" },
+  { text: "きょうは ともだちの たんじょうびです。ケーキを 作って、プレゼントを わたしました。", question: "오늘은 무슨 날입니까?", options: ["시험날", "친구 생일", "휴일", "졸업식"], answer: "친구 생일" },
+  { text: "わたしの へやは ひろくないですが、あかるくて しずかです。だから べんきょうに いいです。", question: "이 사람의 방은 어떻습니까?", options: ["넓고 시끄럽다", "좁지만 밝고 조용하다", "어둡다", "넓고 밝다"], answer: "좁지만 밝고 조용하다" },
 ];
+
+function opt(answer: string, pool: string[], sh: <T>(a: T[]) => T[]): string[] {
+  return sh([answer, ...sh(pool.filter((x) => x !== answer)).slice(0, 3)]);
+}
 
 /**
  * JLPT N5 형식의 **모의시험** 문항을 앱 콘텐츠에서 생성(원본 문항, 기출 원문 아님).
- * 문자·어휘 / 문법 / 독해 / 청해. seed 를 주면 회차가 매번 동일하게 재현된다.
+ * 문자·어휘 / 문법(동사 활용·조사) / 독해 / 청해(단어·대화). seed 로 회차를 재현.
  */
 export function buildExam(opts?: { seed?: number; count?: number }): ExamQuestion[] {
   const count = opts?.count ?? 20;
@@ -71,42 +76,65 @@ export function buildExam(opts?: { seed?: number; count?: number }): ExamQuestio
   const masus = VERBS.map((v) => v.masu);
   const kanjiWords = VOCAB.filter((w) => /[一-龯]/.test(w.word));
 
-  const opt = (answer: string, pool: string[]) => sh([answer, ...sh(pool.filter((x) => x !== answer)).slice(0, 3)]);
+  // 회화 대사 풀 (청해 대화형)
+  const lines = CONVERSATIONS.flatMap((c) => c.lines);
+  const koPool = lines.map((l) => l.ko);
 
-  const nVocab = Math.round(count * 0.5);
+  // 조사 빈칸 후보 (예문에 단일 조사 토큰이 있는 단어)
+  const particleCands = VOCAB.map((w) => {
+    const i = w.example.tokens.findIndex((t) => PARTICLES.includes(t.t));
+    return i >= 0 ? { w, i } : null;
+  }).filter((x): x is { w: (typeof VOCAB)[number]; i: number } => x !== null);
+
+  const nVocab = Math.round(count * 0.4);
   const nGrammar = Math.round(count * 0.2);
-  const nReading = Math.min(3, READINGS.length, Math.round(count * 0.15));
-  const nListen = count - nVocab - nGrammar - nReading;
+  const nReading = Math.min(3, READINGS.length, Math.max(2, Math.round(count * 0.15)));
+  const nListen = Math.max(0, count - nVocab - nGrammar - nReading);
 
   const qs: ExamQuestion[] = [];
 
-  // 읽기·표기 문제는 '한자가 있는 단어'에서만 생성 (가나 단어는 prompt==answer 가 되어 무의미)
+  // 문자·어휘 (읽기·표기는 한자 단어만, 뜻은 전체)
   const kanji = sh(kanjiWords);
   const vshuf = sh(VOCAB);
   for (let i = 0; i < nVocab; i++) {
     const mode = i % 3;
     if (mode === 1) {
       const w = vshuf[i % vshuf.length];
-      qs.push({ key: `v-m-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.word, sub: `[${w.reading}]`, question: "뜻으로 알맞은 것은?", options: opt(w.meaning, meanings), answer: w.meaning });
+      qs.push({ key: `v-m-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.word, sub: `[${w.reading}]`, question: "뜻으로 알맞은 것은?", options: opt(w.meaning, meanings, sh), answer: w.meaning });
     } else if (mode === 0) {
       const w = kanji[i % kanji.length];
-      qs.push({ key: `v-r-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.word, question: "읽는 법으로 알맞은 것은?", options: opt(w.reading, readings), answer: w.reading });
+      qs.push({ key: `v-r-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.word, question: "읽는 법으로 알맞은 것은?", options: opt(w.reading, readings, sh), answer: w.reading });
     } else {
       const w = kanji[(i + 1) % kanji.length];
-      qs.push({ key: `v-k-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.reading, question: "한자 표기로 알맞은 것은?", options: opt(w.word, words), answer: w.word });
+      qs.push({ key: `v-k-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.reading, question: "한자 표기로 알맞은 것은?", options: opt(w.word, words, sh), answer: w.word });
     }
   }
 
-  sh(VERBS).slice(0, nGrammar).forEach((v) => {
-    qs.push({ key: `g-${v.id}`, section: "문법", prompt: v.dict, sub: `[${v.reading}] · ${v.meaning}`, question: "ます형으로 알맞은 것은?", options: opt(v.masu, masus), answer: v.masu });
+  // 문법 (동사 활용 + 조사 빈칸)
+  const nParticle = Math.min(Math.floor(nGrammar / 2), particleCands.length);
+  const nVerb = nGrammar - nParticle;
+  sh(VERBS).slice(0, nVerb).forEach((v, i) => {
+    qs.push({ key: `g-v-${v.id}-${i}`, section: "문법", prompt: v.dict, sub: `[${v.reading}] · ${v.meaning}`, question: "ます형으로 알맞은 것은?", options: opt(v.masu, masus, sh), answer: v.masu });
+  });
+  sh(particleCands).slice(0, nParticle).forEach(({ w, i }, k) => {
+    const ans = w.example.tokens[i].t;
+    const sentence = w.example.tokens.map((t, ti) => (ti === i ? "（　）" : t.t)).join("");
+    qs.push({ key: `g-p-${w.id}-${k}`, section: "문법", passage: sentence, prompt: "", question: "（　）에 들어갈 말은?", options: opt(ans, PARTICLES, sh), answer: ans });
   });
 
+  // 독해
   sh(READINGS).slice(0, nReading).forEach((r, i) => {
     qs.push({ key: `r-${i}-${r.answer}`, section: "독해", passage: r.text, prompt: "", question: r.question, options: sh(r.options), answer: r.answer });
   });
 
-  sh(VOCAB).slice(0, Math.max(0, nListen)).forEach((w) => {
-    qs.push({ key: `l-${w.id}`, wordId: w.id, section: "청해", prompt: "🔊", audio: w.reading, question: "들리는 단어의 뜻은?", options: opt(w.meaning, meanings), answer: w.meaning });
+  // 청해 (단어 듣기 + 대화 듣기)
+  const nDialog = Math.min(Math.floor(nListen / 2), lines.length);
+  const nWordListen = nListen - nDialog;
+  sh(VOCAB).slice(0, nWordListen).forEach((w, i) => {
+    qs.push({ key: `l-w-${w.id}-${i}`, wordId: w.id, section: "청해", prompt: "🔊", audio: w.reading, question: "들리는 단어의 뜻은?", options: opt(w.meaning, meanings, sh), answer: w.meaning });
+  });
+  sh(lines).slice(0, nDialog).forEach((l, i) => {
+    qs.push({ key: `l-d-${i}`, section: "청해", prompt: "🔊", audio: tokensToText(l.tokens), question: "들은 대화의 뜻은?", options: opt(l.ko, koPool, sh), answer: l.ko });
   });
 
   return sh(qs);
