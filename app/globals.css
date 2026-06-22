@@ -76,6 +76,20 @@ html.dark .border-slate-300 { border-color: var(--border) !important; }
 html.dark .border-slate-100 { border-color: var(--border) !important; }
 html.dark .ring-black\/5 { --tw-ring-color: rgb(255 255 255 / 0.06) !important; }
 
+/* ── 다크모드 카드 입체감: 어두운 배경에서 안 보이는 그림자를 깊은 그림자 + 헤어라인 테두리로 대체 ── */
+html.dark .shadow-sm {
+  box-shadow: 0 1px 2px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.05) !important;
+}
+html.dark .shadow,
+html.dark .shadow-md {
+  box-shadow: 0 6px 18px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.05) !important;
+}
+html.dark .shadow-lg,
+html.dark .shadow-xl,
+html.dark .shadow-2xl {
+  box-shadow: 0 14px 36px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.06) !important;
+}
+
 html.dark .from-\[\#f5f6f8\],
 html.dark .from-\[\#F8F9FB\] {
   --tw-gradient-from: var(--bg) var(--tw-gradient-from-position);
