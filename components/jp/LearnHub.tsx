@@ -4,11 +4,12 @@ import { CONVERSATIONS } from "@/lib/jp/conversations";
 import { VERBS } from "@/lib/jp/verbs";
 import { TRAVEL_PHRASEBOOK } from "@/lib/jp/phrasebook";
 
-export type LearnView = "conversation" | "verbs" | "kana" | "exam" | "phrasebook";
+export type LearnView = "conversation" | "verbs" | "kana" | "exam" | "phrasebook" | "roleplay";
 
 // 아이콘은 통일감을 위해 일본어 글자(흰색 볼드)로 표기 — 会(会話)·動(動詞)·あ(かな)
 const CARDS: { key: LearnView; glyph: string; title: string; desc: (n: { conv: number; verb: number; sit: number }) => string; grad: string; shadow: string }[] = [
   { key: "conversation", glyph: "会", title: "생활 회화", desc: (n) => `${n.conv}개 상황 · 핵심표현`, grad: "linear-gradient(135deg,#a29bfe,#6c5ce7)", shadow: "rgba(108,92,231,.35)" },
+  { key: "roleplay", glyph: "話", title: "회화 롤플레이", desc: (n) => `${n.conv}개 상황 · 골라서 대화 완성`, grad: "linear-gradient(135deg,#6c5ce7,#0984e3)", shadow: "rgba(108,92,231,.35)" },
   { key: "phrasebook", glyph: "旅", title: "여행 회화집", desc: (n) => `${n.sit}개 상황별 즉석 표현`, grad: "linear-gradient(135deg,#00b894,#00cec9)", shadow: "rgba(0,184,148,.35)" },
   { key: "verbs", glyph: "動", title: "필수 동사", desc: (n) => `${n.verb}개 · 활용형(ます·て·ない)`, grad: "linear-gradient(135deg,#fd79a8,#e84393)", shadow: "rgba(232,67,147,.35)" },
   { key: "kana", glyph: "あ", title: "가나 (히라가나·가타카나)", desc: () => "기초 문자 · 발음 · 퀴즈", grad: "linear-gradient(135deg,#E63946,#F4A261)", shadow: "rgba(230,57,70,.35)" },

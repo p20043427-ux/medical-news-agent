@@ -9,6 +9,7 @@ import EnReviewMode from "./ReviewMode";
 import EnQuizMode from "./QuizMode";
 import EnGrammarView from "./GrammarView";
 import EnMockExam from "./MockExam";
+import EnPhrasebookView from "./PhrasebookView";
 import EnReviewLibrary from "./ReviewLibrary";
 import EnStats from "./Stats";
 import EnBottomNav, { type EnTab } from "./BottomNav";
@@ -180,6 +181,7 @@ export default function EnglishApp({ onBack }: { onBack?: () => void }) {
               />
             )}
             {learnSub === "grammar" && <EnGrammarView />}
+            {learnSub === "phrasebook" && <EnPhrasebookView />}
           </div>
         ) : (
           <EnLearnHub onOpen={setLearnSub} />
