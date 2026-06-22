@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import type { EnWord } from "@/lib/en/types";
 import type { EnGrade } from "@/lib/en/progress";
 import { speakEn } from "@/lib/en/speech";
-import { Button } from "@/components/ui";
+import { Button, Progress } from "@/components/ui";
 
 function shuffle<T>(arr: T[]): T[] {
   return [...arr].sort(() => Math.random() - 0.5);
@@ -93,9 +93,7 @@ export default function EnQuizMode({
       </div>
 
       <div className="px-5 pb-3">
-        <div className="progress-bar">
-          <div className="progress-bar-fill" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
-        </div>
+        <Progress value={pct} indicatorStyle={{ background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
       </div>
 
       {/* 문제 */}

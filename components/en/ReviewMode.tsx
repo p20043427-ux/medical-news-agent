@@ -5,7 +5,7 @@ import type { EnWord, EnCategory } from "@/lib/en/types";
 import type { EnGrade, EnProgress } from "@/lib/en/progress";
 import { dueIds } from "@/lib/en/progress";
 import { speakEn } from "@/lib/en/speech";
-import { Button } from "@/components/ui";
+import { Button, Progress } from "@/components/ui";
 
 const GRADE_CONFIG: Record<EnGrade, { label: string; sub: string; bg: string; xp: string }> = {
   again: { label: "다시",   sub: "1일",    bg: "#EF4444", xp: "+2" },
@@ -96,9 +96,7 @@ export default function EnReviewMode({
       </div>
 
       <div className="px-5 pb-2">
-        <div className="progress-bar">
-          <div className="progress-bar-fill" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
-        </div>
+        <Progress value={pct} indicatorStyle={{ background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
       </div>
 
       {/* 카드 */}

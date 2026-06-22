@@ -5,7 +5,7 @@ import type { EnWord, EnCategory } from "@/lib/en/types";
 import type { EnProgress } from "@/lib/en/progress";
 import { speakEn } from "@/lib/en/speech";
 import { isLearned } from "@/lib/en/progress";
-import { Button } from "@/components/ui";
+import { Button, Progress } from "@/components/ui";
 
 const CEFR_COLORS: Record<string, string> = {
   A1: "#10B981", A2: "#3B82F6", B1: "#8B5CF6", B2: "#EC4899", C1: "#F59E0B", C2: "#EF4444",
@@ -105,9 +105,7 @@ export default function EnVocabStudy({
 
       {/* 진행바 */}
       <div className="px-5 pb-2">
-        <div className="progress-bar">
-          <div className="progress-bar-fill" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
-        </div>
+        <Progress value={pct} indicatorStyle={{ background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
       </div>
 
       {/* 메인 카드 */}

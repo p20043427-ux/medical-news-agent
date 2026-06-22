@@ -2,7 +2,7 @@
 
 import { EN_VOCAB, EN_CATEGORIES } from "@/lib/en/vocab";
 import { type EnProgress, isLearned } from "@/lib/en/progress";
-import { Button } from "@/components/ui";
+import { Button, Progress } from "@/components/ui";
 
 const LEVEL_GRAD: Record<string, [string, string]> = {
   A1: ["#10B981", "#4361EE"],
@@ -81,9 +81,7 @@ export default function EnHome({ progress, onStudyCategory, onGrammar }: {
                   </span>
                 </div>
 
-                <div className="progress-bar mt-3">
-                  <div className="progress-bar-fill" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
-                </div>
+                <Progress value={pct} className="mt-3" indicatorStyle={{ background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
                 <div className="mt-1.5 flex items-center justify-between text-xs" style={{ color: "var(--text-3)" }}>
                   <span>{status}</span>
                   <span>~{est}분</span>

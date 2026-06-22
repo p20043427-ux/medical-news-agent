@@ -5,7 +5,7 @@ import type { Word, Category } from "@/lib/jp/types";
 import type { Grade } from "@/lib/jp/progress";
 import { VOCAB } from "@/lib/jp/vocab";
 import SpeakerButton from "./SpeakerButton";
-import { Button } from "@/components/ui";
+import { Button, Progress } from "@/components/ui";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -143,9 +143,7 @@ export default function QuizMode({
       </div>
 
       <div className="px-5 pb-4">
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200/70">
-          <div className="h-full rounded-full transition-all" style={{ width: `${(qi / questions.length) * 100}%`, background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
-        </div>
+        <Progress value={(qi / questions.length) * 100} indicatorStyle={{ background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
       </div>
 
       {/* 문제 */}

@@ -7,7 +7,7 @@ import {
 } from "@/lib/en/progress";
 import { useTheme, type Theme } from "@/lib/jp/theme";
 import { getEnRate, setEnRate, speakEn } from "@/lib/en/speech";
-import { Button } from "@/components/ui";
+import { Button, Progress } from "@/components/ui";
 
 const WD = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -88,10 +88,7 @@ export default function EnStats({
         <p className="text-2xl font-extrabold mb-2" style={{ color: "var(--xp)" }}>
           ⚡ {progress.xp.toLocaleString()} XP
         </p>
-        <div className="progress-bar">
-          <div className="progress-bar-fill xp-bar-fill"
-            style={{ width: `${Math.min((progress.xp % 1000) / 10, 100)}%` }} />
-        </div>
+        <Progress value={Math.min((progress.xp % 1000) / 10, 100)} indicatorClassName="xp-bar-fill" />
         <p className="text-xs mt-1" style={{ color: "var(--text-3)" }}>
           다음 레벨까지 {1000 - (progress.xp % 1000)} XP
         </p>
@@ -105,10 +102,7 @@ export default function EnStats({
             {learned} / {total} ({total ? Math.round((learned / total) * 100) : 0}%)
           </span>
         </div>
-        <div className="progress-bar mb-4">
-          <div className="progress-bar-fill"
-            style={{ width: `${total ? (learned / total) * 100 : 0}%`, background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
-        </div>
+        <Progress value={total ? (learned / total) * 100 : 0} className="mb-4" indicatorStyle={{ background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
         {/* CEFR 레벨별 */}
         <div className="space-y-2">
           {levels.map((lv) => {
@@ -121,9 +115,7 @@ export default function EnStats({
                   style={{ background: levelColors[lv] }}>
                   {lv}
                 </span>
-                <div className="flex-1 progress-bar">
-                  <div className="progress-bar-fill" style={{ width: `${p}%`, background: levelColors[lv] }} />
-                </div>
+                <Progress value={p} className="flex-1" indicatorStyle={{ background: levelColors[lv] }} />
                 <span className="text-xs w-16 text-right" style={{ color: "var(--text-3)" }}>{ln}/{ws.length}</span>
               </div>
             );

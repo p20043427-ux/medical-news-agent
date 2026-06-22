@@ -3,18 +3,18 @@
 import { useRef, useState } from "react";
 import { VOCAB } from "@/lib/jp/vocab";
 import {
-  type Progress, knownCount, streak, recentDaily, daysUntilGoal, todayKey, totalReviews,
+  type Progress as JpProgress, knownCount, streak, recentDaily, daysUntilGoal, todayKey, totalReviews,
 } from "@/lib/jp/progress";
 import { useTheme, type Theme } from "@/lib/jp/theme";
 import { getRate, setRate as saveRate, speakJa } from "@/lib/jp/speech";
-import { Button } from "@/components/ui";
+import { Button, Progress } from "@/components/ui";
 
 const WD = ["일", "월", "화", "수", "목", "금", "토"];
 
 export default function Stats({
   progress, onSetGoal, onReset, onExport, onImport,
 }: {
-  progress: Progress;
+  progress: JpProgress;
   onSetGoal: (date: string | undefined) => void;
   onReset: () => void;
   onExport: () => string;
@@ -82,10 +82,7 @@ export default function Stats({
         <p className="text-2xl font-extrabold mb-2" style={{ color: "var(--xp)" }}>
           ⚡ {progress.xp.toLocaleString()} XP
         </p>
-        <div className="progress-bar">
-          <div className="progress-bar-fill xp-bar-fill"
-            style={{ width: `${Math.min((progress.xp % 1000) / 10, 100)}%` }} />
-        </div>
+        <Progress value={Math.min((progress.xp % 1000) / 10, 100)} indicatorClassName="xp-bar-fill" />
         <p className="text-xs mt-1" style={{ color: "var(--text-3)" }}>
           다음 레벨까지 {1000 - (progress.xp % 1000)} XP
         </p>
@@ -99,10 +96,7 @@ export default function Stats({
             {known} / {total} ({total ? Math.round((known / total) * 100) : 0}%)
           </span>
         </div>
-        <div className="progress-bar">
-          <div className="progress-bar-fill"
-            style={{ width: `${total ? (known / total) * 100 : 0}%`, background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
-        </div>
+        <Progress value={total ? (known / total) * 100 : 0} indicatorStyle={{ background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
       </div>
 
       {/* 최근 2주 그래프 */}

@@ -5,7 +5,7 @@ import type { Word, Category } from "@/lib/jp/types";
 import type { Grade } from "@/lib/jp/progress";
 import Furigana from "./Furigana";
 import SpeakerButton from "./SpeakerButton";
-import { Button } from "@/components/ui";
+import { Button, Progress } from "@/components/ui";
 
 const GRADE_CONFIG: Record<Grade, { label: string; sub: string; grad: [string, string]; xp: string; icon: string }> = {
   again: { label: "다시",   sub: "1일",   grad: ["#ff7675", "#d63031"], xp: "+2",  icon: "↺" },
@@ -101,9 +101,7 @@ export default function ReviewMode({
 
       {/* 진행바 */}
       <div className="px-5 pb-2">
-        <div className="progress-bar">
-          <div className="progress-bar-fill" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
-        </div>
+        <Progress value={pct} indicatorStyle={{ background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
       </div>
 
       {/* 카드 */}

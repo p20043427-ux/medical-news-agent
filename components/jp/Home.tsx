@@ -3,12 +3,12 @@
 import { VOCAB, VOCAB_CATEGORIES } from "@/lib/jp/vocab";
 import { VERBS } from "@/lib/jp/verbs";
 import { CONVERSATIONS } from "@/lib/jp/conversations";
-import { type Progress, isKnown } from "@/lib/jp/progress";
+import { type Progress as JpProgress, isKnown } from "@/lib/jp/progress";
 import WordImage from "./WordImage";
-import { Button } from "@/components/ui";
+import { Button, Progress } from "@/components/ui";
 
 export default function Home({ progress, onStudyCategory, onGo }: {
-  progress: Progress;
+  progress: JpProgress;
   onStudyCategory: (key: string) => void;
   onGo: (tab: "conversation" | "verbs") => void;
 }) {
@@ -83,9 +83,7 @@ export default function Home({ progress, onStudyCategory, onGo }: {
                   </span>
                 </div>
 
-                <div className="progress-bar mt-3">
-                  <div className="progress-bar-fill" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
-                </div>
+                <Progress value={pct} className="mt-3" indicatorStyle={{ background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
                 <div className="mt-1.5 flex items-center justify-between text-xs" style={{ color: "var(--text-3)" }}>
                   <span>{status}</span>
                   <span>~{est}분</span>

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import type { Word, Category } from "@/lib/jp/types";
 import Flashcard from "./Flashcard";
 import SwipeCard from "./SwipeCard";
-import { Button, Switch } from "@/components/ui";
+import { Button, Switch, Progress } from "@/components/ui";
 
 export default function VocabStudy({
   category,
@@ -150,9 +150,7 @@ export default function VocabStudy({
 
       {/* 진행 바 */}
       <div className="px-5 pb-2">
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200/70">
-          <div className="h-full rounded-full bg-slate-900 transition-all" style={{ width: `${progressPct}%` }} />
-        </div>
+        <Progress value={progressPct} indicatorClassName="bg-slate-900 transition-all" />
       </div>
 
       {/* 카드 (스와이프) */}
