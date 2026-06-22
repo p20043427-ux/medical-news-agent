@@ -13,6 +13,7 @@ import VerbView from "./VerbView";
 import Stats from "./Stats";
 import BottomNav, { type Tab } from "./BottomNav";
 import Wordbook from "./Wordbook";
+import KanaView from "./KanaView";
 
 const FURIGANA_KEY = "jp-app-furigana";
 
@@ -23,6 +24,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
   const { progress, ready, markNew, grade, setGoalDate, reset, exportJson, importJson, toggleBookmark } = useProgress();
   const [tab, setTab] = useState<Tab>("home");
   const [session, setSession] = useState<Session | null>(null);
+  const [kanaOpen, setKanaOpen] = useState(false);
   const [showFurigana, setShowFurigana] = useState(true);
 
   useEffect(() => {
@@ -81,6 +83,15 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
           <QuizMode category={category} words={pool} onGrade={grade} onExit={exit} onReview={() => go("review")} />
         )}
         <BottomNav tab="home" onChange={(t) => { setSession(null); setTab(t); }} accentColor="#E63946" />
+      </div>
+    );
+  }
+
+  if (kanaOpen) {
+    return (
+      <div className="mx-auto min-h-screen max-w-md" style={{ background: "var(--bg)" }}>
+        <KanaView onBack={() => setKanaOpen(false)} />
+        <BottomNav tab="home" onChange={(t) => { setKanaOpen(false); setTab(t); }} accentColor="#E63946" />
       </div>
     );
   }
@@ -160,7 +171,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
       </header>
 
       {tab === "home" && (
-        <Home progress={progress} onStudyCategory={(key) => setSession({ category: key, mode: "skim" })} onGo={(t) => setTab(t)} />
+        <Home progress={progress} onStudyCategory={(key) => setSession({ category: key, mode: "skim" })} onGo={(t) => setTab(t)} onKana={() => setKanaOpen(true)} />
       )}
       {tab === "conversation" && (
         <ConversationView showFurigana={showFurigana} onToggleFurigana={toggleFurigana} />

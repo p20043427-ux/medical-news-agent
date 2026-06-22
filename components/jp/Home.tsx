@@ -7,10 +7,11 @@ import { type Progress as JpProgress, isKnown } from "@/lib/jp/progress";
 import WordImage from "./WordImage";
 import { Button, Progress } from "@/components/ui";
 
-export default function Home({ progress, onStudyCategory, onGo }: {
+export default function Home({ progress, onStudyCategory, onGo, onKana }: {
   progress: JpProgress;
   onStudyCategory: (key: string) => void;
   onGo: (tab: "conversation" | "verbs") => void;
+  onKana?: () => void;
 }) {
   const start = new Date(progress.startedAt);
   const dayN = Math.floor((Date.now() - start.getTime()) / 86400000) + 1;
@@ -132,6 +133,21 @@ export default function Home({ progress, onStudyCategory, onGo }: {
           <p className="mt-3 font-bold" style={{ color: "var(--text-1)" }}>필수 동사</p>
           <p className="text-xs" style={{ color: "var(--text-3)" }}>{VERBS.length}개 동사</p>
         </button>
+        {onKana && (
+          <button onClick={onKana}
+            className="col-span-2 flex items-center gap-4 rounded-2xl p-4 text-left shadow-sm transition active:scale-95"
+            style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-xl"
+              style={{ background: "linear-gradient(135deg,#E63946,#F4A261)", boxShadow: "0 4px 12px rgba(230,57,70,.3)" }}>
+              あ
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-bold" style={{ color: "var(--text-1)" }}>가나 (히라가나·가타카나)</p>
+              <p className="text-xs" style={{ color: "var(--text-3)" }}>기초 문자 · 발음 듣기 · 퀴즈</p>
+            </div>
+            <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" style={{ color: "var(--text-3)" }} fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+          </button>
+        )}
       </div>
     </div>
   );
