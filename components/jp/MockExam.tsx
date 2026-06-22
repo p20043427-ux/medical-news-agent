@@ -126,7 +126,7 @@ export default function MockExam({
         <h1 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{round?.label}</h1>
         <p className="mt-1 text-sm" style={{ color: "var(--text-3)" }}>{questions.length}문항 · 문자·어휘 / 문법 / 독해 / 청해</p>
         <div className="mt-5 space-y-2.5">
-          {[["문자·어휘", "한자 읽기 · 표기 · 뜻"], ["문법", "동사 활용 · 조사 빈칸"], ["독해", "짧은 글 읽고 답하기"], ["청해", "단어 · 대화 듣고 뜻 고르기 (🔊 자동 재생)"]].map(([s, d]) => (
+          {[["문자·어휘", "한자 읽기 · 표기 · 뜻 · 문맥 · 유의어"], ["문법", "동사 활용 · 조사 · 문 조립"], ["독해", "짧은 글 · 안내문(정보검색)"], ["청해", "단어 · 대화 듣고 뜻 고르기 (🔊 자동 재생)"]].map(([s, d]) => (
             <div key={s} className="rounded-2xl p-4" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
               <p className="font-bold" style={{ color: "var(--text-1)" }}>{s}</p>
               <p className="text-xs" style={{ color: "var(--text-3)" }}>{d}</p>
@@ -189,7 +189,7 @@ export default function MockExam({
               {wrong.map((qq) => (
                 <div key={qq.key} className="rounded-2xl p-3.5" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
                   <p className="text-[11px]" style={{ color: "var(--text-3)" }}>{qq.section} · {qq.question}</p>
-                  {qq.passage && <p className="mt-1 text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>{qq.passage}</p>}
+                  {qq.passage && <p className="mt-1 whitespace-pre-line text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>{qq.passage}</p>}
                   {qq.prompt && qq.prompt !== "🔊" && <p className="mt-1 text-base font-bold" style={{ color: "var(--text-1)" }}>{qq.prompt}</p>}
                   {qq.audio && <p className="mt-1 text-sm" style={{ color: "var(--text-2)" }}>🔊 {qq.audio}</p>}
                   <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-0.5 text-sm font-semibold">
@@ -234,7 +234,7 @@ export default function MockExam({
 
       <div className="rounded-3xl p-6 shadow-sm" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
         {q.passage && (
-          <p className="mb-4 rounded-2xl p-4 text-base leading-loose" style={{ background: "var(--surface)", color: "var(--text-1)" }}>
+          <p className="mb-4 whitespace-pre-line rounded-2xl p-4 text-base leading-loose" style={{ background: "var(--surface)", color: "var(--text-1)" }}>
             {q.passage}
           </p>
         )}

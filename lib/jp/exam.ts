@@ -58,6 +58,29 @@ const READINGS: { text: string; question: string; options: string[]; answer: str
   { text: "わたしの へやは ひろくないですが、あかるくて しずかです。だから べんきょうに いいです。", question: "이 사람의 방은 어떻습니까?", options: ["넓고 시끄럽다", "좁지만 밝고 조용하다", "어둡다", "넓고 밝다"], answer: "좁지만 밝고 조용하다" },
 ];
 
+// ── 문 조립(문장 만들기) · 정보검색 — 직접 작성한 원본 N5 자료 ──
+// parts: 올바른 순서의 4조각. ★(세 번째, index 2)에 오는 조각을 묻는다.
+const KUMITATE: { parts: [string, string, string, string]; ko: string }[] = [
+  { parts: ["わたしは", "まいあさ", "コーヒーを", "のみます"], ko: "나는 매일 아침 커피를 마십니다." },
+  { parts: ["きのう", "ともだちと", "えいがを", "見ました"], ko: "어제 친구와 영화를 봤습니다." },
+  { parts: ["この みせの", "ラーメンは", "とても", "おいしいです"], ko: "이 가게의 라멘은 매우 맛있습니다." },
+  { parts: ["へやに", "だれも", "いま", "いません"], ko: "방에 아무도 지금 없습니다." },
+  { parts: ["わたしは", "にほんごを", "すこし", "はなせます"], ko: "나는 일본어를 조금 말할 수 있습니다." },
+  { parts: ["あした", "あめが", "ふるか", "どうか"], ko: "내일 비가 올지 어떨지." },
+  { parts: ["がっこうまで", "じてんしゃで", "じゅっぷん", "かかります"], ko: "학교까지 자전거로 10분 걸립니다." },
+  { parts: ["かぞくと", "いっしょに", "りょこうに", "行きたいです"], ko: "가족과 함께 여행을 가고 싶습니다." },
+  { parts: ["この ほんは", "むずかしくて", "ぜんぜん", "わかりません"], ko: "이 책은 어려워서 전혀 모르겠습니다." },
+  { parts: ["まいばん", "ねるまえに", "歯を", "みがきます"], ko: "매일 밤 자기 전에 이를 닦습니다." },
+];
+
+const INFO: { text: string; question: string; options: string[]; answer: string }[] = [
+  { text: "＜図書館の あんない＞\n・あいている 時間：あさ 9時～ゆうがた 6時\n・休み：まいしゅう 月曜日\n・本は 2週間 かりられます。", question: "図書館は 何曜日が 休みですか。", options: ["月曜日", "火曜日", "日曜日", "土曜日"], answer: "月曜日" },
+  { text: "＜カフェ メニュー＞\n・コーヒー 300円\n・こうちゃ 350円\n・ケーキ 400円\n※ コーヒーと ケーキの セットは 600円。", question: "コーヒーと ケーキを セットで かうと いくらですか。", options: ["600円", "700円", "650円", "750円"], answer: "600円" },
+  { text: "＜日本語 クラス＞\nまいしゅう 火曜日と 木曜日\nごご 7時から 8時半まで\nばしょ：202きょうしつ", question: "クラスは 何時に はじまりますか。", options: ["ごご 7時", "ごご 8時", "ごご 6時", "ごご 8時半"], answer: "ごご 7時" },
+  { text: "＜バスの 時間＞\n駅ゆき：8:00 / 8:30 / 9:00\nびょういんゆき：8:15 / 8:45\n※ 日曜日は バスが ありません。", question: "びょういんゆきの バスは 何時に ありますか。", options: ["8:15と 8:45", "8:00と 8:30", "9:00だけ", "8:30だけ"], answer: "8:15と 8:45" },
+  { text: "＜スーパー セール＞\nきょうだけ！\n・やさい ぜんぶ 半分\n・くだもの 100円びき\n・あさ 10時から ごご 8時まで", question: "きょう やさいは どうなりますか。", options: ["はんがくに なる", "100円 やすくなる", "かわらない", "高くなる"], answer: "はんがくに なる" },
+];
+
 function opt(answer: string, pool: string[], sh: <T>(a: T[]) => T[]): string[] {
   return sh([answer, ...sh(pool.filter((x) => x !== answer)).slice(0, 3)]);
 }
@@ -95,10 +118,21 @@ export function buildExam(opts?: { seed?: number; count?: number }): ExamQuestio
     return i >= 0 ? { w, i } : null;
   }).filter((x): x is { w: (typeof VOCAB)[number]; i: number } => x !== null);
 
-  const nVocab = Math.round(count * 0.4);
-  const nGrammar = Math.round(count * 0.2);
-  const nReading = Math.min(3, READINGS.length, Math.max(2, Math.round(count * 0.15)));
-  const nListen = Math.max(0, count - nVocab - nGrammar - nReading);
+  const nVocabTotal = Math.round(count * 0.4);
+  const nGrammarTotal = Math.round(count * 0.2);
+  const nReadingTotal = Math.min(3, READINGS.length, Math.max(2, Math.round(count * 0.15)));
+  const nListen = Math.max(0, count - nVocabTotal - nGrammarTotal - nReadingTotal);
+
+  // 유의어 단어 풀 (curated synonyms 보유 단어)
+  const synPool = VOCAB.filter((w) => w.synonyms && w.synonyms.length > 0);
+  const nSyn = Math.min(2, synPool.length, Math.max(0, nVocabTotal - 2));
+  const nVocab = nVocabTotal - nSyn;
+
+  const nKumi = Math.min(2, KUMITATE.length, Math.max(0, nGrammarTotal - 2));
+  const nGrammar = nGrammarTotal - nKumi;
+
+  const nInfo = Math.min(1, INFO.length, Math.max(0, nReadingTotal - 1));
+  const nReading = nReadingTotal - nInfo;
 
   const qs: ExamQuestion[] = [];
 
@@ -136,6 +170,12 @@ export function buildExam(opts?: { seed?: number; count?: number }): ExamQuestio
     }
   }
 
+  // 유의어 (비슷한 뜻 고르기) — curated synonyms
+  sh(synPool).slice(0, nSyn).forEach((w, i) => {
+    const ans = w.synonyms![0].word;
+    qs.push({ key: `v-s-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.word, sub: `[${w.reading}] · ${w.meaning}`, question: "뜻이 가장 가까운 말은?", options: smartOpt(ans, catWords[w.category] || [], words, sh), answer: ans });
+  });
+
   // 문법 (동사 활용 + 조사 빈칸)
   const nParticle = Math.min(Math.floor(nGrammar / 2), particleCands.length);
   const nVerb = nGrammar - nParticle;
@@ -148,9 +188,21 @@ export function buildExam(opts?: { seed?: number; count?: number }): ExamQuestio
     qs.push({ key: `g-p-${w.id}-${k}`, section: "문법", passage: sentence, prompt: "", question: "（　）에 들어갈 말은?", options: opt(ans, PARTICLES, sh), answer: ans });
   });
 
+  // 문 조립 (문장 만들기) — 네 조각을 바른 순서로, ★(세 번째)에 오는 것
+  sh(KUMITATE).slice(0, nKumi).forEach((k, i) => {
+    const bank = sh(k.parts);
+    const passage = `뜻: ${k.ko}\n[ ${bank.join(" / ")} ]\n①＿＿ ②＿＿ ③★ ④＿＿`;
+    qs.push({ key: `g-k-${i}-${k.parts[2]}`, section: "문법", passage, prompt: "", question: "★(세 번째)에 들어갈 말은?", options: sh(k.parts), answer: k.parts[2] });
+  });
+
   // 독해
   sh(READINGS).slice(0, nReading).forEach((r, i) => {
     qs.push({ key: `r-${i}-${r.answer}`, section: "독해", passage: r.text, prompt: "", question: r.question, options: sh(r.options), answer: r.answer });
+  });
+
+  // 정보검색 (안내문·시간표 읽고 답하기)
+  sh(INFO).slice(0, nInfo).forEach((r, i) => {
+    qs.push({ key: `i-${i}-${r.answer}`, section: "독해", passage: r.text, prompt: "", question: r.question, options: sh(r.options), answer: r.answer });
   });
 
   // 청해 (단어 듣기 + 대화 듣기)
