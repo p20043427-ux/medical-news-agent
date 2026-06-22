@@ -12,14 +12,15 @@ import ConversationView from "./ConversationView";
 import VerbView from "./VerbView";
 import Stats from "./Stats";
 import BottomNav, { type Tab } from "./BottomNav";
+import Wordbook from "./Wordbook";
 
 const FURIGANA_KEY = "jp-app-furigana";
 
 type Mode = "skim" | "review" | "quiz";
-interface Session { category: string; mode: Mode }
+interface Session { category: string; mode: Mode; wordIds?: string[] }
 
 export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
-  const { progress, ready, markNew, grade, setGoalDate, reset, exportJson, importJson } = useProgress();
+  const { progress, ready, markNew, grade, setGoalDate, reset, exportJson, importJson, toggleBookmark } = useProgress();
   const [tab, setTab] = useState<Tab>("home");
   const [session, setSession] = useState<Session | null>(null);
   const [showFurigana, setShowFurigana] = useState(true);
@@ -48,11 +49,16 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
   }
 
   if (session) {
-    const category = VOCAB_CATEGORIES.find((c) => c.key === session.category)!;
-    const all = VOCAB.filter((w) => w.category === session.category);
+    const isWordbook = session.category === "_wordbook";
+    const category = isWordbook
+      ? { key: "_wordbook", label: "단어장", emoji: "📚" }
+      : VOCAB_CATEGORIES.find((c) => c.key === session.category)!;
+    const all = session.wordIds
+      ? VOCAB.filter((w) => session.wordIds!.includes(w.id))
+      : VOCAB.filter((w) => w.category === session.category);
     const learning = all.filter((w) => !isKnown(progress, w.id));
     const pool = learning.length > 0 ? learning : all;
-    const go = (mode: Mode) => setSession({ category: session.category, mode });
+    const go = (mode: Mode) => setSession({ ...session, mode });
     const exit = () => setSession(null);
 
     return (
@@ -62,6 +68,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
             category={category} words={all} showFurigana={showFurigana}
             onToggleFurigana={toggleFurigana} onSkim={markNew} onExit={exit}
             onReview={() => go("review")} onQuiz={() => go("quiz")}
+            bookmarks={progress.bookmarks} onToggleBookmark={toggleBookmark}
           />
         )}
         {session.mode === "review" && (
@@ -159,6 +166,14 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
         <ConversationView showFurigana={showFurigana} onToggleFurigana={toggleFurigana} />
       )}
       {tab === "verbs" && <VerbView showFurigana={showFurigana} />}
+      {tab === "wordbook" && (
+        <Wordbook
+          bookmarks={progress.bookmarks}
+          showFurigana={showFurigana}
+          onToggleBookmark={toggleBookmark}
+          onStudy={(ids) => setSession({ category: "_wordbook", mode: "review", wordIds: ids })}
+        />
+      )}
       {tab === "stats" && (
         <Stats progress={progress} onSetGoal={setGoalDate} onReset={reset} onExport={exportJson} onImport={importJson} />
       )}

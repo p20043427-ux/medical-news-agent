@@ -26,6 +26,7 @@ export interface Progress {
   goalDate?: string;
   xp: number;
   achievements: string[];
+  bookmarks: string[];            // persisted word ids
 }
 
 export type Grade = "again" | "hard" | "good" | "easy";
@@ -39,6 +40,7 @@ const EMPTY: Progress = {
   startedAt: todayKey(),
   xp: 0,
   achievements: [],
+  bookmarks: [],
 };
 
 export function todayKey(d: Date = new Date()): string {
@@ -82,7 +84,7 @@ function load(): Progress {
           interval: c.interval ?? (c.box <= 1 ? 1 : c.box <= 2 ? 2 : c.box <= 3 ? 4 : c.box <= 4 ? 7 : 15),
         };
       }
-      return { ...parsed, xp: parsed.xp ?? 0, achievements: parsed.achievements ?? [], cards };
+      return { ...parsed, xp: parsed.xp ?? 0, achievements: parsed.achievements ?? [], bookmarks: parsed.bookmarks ?? [], cards };
     }
     // 이전 버전 마이그레이션
     const old = window.localStorage.getItem("jp-app-progress-v2");
@@ -187,6 +189,14 @@ function applyGrade(p: Progress, id: string, grade: Grade): Progress {
   return { ...p, cards, daily: bumpDaily(p.daily), xp: p.xp + xpGain };
 }
 
+function applyToggleBookmark(p: Progress, id: string): Progress {
+  const existing = p.bookmarks ?? [];
+  const bookmarks = existing.includes(id)
+    ? existing.filter((b) => b !== id)
+    : [...existing, id];
+  return { ...p, bookmarks };
+}
+
 // ── React 훅 ──
 export function useProgress() {
   const [progress, setProgress] = useState<Progress>(EMPTY);
@@ -226,7 +236,11 @@ export function useProgress() {
     } catch { return false; }
   }, []);
 
-  return { progress, ready, markNew, grade, setGoalDate, reset, exportJson, importJson };
+  const toggleBookmark = useCallback((id: string) => {
+    setProgress((prev) => { const next = applyToggleBookmark(prev, id); save(next); return next; });
+  }, []);
+
+  return { progress, ready, markNew, grade, setGoalDate, reset, exportJson, importJson, toggleBookmark };
 }
 
 // 하위 호환 alias

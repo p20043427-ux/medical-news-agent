@@ -14,6 +14,8 @@ export default function VocabStudy({
   onExit,
   onReview,
   onQuiz,
+  bookmarks = [],
+  onToggleBookmark,
 }: {
   category: Category;
   words: Word[];
@@ -23,6 +25,8 @@ export default function VocabStudy({
   onExit: () => void;
   onReview: () => void;
   onQuiz: () => void;
+  bookmarks?: string[];
+  onToggleBookmark?: (id: string) => void;
 }) {
   const [index, setIndex] = useState(0);
   const [known, setKnown] = useState(0);
@@ -163,6 +167,8 @@ export default function VocabStudy({
               showFurigana={showFurigana}
               emoji={category.emoji}
               hideMeaningDefault={hideMeaning}
+              bookmarked={bookmarks.includes(word.id)}
+              onToggleBookmark={onToggleBookmark ? () => onToggleBookmark(word.id) : undefined}
             />
           </SwipeCard>
         )}
