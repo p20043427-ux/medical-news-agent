@@ -2,13 +2,25 @@
 
 import { VOCAB, VOCAB_CATEGORIES } from "@/lib/jp/vocab";
 import { type Progress as JpProgress, isKnown, todayKey } from "@/lib/jp/progress";
+import { TRAVEL_PHRASEBOOK } from "@/lib/jp/phrasebook";
+import { speakJa } from "@/lib/jp/speech";
+import { useFavorites } from "@/lib/favorites";
 import WordImage from "./WordImage";
 import { Button, Progress } from "@/components/ui";
+
+const ALL_PHRASES = TRAVEL_PHRASEBOOK.flatMap((s) => s.phrases);
+function dailyIndex(key: string, mod: number): number {
+  let h = 0;
+  for (const c of key) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return mod > 0 ? h % mod : 0;
+}
 
 export default function Home({ progress, onStudyCategory }: {
   progress: JpProgress;
   onStudyCategory: (key: string) => void;
 }) {
+  const { has, toggle } = useFavorites("jp-phrase");
+  const todayPhrase = ALL_PHRASES[dailyIndex(todayKey(), ALL_PHRASES.length)];
   const goal = progress.dailyGoal ?? 20;
   const todayCount = progress.daily?.[todayKey()] ?? 0;
   const goalPct = Math.min((todayCount / goal) * 100, 100);
@@ -42,6 +54,23 @@ export default function Home({ progress, onStudyCategory }: {
           />
         </div>
       </div>
+
+      {/* 오늘의 표현 */}
+      {todayPhrase && (
+        <div className="px-5 pb-2 pt-1">
+          <div className="rounded-2xl p-4" style={{ background: "linear-gradient(135deg,#00b89412,#00cec912)", border: "1px solid var(--border)" }}>
+            <div className="mb-1.5 flex items-center justify-between">
+              <span className="text-xs font-extrabold" style={{ color: "#00b894" }}>🗾 오늘의 표현</span>
+              <button onClick={() => toggle(todayPhrase.jp)} aria-label="즐겨찾기" className="text-lg" style={{ color: has(todayPhrase.jp) ? "#f0932b" : "var(--text-3)" }}>{has(todayPhrase.jp) ? "★" : "☆"}</button>
+            </div>
+            <button onClick={() => speakJa(todayPhrase.reading || todayPhrase.jp)} className="w-full text-left">
+              <p className="text-lg font-extrabold leading-snug" style={{ color: "var(--text-1)" }}>{todayPhrase.jp}</p>
+              <p className="mt-0.5 text-xs" style={{ color: "var(--text-3)" }}>{todayPhrase.reading}</p>
+              <p className="mt-1 text-sm" style={{ color: "var(--text-2)" }}>{todayPhrase.ko} · 🔊 눌러 듣기</p>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Day N */}
       <div className="px-5 pb-3 pt-1">

@@ -1,8 +1,18 @@
 "use client";
 
 import { EN_VOCAB, EN_CATEGORIES } from "@/lib/en/vocab";
-import { type EnProgress, isLearned } from "@/lib/en/progress";
+import { type EnProgress, isLearned, todayKey } from "@/lib/en/progress";
+import { EN_TRAVEL_PHRASEBOOK } from "@/lib/en/phrasebook";
+import { speakEn } from "@/lib/en/speech";
+import { useFavorites } from "@/lib/favorites";
 import { Button, Progress } from "@/components/ui";
+
+const EN_ALL_PHRASES = EN_TRAVEL_PHRASEBOOK.flatMap((s) => s.phrases);
+function enDailyIndex(key: string, mod: number): number {
+  let h = 0;
+  for (const c of key) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return mod > 0 ? h % mod : 0;
+}
 
 const LEVEL_GRAD: Record<string, [string, string]> = {
   A1: ["#10B981", "#4361EE"],
@@ -20,6 +30,8 @@ export default function EnHome({ progress, onStudyCategory, onGrammar }: {
 }) {
   const start = new Date(progress.startedAt);
   const dayN = Math.floor((Date.now() - start.getTime()) / 86400000) + 1;
+  const { has, toggle } = useFavorites("en-phrase");
+  const todayPhrase = EN_ALL_PHRASES[enDailyIndex(todayKey(), EN_ALL_PHRASES.length)];
 
   const ordered = [...EN_CATEGORIES].sort((a, b) => {
     const aDone = EN_VOCAB.filter((w) => w.category === a.key).every((w) => isLearned(progress, w.id));
@@ -34,6 +46,23 @@ export default function EnHome({ progress, onStudyCategory, onGrammar }: {
           Day {dayN}
         </h1>
       </div>
+
+      {/* 오늘의 표현 */}
+      {todayPhrase && (
+        <div className="px-5 pb-3">
+          <div className="rounded-2xl p-4" style={{ background: "linear-gradient(135deg,#4361EE12,#7209B712)", border: "1px solid var(--border)" }}>
+            <div className="mb-1.5 flex items-center justify-between">
+              <span className="text-xs font-extrabold" style={{ color: "#4361EE" }}>🌍 오늘의 표현</span>
+              <button onClick={() => toggle(todayPhrase.en)} aria-label="즐겨찾기" className="text-lg" style={{ color: has(todayPhrase.en) ? "#f0932b" : "var(--text-3)" }}>{has(todayPhrase.en) ? "★" : "☆"}</button>
+            </div>
+            <button onClick={() => speakEn(todayPhrase.en)} className="w-full text-left">
+              <p className="text-lg font-extrabold leading-snug" style={{ color: "var(--text-1)" }}>{todayPhrase.en}</p>
+              <p className="mt-0.5 text-xs" style={{ color: "var(--text-3)" }}>{todayPhrase.pronunciation}</p>
+              <p className="mt-1 text-sm" style={{ color: "var(--text-2)" }}>{todayPhrase.ko} · 🔊 눌러 듣기</p>
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-1">
         {ordered.map((cat) => {
