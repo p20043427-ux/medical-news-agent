@@ -62,6 +62,15 @@ function opt(answer: string, pool: string[], sh: <T>(a: T[]) => T[]): string[] {
   return sh([answer, ...sh(pool.filter((x) => x !== answer)).slice(0, 3)]);
 }
 
+/** 변별력 강화: 같은 카테고리(유사어군)에서 오답을 우선 뽑고, 부족하면 전체로 보충 */
+function smartOpt(answer: string, prefer: string[], full: string[], sh: <T>(a: T[]) => T[]): string[] {
+  const seen = new Set([answer]);
+  const distract: string[] = [];
+  for (const x of sh(prefer)) { if (!seen.has(x)) { seen.add(x); distract.push(x); } if (distract.length >= 3) break; }
+  if (distract.length < 3) for (const x of sh(full)) { if (!seen.has(x)) { seen.add(x); distract.push(x); } if (distract.length >= 3) break; }
+  return sh([answer, ...distract.slice(0, 3)]);
+}
+
 /**
  * JLPT N5 형식의 **모의시험** 문항을 앱 콘텐츠에서 생성(원본 문항, 기출 원문 아님).
  * 문자·어휘 / 문법(동사 활용·조사) / 독해 / 청해(단어·대화). seed 로 회차를 재현.
@@ -93,20 +102,37 @@ export function buildExam(opts?: { seed?: number; count?: number }): ExamQuestio
 
   const qs: ExamQuestion[] = [];
 
-  // 문자·어휘 (읽기·표기는 한자 단어만, 뜻은 전체)
+  // 같은 카테고리(유사어군) 풀 — 오답 변별력 강화용
+  const byCat = (sel: (w: (typeof VOCAB)[number]) => string) => {
+    const m: Record<string, string[]> = {};
+    VOCAB.forEach((w) => { (m[w.category] ||= []).push(sel(w)); });
+    return m;
+  };
+  const catMeanings = byCat((w) => w.meaning);
+  const catReadings = byCat((w) => w.reading);
+  const catWords = byCat((w) => w.word);
+  const contextCands = sh(VOCAB.filter((w) => w.example.tokens.some((t) => t.hl)));
+
+  // 문자·어휘 (읽기·표기는 한자 단어만, 뜻·문맥규정은 전체)
   const kanji = sh(kanjiWords);
   const vshuf = sh(VOCAB);
   for (let i = 0; i < nVocab; i++) {
-    const mode = i % 3;
+    const mode = (contextCands.length ? i % 4 : i % 3);
     if (mode === 1) {
       const w = vshuf[i % vshuf.length];
-      qs.push({ key: `v-m-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.word, sub: `[${w.reading}]`, question: "뜻으로 알맞은 것은?", options: opt(w.meaning, meanings, sh), answer: w.meaning });
+      qs.push({ key: `v-m-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.word, sub: `[${w.reading}]`, question: "뜻으로 알맞은 것은?", options: smartOpt(w.meaning, catMeanings[w.category] || [], meanings, sh), answer: w.meaning });
     } else if (mode === 0) {
       const w = kanji[i % kanji.length];
-      qs.push({ key: `v-r-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.word, question: "읽는 법으로 알맞은 것은?", options: opt(w.reading, readings, sh), answer: w.reading });
-    } else {
+      qs.push({ key: `v-r-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.word, question: "읽는 법으로 알맞은 것은?", options: smartOpt(w.reading, catReadings[w.category] || [], readings, sh), answer: w.reading });
+    } else if (mode === 2) {
       const w = kanji[(i + 1) % kanji.length];
-      qs.push({ key: `v-k-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.reading, question: "한자 표기로 알맞은 것은?", options: opt(w.word, words, sh), answer: w.word });
+      qs.push({ key: `v-k-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.reading, question: "한자 표기로 알맞은 것은?", options: smartOpt(w.word, catWords[w.category] || [], words, sh), answer: w.word });
+    } else {
+      // 문맥규정: 예문에서 표제어를 비우고 알맞은 단어 고르기
+      const w = contextCands[i % contextCands.length];
+      let blanked = false;
+      const sentence = w.example.tokens.map((t) => (t.hl ? (blanked ? "" : ((blanked = true), "（　）")) : t.t)).join("");
+      qs.push({ key: `v-c-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", passage: sentence, prompt: "", question: "（　）에 들어갈 말은?", options: smartOpt(w.word, catWords[w.category] || [], words, sh), answer: w.word });
     }
   }
 
