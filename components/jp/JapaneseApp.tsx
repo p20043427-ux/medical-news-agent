@@ -12,9 +12,9 @@ import ConversationView from "./ConversationView";
 import VerbView from "./VerbView";
 import Stats from "./Stats";
 import BottomNav, { type Tab } from "./BottomNav";
-import Wordbook from "./Wordbook";
 import KanaView from "./KanaView";
-import MistakesView from "./MistakesView";
+import LearnHub, { type LearnView } from "./LearnHub";
+import LibraryView from "./LibraryView";
 
 const FURIGANA_KEY = "jp-app-furigana";
 
@@ -25,8 +25,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
   const { progress, ready, markNew, grade, setGoalDate, setDailyGoal, reset, exportJson, importJson, toggleBookmark } = useProgress();
   const [tab, setTab] = useState<Tab>("home");
   const [session, setSession] = useState<Session | null>(null);
-  const [kanaOpen, setKanaOpen] = useState(false);
-  const [mistakesOpen, setMistakesOpen] = useState(false);
+  const [learnView, setLearnView] = useState<LearnView | null>(null);
   const [showFurigana, setShowFurigana] = useState(true);
 
   useEffect(() => {
@@ -87,30 +86,6 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
           <QuizMode category={category} words={pool} onGrade={grade} onExit={exit} onReview={() => go("review")} />
         )}
         <BottomNav tab="home" onChange={(t) => { setSession(null); setTab(t); }} accentColor="#E63946" />
-      </div>
-    );
-  }
-
-  if (kanaOpen) {
-    return (
-      <div className="mx-auto min-h-screen max-w-md" style={{ background: "var(--bg)" }}>
-        <KanaView onBack={() => setKanaOpen(false)} />
-        <BottomNav tab="home" onChange={(t) => { setKanaOpen(false); setTab(t); }} accentColor="#E63946" />
-      </div>
-    );
-  }
-
-  if (mistakesOpen) {
-    return (
-      <div className="mx-auto min-h-screen max-w-md" style={{ background: "var(--bg)" }}>
-        <MistakesView
-          mistakes={progress.mistakes ?? []}
-          showFurigana={showFurigana}
-          onReview={(ids) => { setMistakesOpen(false); setSession({ category: "_mistakes", mode: "review", wordIds: ids }); }}
-          onQuiz={(ids) => { setMistakesOpen(false); setSession({ category: "_mistakes", mode: "quiz", wordIds: ids }); }}
-          onBack={() => setMistakesOpen(false)}
-        />
-        <BottomNav tab="home" onChange={(t) => { setMistakesOpen(false); setTab(t); }} accentColor="#E63946" />
       </div>
     );
   }
@@ -190,25 +165,48 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
       </header>
 
       {tab === "home" && (
-        <Home progress={progress} onStudyCategory={(key) => setSession({ category: key, mode: "skim" })} onGo={(t) => setTab(t)} onKana={() => setKanaOpen(true)} onMistakes={() => setMistakesOpen(true)} />
+        <Home progress={progress} onStudyCategory={(key) => setSession({ category: key, mode: "skim" })} />
       )}
-      {tab === "conversation" && (
-        <ConversationView showFurigana={showFurigana} onToggleFurigana={toggleFurigana} />
+
+      {tab === "learn" && (
+        learnView ? (
+          <div>
+            <div className="px-4 pt-3">
+              <button
+                onClick={() => setLearnView(null)}
+                className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold"
+                style={{ background: "var(--surface)", color: "var(--text-2)" }}
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                학습 메뉴
+              </button>
+            </div>
+            {learnView === "conversation" && <ConversationView showFurigana={showFurigana} onToggleFurigana={toggleFurigana} />}
+            {learnView === "verbs" && <VerbView showFurigana={showFurigana} />}
+            {learnView === "kana" && <KanaView />}
+          </div>
+        ) : (
+          <LearnHub onOpen={setLearnView} />
+        )
       )}
-      {tab === "verbs" && <VerbView showFurigana={showFurigana} />}
-      {tab === "wordbook" && (
-        <Wordbook
+
+      {tab === "library" && (
+        <LibraryView
           bookmarks={progress.bookmarks}
+          mistakes={progress.mistakes ?? []}
           showFurigana={showFurigana}
           onToggleBookmark={toggleBookmark}
-          onStudy={(ids) => setSession({ category: "_wordbook", mode: "review", wordIds: ids })}
+          onStudyWordbook={(ids) => setSession({ category: "_wordbook", mode: "review", wordIds: ids })}
+          onReviewMistakes={(ids) => setSession({ category: "_mistakes", mode: "review", wordIds: ids })}
+          onQuizMistakes={(ids) => setSession({ category: "_mistakes", mode: "quiz", wordIds: ids })}
         />
       )}
+
       {tab === "stats" && (
         <Stats progress={progress} onSetGoal={setGoalDate} onSetDailyGoal={setDailyGoal} onReset={reset} onExport={exportJson} onImport={importJson} />
       )}
 
-      <BottomNav tab={tab} onChange={setTab} accentColor="#E63946" />
+      <BottomNav tab={tab} onChange={(t) => { setLearnView(null); setTab(t); }} accentColor="#E63946" />
     </div>
   );
 }

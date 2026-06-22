@@ -1,20 +1,18 @@
 "use client";
 
-export type Tab = "home" | "conversation" | "verbs" | "wordbook" | "stats";
+export type Tab = "home" | "learn" | "library" | "stats";
 
 const ICONS: Record<Tab, React.ReactNode> = {
   home: <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" />,
-  conversation: <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />,
-  verbs: <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />,
-  wordbook: <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />,
+  learn: <><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></>,
+  library: <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />,
   stats: <path d="M3 3v18h18M8 16V9m5 7V5m5 11v-4" />,
 };
 
 const LABEL: Record<Tab, string> = {
   home: "홈",
-  conversation: "회화",
-  verbs: "동사",
-  wordbook: "단어장",
+  learn: "학습",
+  library: "단어장",
   stats: "분석",
 };
 
