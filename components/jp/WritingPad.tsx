@@ -68,6 +68,7 @@ export default function WritingPad({
 
   function down(e: React.PointerEvent<HTMLCanvasElement>) {
     e.preventDefault();
+    e.stopPropagation(); // 스와이프 래퍼로 전파되어 카드가 넘어가는 것 방지
     const canvas = canvasRef.current;
     if (!canvas) return;
     canvas.setPointerCapture(e.pointerId);
@@ -84,6 +85,7 @@ export default function WritingPad({
   function move(e: React.PointerEvent<HTMLCanvasElement>) {
     if (!isDown.current || !prevPt.current) return;
     e.preventDefault();
+    e.stopPropagation();
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d")!;

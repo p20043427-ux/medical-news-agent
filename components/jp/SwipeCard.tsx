@@ -25,8 +25,9 @@ export default function SwipeCard({
   const THRESHOLD = 90;
 
   function down(e: React.PointerEvent) {
-    // 버튼/인터랙티브 요소 위에서 시작한 드래그는 무시
-    if ((e.target as HTMLElement).closest("button")) return;
+    // 버튼/캔버스(쓰기)/스와이프 제외 영역 위에서 시작한 드래그는 무시
+    const t = e.target as HTMLElement;
+    if (t.closest("button, canvas, [data-no-swipe]")) return;
     start.current = e.clientX;
     dragging.current = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
