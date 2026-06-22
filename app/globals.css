@@ -272,3 +272,11 @@ html.dark {
     scroll-behavior: auto !important;
   }
 }
+
+/* ── 완료 보상 팝 애니메이션 ── */
+@keyframes reward-pop {
+  0%   { transform: scale(.5); opacity: 0; }
+  60%  { transform: scale(1.18); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-reward { animation: reward-pop .55s cubic-bezier(.34,1.56,.64,1) both; }

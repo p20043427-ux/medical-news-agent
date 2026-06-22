@@ -77,7 +77,7 @@ export default function QuizMode({
     const score = Math.round((correct / questions.length) * 100);
     return (
       <div className="flex flex-col items-center justify-center gap-4 px-6 py-16 text-center">
-        <div className="text-6xl">{score >= 80 ? "🏆" : score >= 50 ? "👍" : "💪"}</div>
+        <div className="animate-reward text-6xl">{score >= 80 ? "🏆" : score >= 50 ? "👍" : "💪"}</div>
         <h2 className="text-2xl font-bold text-slate-900">퀴즈 결과</h2>
         <p className="text-5xl font-extrabold text-slate-900">
           {correct}

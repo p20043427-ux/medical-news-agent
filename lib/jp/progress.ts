@@ -239,7 +239,16 @@ export function useProgress() {
     setProgress((prev) => { const next = applyToggleBookmark(prev, id); save(next); return next; });
   }, []);
 
-  return { progress, ready, markNew, grade, setGoalDate, setDailyGoal, reset, exportJson, importJson, toggleBookmark };
+  const addMistakes = useCallback((ids: string[]) => {
+    setProgress((prev) => {
+      const m = new Set(prev.mistakes ?? []);
+      ids.forEach((i) => m.add(i));
+      const next = { ...prev, mistakes: [...m] };
+      save(next); return next;
+    });
+  }, []);
+
+  return { progress, ready, markNew, grade, setGoalDate, setDailyGoal, reset, exportJson, importJson, toggleBookmark, addMistakes };
 }
 
 // 하위 호환 alias

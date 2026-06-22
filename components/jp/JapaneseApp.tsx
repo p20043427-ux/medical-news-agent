@@ -13,6 +13,7 @@ import VerbView from "./VerbView";
 import Stats from "./Stats";
 import BottomNav, { type Tab } from "./BottomNav";
 import KanaView from "./KanaView";
+import MockExam from "./MockExam";
 import LearnHub, { type LearnView } from "./LearnHub";
 import LibraryView from "./LibraryView";
 
@@ -22,7 +23,7 @@ type Mode = "skim" | "review" | "quiz";
 interface Session { category: string; mode: Mode; wordIds?: string[] }
 
 export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
-  const { progress, ready, markNew, grade, setGoalDate, setDailyGoal, reset, exportJson, importJson, toggleBookmark } = useProgress();
+  const { progress, ready, markNew, grade, setGoalDate, setDailyGoal, reset, exportJson, importJson, toggleBookmark, addMistakes } = useProgress();
   const [tab, setTab] = useState<Tab>("home");
   const [session, setSession] = useState<Session | null>(null);
   const [learnView, setLearnView] = useState<LearnView | null>(null);
@@ -184,6 +185,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
             {learnView === "conversation" && <ConversationView showFurigana={showFurigana} onToggleFurigana={toggleFurigana} />}
             {learnView === "verbs" && <VerbView showFurigana={showFurigana} />}
             {learnView === "kana" && <KanaView />}
+            {learnView === "exam" && <MockExam onExit={() => setLearnView(null)} onMistake={addMistakes} />}
           </div>
         ) : (
           <LearnHub onOpen={setLearnView} />

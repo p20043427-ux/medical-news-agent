@@ -59,7 +59,7 @@ export default function VocabStudy({
   if (done) {
     return (
       <div className="flex flex-col items-center justify-center gap-5 px-6 py-16 text-center">
-        <div className="text-6xl">🎉</div>
+        <div className="animate-reward text-6xl">🎉</div>
         <h2 className="text-2xl font-bold text-slate-900">스키밍 완료!</h2>
         <p className="text-slate-500">
           {category.label} · 총 {total}개 중{" "}
