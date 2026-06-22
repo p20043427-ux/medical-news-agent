@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { EN_VOCAB } from "@/lib/en/vocab";
+import { EN_VOCAB, EN_CATEGORIES } from "@/lib/en/vocab";
 import {
   type EnProgress, learnedCount, enStreak, enRecentDaily, totalEnReviews, todayKey,
 } from "@/lib/en/progress";
@@ -54,6 +54,21 @@ export default function EnStats({
   // CEFR 레벨별 진도
   const levels = ["A1", "A2", "B1", "B2", "C1"] as const;
   const levelColors: Record<string, string> = { A1: "#10B981", A2: "#3B82F6", B1: "#8B5CF6", B2: "#EC4899", C1: "#F59E0B" };
+
+  // 약점 분석 — 카테고리별 숙련도(reps≥1 & interval≥3) + 자주 틀린 단어(lapses)
+  const isMastered = (id: string) => { const c = progress.cards[id]; return !!c && c.reps >= 1 && c.interval >= 3; };
+  const catStats = EN_CATEGORIES.map((c) => {
+    const ws = EN_VOCAB.filter((w) => w.category === c.key);
+    const known = ws.filter((w) => isMastered(w.id)).length;
+    return { ...c, known, total: ws.length, pct: ws.length ? Math.round((known / ws.length) * 100) : 0 };
+  }).filter((c) => c.total > 0);
+  const studiedCats = catStats.filter((c) => c.known > 0);
+  const weakCats = [...(studiedCats.length ? studiedCats : catStats)].sort((a, b) => a.pct - b.pct).slice(0, 3);
+  const lapseWords = EN_VOCAB
+    .map((w) => ({ w, lapses: progress.cards[w.id]?.lapses ?? 0 }))
+    .filter((x) => x.lapses > 0)
+    .sort((a, b) => b.lapses - a.lapses)
+    .slice(0, 8);
 
   return (
     <div className="px-4 pb-28 pt-3">
@@ -121,6 +136,39 @@ export default function EnStats({
             );
           })}
         </div>
+      </div>
+
+      {/* 약점 분석 */}
+      <div className="mb-4 rounded-3xl p-5 shadow-sm" style={{ background: "var(--card)" }}>
+        <p className="mb-1 font-bold" style={{ color: "var(--text-1)" }}>약점 분석</p>
+        <p className="mb-4 text-xs" style={{ color: "var(--text-3)" }}>익힘률이 낮은 분야와 자주 틀린 단어예요.</p>
+
+        <div className="space-y-2.5">
+          {weakCats.map((c) => (
+            <div key={c.key} className="flex items-center gap-3">
+              <span className="w-28 shrink-0 truncate text-sm" style={{ color: "var(--text-2)" }}>{c.emoji} {c.label}</span>
+              <Progress value={c.pct} className="flex-1" indicatorStyle={{ background: c.pct < 34 ? "#EF4444" : c.pct < 67 ? "#F59E0B" : "#10B981" }} />
+              <span className="w-14 text-right text-xs" style={{ color: "var(--text-3)" }}>{c.known}/{c.total}</span>
+            </div>
+          ))}
+        </div>
+
+        {lapseWords.length > 0 && (
+          <div className="mt-4 border-t pt-3" style={{ borderColor: "var(--border)" }}>
+            <p className="mb-2 text-sm font-semibold" style={{ color: "var(--text-2)" }}>자주 틀린 단어</p>
+            <div className="flex flex-wrap gap-2">
+              {lapseWords.map(({ w, lapses }) => (
+                <button key={w.id} onClick={() => speakEn(w.word)}
+                  className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold"
+                  style={{ background: "var(--surface)", color: "var(--text-1)" }}>
+                  <span>{w.word}</span>
+                  <span className="text-[10px]" style={{ color: "var(--text-3)" }}>{w.meaning}</span>
+                  <span className="rounded-full px-1.5 text-[10px] font-bold text-white" style={{ background: "#EF4444" }}>{lapses}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 최근 2주 그래프 */}
