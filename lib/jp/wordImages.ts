@@ -9,11 +9,12 @@ export const WORD_IMAGES = new Set<string>([
 ]);
 
 export const CATEGORY_IMAGES = new Set<string>([
-  // 예: "greeting",
+  "greeting", "people", "number", "time", "food", "place", "adjective",
+  "daily", "nature", "body", "hobby", "color", "adverb",
 ]);
 
 export function wordImageSrc(id: string, category: string): string | null {
-  if (WORD_IMAGES.has(id)) return `/words/${id}.webp`;
-  if (CATEGORY_IMAGES.has(category)) return `/words/cat-${category}.webp`;
+  if (WORD_IMAGES.has(id)) return `/words/${id}.jpg`;
+  if (CATEGORY_IMAGES.has(category)) return `/words/cat-${category}.jpg`;
   return null;
 }
