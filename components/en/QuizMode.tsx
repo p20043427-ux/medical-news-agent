@@ -6,6 +6,7 @@ import type { EnGrade } from "@/lib/en/progress";
 import { speakEn } from "@/lib/en/speech";
 import { Button, Progress } from "@/components/ui";
 import { shuffle } from "@/lib/learn/shuffle";
+import { track } from "@/lib/analytics";
 
 export default function EnQuizMode({
   words, onGrade, onExit, onReview,
@@ -61,6 +62,9 @@ export default function EnQuizMode({
     const isCorrect = w.id === word.id;
     onGrade(word.id, isCorrect ? "good" : "again");
     if (isCorrect) setScore((s) => s + 1);
+    if (idx + 1 >= pool.length) {
+      track("quiz_finish", { lang: "en", score: score + (isCorrect ? 1 : 0), total: pool.length });
+    }
     setTimeout(() => { setIdx((i) => i + 1); setSelected(null); }, 1200);
   }
 

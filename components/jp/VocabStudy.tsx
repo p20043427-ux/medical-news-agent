@@ -5,6 +5,7 @@ import type { Word, Category } from "@/lib/jp/types";
 import Flashcard from "./Flashcard";
 import SwipeCard from "./SwipeCard";
 import { Button, Switch, Progress } from "@/components/ui";
+import { track } from "@/lib/analytics";
 
 export default function VocabStudy({
   category,
@@ -44,8 +45,10 @@ export default function VocabStudy({
     onSkim(word.id, isKnown);
     if (isKnown) setKnown((k) => k + 1);
     else setUnknown((u) => u + 1);
-    if (index + 1 >= total) setDone(true);
-    else setIndex((i) => i + 1);
+    if (index + 1 >= total) {
+      track("skim_complete", { category: category.key, total });
+      setDone(true);
+    } else setIndex((i) => i + 1);
   }
 
   const progressPct = useMemo(

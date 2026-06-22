@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { GOJUON, DAKUON, YOON, ALL_KANA, type Kana } from "@/lib/jp/kana";
 import { speakJa } from "@/lib/jp/speech";
+import { track } from "@/lib/analytics";
 
 type Script = "h" | "k";
 
@@ -103,7 +104,11 @@ export default function KanaView({ onBack }: { onBack?: () => void }) {
           romaji
         </button>
         <button
-          onClick={() => setMode((m) => (m === "chart" ? "quiz" : "chart"))}
+          onClick={() => setMode((m) => {
+            const nx = m === "chart" ? "quiz" : "chart";
+            if (nx === "quiz") track("kana_quiz_open", { script });
+            return nx;
+          })}
           className="ml-auto rounded-full px-3 py-1.5 text-xs font-bold"
           style={{ background: "var(--surface)", color: "var(--text-2)" }}
         >

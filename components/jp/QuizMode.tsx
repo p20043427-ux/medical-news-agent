@@ -7,6 +7,7 @@ import { VOCAB } from "@/lib/jp/vocab";
 import SpeakerButton from "./SpeakerButton";
 import { Button, Progress } from "@/components/ui";
 import { shuffle } from "@/lib/learn/shuffle";
+import { track } from "@/lib/analytics";
 
 interface Q {
   word: Word;
@@ -63,8 +64,10 @@ export default function QuizMode({
   }
 
   function next() {
-    if (qi + 1 >= questions.length) setFinished(true);
-    else {
+    if (qi + 1 >= questions.length) {
+      track("quiz_finish", { lang: "jp", category: category.key, score: correct, total: questions.length });
+      setFinished(true);
+    } else {
       setQi((i) => i + 1);
       setPicked(null);
     }
