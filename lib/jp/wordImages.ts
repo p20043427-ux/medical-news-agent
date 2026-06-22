@@ -9,8 +9,19 @@ export const WORD_IMAGES = new Set<string>([
 ]);
 
 export const CATEGORY_IMAGES = new Set<string>([
-  // Claude SVG illustrations are now used via CardArt component.
-  // Re-add category keys here only if you want to use Pollinations jpg images instead.
+  "greeting",
+  "people",
+  "number",
+  "time",
+  "food",
+  "place",
+  "adjective",
+  "daily",
+  "nature",
+  "body",
+  "hobby",
+  "color",
+  "adverb",
 ]);
 
 export function wordImageSrc(id: string, category: string): string | null {
