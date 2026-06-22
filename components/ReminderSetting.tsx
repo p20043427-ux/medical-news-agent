@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { getReminder, setReminder, requestPermission, fireStudyNotification, notificationsSupported, permissionState } from "@/lib/reminder";
+import { subscribeWebPush, unsubscribeWebPush, webPushSupported } from "@/lib/push";
 
 // 학습 리마인더 설정 카드 (JP·EN Stats 공용)
-export default function ReminderSetting({ accent = "#E63946" }: { accent?: string }) {
+export default function ReminderSetting({ accent = "#E63946", lang = "jp" }: { accent?: string; lang?: "jp" | "en" }) {
   const [enabled, setEnabled] = useState(false);
   const [time, setTime] = useState("20:00");
   const [perm, setPerm] = useState<string>("default");
+  const [bgPush, setBgPush] = useState(false);
 
   useEffect(() => {
     const r = getReminder();
@@ -29,6 +31,11 @@ export default function ReminderSetting({ accent = "#E63946" }: { accent?: strin
       const p = await requestPermission();
       setPerm(p);
       if (p !== "granted") return;
+      // 백엔드가 준비된 경우 웹 푸시 구독(백그라운드 알림), 아니면 로컬 폴백
+      if (webPushSupported()) setBgPush(await subscribeWebPush(time, lang));
+    } else {
+      void unsubscribeWebPush();
+      setBgPush(false);
     }
     const next = !enabled;
     setEnabled(next);
@@ -37,6 +44,7 @@ export default function ReminderSetting({ accent = "#E63946" }: { accent?: strin
   function changeTime(t: string) {
     setTime(t);
     setReminder({ enabled, time: t });
+    if (enabled && webPushSupported()) void subscribeWebPush(t, lang);
   }
 
   return (
@@ -44,7 +52,7 @@ export default function ReminderSetting({ accent = "#E63946" }: { accent?: strin
       <div className="flex items-center justify-between">
         <div className="min-w-0 pr-3">
           <p className="font-bold" style={{ color: "var(--text-1)" }}>학습 리마인더</p>
-          <p className="mt-0.5 text-xs" style={{ color: "var(--text-3)" }}>앱이 열려 있을 때 설정한 시각에 알려드려요.</p>
+          <p className="mt-0.5 text-xs" style={{ color: "var(--text-3)" }}>{bgPush ? "백그라운드 푸시로 설정한 시각에 알려드려요." : "앱이 열려 있을 때 설정한 시각에 알려드려요."}</p>
         </div>
         <button onClick={toggle} aria-label="리마인더 토글" role="switch" aria-checked={enabled}
           className="relative h-7 w-12 shrink-0 rounded-full transition"

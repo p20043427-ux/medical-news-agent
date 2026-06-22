@@ -315,7 +315,7 @@ export default function EnStats({
         </div>
       </div>
 
-      <ReminderSetting accent="#4361EE" />
+      <ReminderSetting accent="#4361EE" lang="en" />
 
       {/* 진도 백업 */}
       <div className="mb-4 rounded-3xl p-5 shadow-sm" style={{ background: "var(--card)" }}>

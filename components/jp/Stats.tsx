@@ -332,7 +332,7 @@ export default function Stats({
         </div>
       </div>
 
-      <ReminderSetting accent="#E63946" />
+      <ReminderSetting accent="#E63946" lang="jp" />
 
       {/* 진도 백업 */}
       <div className="mb-4 rounded-3xl p-5 shadow-sm" style={{ background: "var(--card)" }}>
