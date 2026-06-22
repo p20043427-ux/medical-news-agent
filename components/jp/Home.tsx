@@ -3,7 +3,7 @@
 import { VOCAB, VOCAB_CATEGORIES } from "@/lib/jp/vocab";
 import { VERBS } from "@/lib/jp/verbs";
 import { CONVERSATIONS } from "@/lib/jp/conversations";
-import { type Progress as JpProgress, isKnown } from "@/lib/jp/progress";
+import { type Progress as JpProgress, isKnown, todayKey } from "@/lib/jp/progress";
 import WordImage from "./WordImage";
 import { Button, Progress } from "@/components/ui";
 
@@ -15,6 +15,10 @@ export default function Home({ progress, onStudyCategory, onGo, onKana, onMistak
   onMistakes?: () => void;
 }) {
   const mistakeCount = progress.mistakes?.length ?? 0;
+  const goal = progress.dailyGoal ?? 20;
+  const todayCount = progress.daily?.[todayKey()] ?? 0;
+  const goalPct = Math.min((todayCount / goal) * 100, 100);
+  const goalMet = todayCount >= goal;
   const start = new Date(progress.startedAt);
   const dayN = Math.floor((Date.now() - start.getTime()) / 86400000) + 1;
 
@@ -27,6 +31,24 @@ export default function Home({ progress, onStudyCategory, onGo, onKana, onMistak
 
   return (
     <div className="pb-28">
+      {/* 오늘의 목표 */}
+      <div className="px-5 pb-2 pt-1">
+        <div className="rounded-2xl p-4" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>
+              {goalMet ? "🎉 오늘 목표 달성!" : "오늘의 목표"}
+            </span>
+            <span className="text-sm font-bold" style={{ color: goalMet ? "#10B981" : "var(--text-2)" }}>
+              {todayCount} / {goal}장
+            </span>
+          </div>
+          <Progress
+            value={goalPct}
+            indicatorStyle={{ background: goalMet ? "#10B981" : "linear-gradient(90deg,#E63946,#F4A261)" }}
+          />
+        </div>
+      </div>
+
       {/* Day N */}
       <div className="px-5 pb-3 pt-1">
         <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "var(--text-1)" }}>

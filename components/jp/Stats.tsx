@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { VOCAB } from "@/lib/jp/vocab";
 import {
   type Progress as JpProgress, knownCount, streak, recentDaily, daysUntilGoal, todayKey, totalReviews,
@@ -12,17 +12,30 @@ import { Button, Progress } from "@/components/ui";
 const WD = ["일", "월", "화", "수", "목", "금", "토"];
 
 export default function Stats({
-  progress, onSetGoal, onReset, onExport, onImport,
+  progress, onSetGoal, onSetDailyGoal, onReset, onExport, onImport,
 }: {
   progress: JpProgress;
   onSetGoal: (date: string | undefined) => void;
+  onSetDailyGoal?: (n: number) => void;
   onReset: () => void;
   onExport: () => string;
   onImport: (json: string) => boolean;
 }) {
   const { theme, change } = useTheme();
   const [rate, setRateState] = useState(getRate());
+  const [textScale, setTextScale] = useState<"sm" | "md" | "lg">("md");
   const fileRef = useRef<HTMLInputElement>(null);
+  const dailyGoal = progress.dailyGoal ?? 20;
+
+  useEffect(() => {
+    const s = (window.localStorage.getItem("app-text-scale") as "sm" | "md" | "lg") || "md";
+    setTextScale(s);
+  }, []);
+  function changeTextScale(s: "sm" | "md" | "lg") {
+    setTextScale(s);
+    window.localStorage.setItem("app-text-scale", s);
+    document.documentElement.style.fontSize = s === "sm" ? "15px" : s === "lg" ? "18px" : "16px";
+  }
 
   const total = VOCAB.length;
   const known = knownCount(progress);
@@ -153,6 +166,22 @@ export default function Stats({
       <div className="mb-4 rounded-3xl p-5 shadow-sm" style={{ background: "var(--card)" }}>
         <p className="mb-4 font-bold" style={{ color: "var(--text-1)" }}>설정</p>
 
+        {/* 일일 학습 목표 */}
+        <div className="mb-4">
+          <p className="mb-2 text-sm" style={{ color: "var(--text-3)" }}>일일 학습 목표 (장/일)</p>
+          <div className="flex gap-2">
+            {[10, 20, 30, 50].map((n) => (
+              <button key={n} onClick={() => onSetDailyGoal?.(n)}
+                className="flex-1 rounded-xl py-2 text-sm font-bold transition"
+                style={dailyGoal === n
+                  ? { background: "#E63946", color: "#fff" }
+                  : { background: "var(--surface)", color: "var(--text-3)" }}>
+                {n}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* 테마 */}
         <div className="mb-4">
           <p className="mb-2 text-sm" style={{ color: "var(--text-3)" }}>화면 테마</p>
@@ -184,6 +213,25 @@ export default function Stats({
           <input type="range" min={0.5} max={1.2} step={0.1} value={rate}
             onChange={(e) => changeRate(Number(e.target.value))}
             className="w-full" style={{ accentColor: "#E63946" }} />
+        </div>
+
+        {/* 글자 크기 (접근성) */}
+        <div className="mt-4">
+          <p className="mb-2 text-sm" style={{ color: "var(--text-3)" }}>글자 크기</p>
+          <div className="grid grid-cols-3 gap-1 rounded-xl p-1" style={{ background: "var(--surface)" }}>
+            {([["sm", "작게"], ["md", "보통"], ["lg", "크게"]] as ["sm" | "md" | "lg", string][]).map(([s, label]) => (
+              <button key={s} onClick={() => changeTextScale(s)}
+                className="rounded-lg py-2 font-semibold transition"
+                style={{
+                  background: textScale === s ? "var(--card)" : "transparent",
+                  color: textScale === s ? "var(--text-1)" : "var(--text-3)",
+                  boxShadow: textScale === s ? "0 1px 3px rgba(0,0,0,.1)" : "none",
+                  fontSize: s === "sm" ? "13px" : s === "lg" ? "17px" : "15px",
+                }}>
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

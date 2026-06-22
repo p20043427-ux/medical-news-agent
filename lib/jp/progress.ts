@@ -25,6 +25,7 @@ export interface Progress {
   achievements: string[];
   bookmarks: string[];            // persisted word ids
   mistakes: string[];             // 영구 오답 단어 id (오답노트)
+  dailyGoal?: number;             // 일일 목표 카드 수 (기본 20)
 }
 
 export type Grade = "again" | "hard" | "good" | "easy";
@@ -217,6 +218,10 @@ export function useProgress() {
     setProgress((prev) => { const next = { ...prev, goalDate: date }; save(next); return next; });
   }, []);
 
+  const setDailyGoal = useCallback((n: number) => {
+    setProgress((prev) => { const next = { ...prev, dailyGoal: n }; save(next); return next; });
+  }, []);
+
   const reset = useCallback(() => { save(EMPTY); setProgress(EMPTY); }, []);
 
   const exportJson = useCallback(() => JSON.stringify(progress), [progress]);
@@ -234,7 +239,7 @@ export function useProgress() {
     setProgress((prev) => { const next = applyToggleBookmark(prev, id); save(next); return next; });
   }, []);
 
-  return { progress, ready, markNew, grade, setGoalDate, reset, exportJson, importJson, toggleBookmark };
+  return { progress, ready, markNew, grade, setGoalDate, setDailyGoal, reset, exportJson, importJson, toggleBookmark };
 }
 
 // 하위 호환 alias

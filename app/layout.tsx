@@ -24,7 +24,7 @@ export const viewport = {
   ],
 };
 
-const themeInit = `(function(){try{var t=localStorage.getItem('app-theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
+const themeInit = `(function(){try{var t=localStorage.getItem('app-theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');var s=localStorage.getItem('app-text-scale');if(s)document.documentElement.style.fontSize=(s==='sm'?'15px':s==='lg'?'18px':'16px');}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -22,7 +22,7 @@ type Mode = "skim" | "review" | "quiz";
 interface Session { category: string; mode: Mode; wordIds?: string[] }
 
 export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
-  const { progress, ready, markNew, grade, setGoalDate, reset, exportJson, importJson, toggleBookmark } = useProgress();
+  const { progress, ready, markNew, grade, setGoalDate, setDailyGoal, reset, exportJson, importJson, toggleBookmark } = useProgress();
   const [tab, setTab] = useState<Tab>("home");
   const [session, setSession] = useState<Session | null>(null);
   const [kanaOpen, setKanaOpen] = useState(false);
@@ -205,7 +205,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
         />
       )}
       {tab === "stats" && (
-        <Stats progress={progress} onSetGoal={setGoalDate} onReset={reset} onExport={exportJson} onImport={importJson} />
+        <Stats progress={progress} onSetGoal={setGoalDate} onSetDailyGoal={setDailyGoal} onReset={reset} onExport={exportJson} onImport={importJson} />
       )}
 
       <BottomNav tab={tab} onChange={setTab} accentColor="#E63946" />
