@@ -2,12 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { queueRemotePush, HYDRATED_EVENT } from "@/lib/sync";
+import { sm2Core, DEFAULT_EF } from "@/lib/learn/sm2";
 
 const KEY = "jp-app-progress-v3";
-
-// SM-2 기본값
-const DEFAULT_EF = 2.5;
-const MIN_EF = 1.3;
 
 export interface CardState {
   box: number;          // 0=신규, 1~5=학습중, 6=완료 (하위 호환)
@@ -55,17 +52,8 @@ function addDays(days: number): string {
 
 // ── SM-2 알고리즘 ──
 function sm2(cur: CardState, q: number): { interval: number; easeFactor: number; box: number } {
-  let { interval, easeFactor, box } = cur;
-  if (q >= 3) {
-    if (cur.reps === 0) interval = 1;
-    else if (cur.reps === 1) interval = 6;
-    else interval = Math.max(1, Math.round(interval * easeFactor));
-    box = Math.min(box + 1, 6);
-  } else {
-    interval = 1;
-    box = 1;
-  }
-  easeFactor = Math.max(MIN_EF, easeFactor + 0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+  const { interval, easeFactor } = sm2Core(cur, q);
+  const box = q >= 3 ? Math.min(cur.box + 1, 6) : 1;
   return { interval, easeFactor, box };
 }
 

@@ -2,11 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { queueRemotePush, HYDRATED_EVENT } from "@/lib/sync";
+import { sm2Core, DEFAULT_EF } from "@/lib/learn/sm2";
 
 const KEY = "en-app-progress-v1";
-
-const DEFAULT_EF = 2.5;
-const MIN_EF = 1.3;
 
 export interface EnCardState {
   due: string;           // yyyy-mm-dd
@@ -50,16 +48,7 @@ function addDays(n: number): string {
 }
 
 function sm2(cur: EnCardState, q: number): { interval: number; easeFactor: number } {
-  let { interval, easeFactor, reps } = cur;
-  if (q >= 3) {
-    if (reps === 0) interval = 1;
-    else if (reps === 1) interval = 6;
-    else interval = Math.max(1, Math.round(interval * easeFactor));
-  } else {
-    interval = 1;
-  }
-  easeFactor = Math.max(MIN_EF, easeFactor + 0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
-  return { interval, easeFactor };
+  return sm2Core(cur, q);
 }
 
 function load(): EnProgress {

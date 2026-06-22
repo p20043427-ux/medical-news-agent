@@ -5,10 +5,7 @@ import type { EnWord } from "@/lib/en/types";
 import type { EnGrade } from "@/lib/en/progress";
 import { speakEn } from "@/lib/en/speech";
 import { Button, Progress } from "@/components/ui";
-
-function shuffle<T>(arr: T[]): T[] {
-  return [...arr].sort(() => Math.random() - 0.5);
-}
+import { shuffle } from "@/lib/learn/shuffle";
 
 export default function EnQuizMode({
   words, onGrade, onExit, onReview,
