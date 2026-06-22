@@ -52,8 +52,7 @@ export default function Wordbook({
         </div>
         <button
           onClick={() => onStudy(bookmarks)}
-          className="rounded-full px-4 py-2 text-sm font-bold text-white shadow"
-          style={{ background: "#E63946" }}
+          className="ui-btn ui-btn-brand px-4 py-2 text-sm"
         >
           복습하기
         </button>

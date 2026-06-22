@@ -223,13 +223,11 @@ export default function EnStats({
         <p className="mb-3 text-xs" style={{ color: "var(--text-3)" }}>기기 이전 시 내보내고 가져오세요.</p>
         <div className="flex gap-2">
           <button onClick={exportFile}
-            className="flex-1 rounded-xl border py-2.5 text-sm font-semibold"
-            style={{ borderColor: "var(--border)", color: "var(--text-2)" }}>
+            className="ui-btn ui-btn-surface flex-1 py-2.5 text-sm">
             ⬇ 내보내기
           </button>
           <button onClick={() => fileRef.current?.click()}
-            className="flex-1 rounded-xl border py-2.5 text-sm font-semibold"
-            style={{ borderColor: "var(--border)", color: "var(--text-2)" }}>
+            className="ui-btn ui-btn-surface flex-1 py-2.5 text-sm">
             ⬆ 가져오기
           </button>
           <input ref={fileRef} type="file" accept="application/json,.json" onChange={importFile} className="hidden" />

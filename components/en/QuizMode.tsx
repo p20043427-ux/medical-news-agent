@@ -39,13 +39,11 @@ export default function EnQuizMode({
         </div>
         <div className="grid w-full max-w-xs gap-2.5">
           <button onClick={onReview}
-            className="rounded-2xl py-3.5 font-bold text-white"
-            style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
+            className="ui-btn ui-btn-brand-en py-3.5">
             🔁 복습하기
           </button>
           <button onClick={onExit}
-            className="rounded-2xl border py-3.5 font-bold"
-            style={{ borderColor: "var(--border)", color: "var(--text-2)" }}>
+            className="ui-btn ui-btn-surface py-3.5">
             홈으로
           </button>
         </div>

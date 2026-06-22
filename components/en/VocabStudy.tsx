@@ -44,18 +44,15 @@ export default function EnVocabStudy({
         </p>
         <div className="grid w-full max-w-xs gap-2.5">
           <button onClick={onReview}
-            className="rounded-2xl py-3.5 font-bold text-white"
-            style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
+            className="ui-btn ui-btn-brand-en py-3.5">
             🔁 SM-2 복습하기
           </button>
           <button onClick={onQuiz}
-            className="rounded-2xl py-3.5 font-bold text-white"
-            style={{ background: "linear-gradient(135deg,#7209B7,#4361EE)" }}>
+            className="ui-btn ui-btn-brand-en py-3.5">
             📝 퀴즈 도전
           </button>
           <button onClick={onExit}
-            className="rounded-2xl border py-3.5 font-bold"
-            style={{ borderColor: "var(--border)", color: "var(--text-2)" }}>
+            className="ui-btn ui-btn-surface py-3.5">
             홈으로
           </button>
         </div>
@@ -247,20 +244,17 @@ export default function EnVocabStudy({
         {showMeaning ? (
           <div className="grid grid-cols-2 gap-3">
             <button onClick={next}
-              className="rounded-2xl py-4 font-bold"
-              style={{ background: "var(--surface)", color: "var(--text-2)" }}>
+              className="ui-btn ui-btn-surface py-4">
               다음 →
             </button>
             <button onClick={handleKnow}
-              className="rounded-2xl py-4 font-bold text-white"
-              style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
+              className="ui-btn ui-btn-success py-4">
               ✓ 알고 있어요
             </button>
           </div>
         ) : (
           <button onClick={() => setShowMeaning(true)}
-            className="w-full rounded-2xl py-4 font-bold text-white"
-            style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
+            className="ui-btn ui-btn-brand-en w-full py-4">
             뜻 확인하기
           </button>
         )}

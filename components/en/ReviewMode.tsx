@@ -46,13 +46,11 @@ export default function EnReviewMode({
         <p style={{ color: "var(--text-3)" }}>총 <strong style={{ color: "var(--text-1)" }}>{reviewed}개</strong> 복습했어요.</p>
         <div className="grid w-full max-w-xs gap-2.5">
           <button onClick={onQuiz}
-            className="rounded-2xl py-3.5 font-bold text-white"
-            style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
+            className="ui-btn ui-btn-brand-en py-3.5">
             📝 퀴즈 도전
           </button>
           <button onClick={onExit}
-            className="rounded-2xl border py-3.5 font-bold"
-            style={{ borderColor: "var(--border)", color: "var(--text-2)" }}>
+            className="ui-btn ui-btn-surface py-3.5">
             홈으로
           </button>
         </div>
@@ -182,8 +180,7 @@ export default function EnReviewMode({
           </div>
         ) : (
           <button onClick={() => setRevealed(true)}
-            className="w-full rounded-2xl py-4 font-bold text-white shadow-sm active:scale-95"
-            style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
+            className="ui-btn ui-btn-brand-en w-full py-4">
             답 확인
           </button>
         )}
