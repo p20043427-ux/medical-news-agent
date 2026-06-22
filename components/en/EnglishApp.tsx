@@ -10,11 +10,13 @@ import EnQuizMode from "./QuizMode";
 import EnGrammarView from "./GrammarView";
 import EnStats from "./Stats";
 import EnBottomNav, { type EnTab } from "./BottomNav";
+import EnLearnHub, { type EnLearnView } from "./LearnHub";
 import { EN_VOCAB, EN_CATEGORIES } from "@/lib/en/vocab";
 
 export default function EnglishApp({ onBack }: { onBack?: () => void }) {
   const { progress, ready, markNew, grade, setGoalDate, reset, exportJson, importJson } = useEnProgress();
   const [tab, setTab] = useState<EnTab>("home");
+  const [learnSub, setLearnSub] = useState<EnLearnView | null>(null);
   const [studyCategory, setStudyCategory] = useState<string | null>(null);
   const [studyMode, setStudyMode] = useState<"learn" | "review" | "quiz">("learn");
 
@@ -149,16 +151,35 @@ export default function EnglishApp({ onBack }: { onBack?: () => void }) {
       </header>
 
       {tab === "home" && (
-        <EnHome progress={progress} onStudyCategory={startStudy} onGrammar={() => setTab("grammar")} />
+        <EnHome progress={progress} onStudyCategory={startStudy} onGrammar={() => { setTab("learn"); setLearnSub("grammar"); }} />
       )}
       {tab === "learn" && (
-        <EnVocabStudy
-          category={EN_CATEGORIES[0]} words={EN_VOCAB}
-          onMarkNew={markNew} onExit={() => setTab("home")}
-          onReview={() => { setTab("review"); }}
-          onQuiz={() => { setTab("quiz" as EnTab); }}
-          progress={progress}
-        />
+        learnSub ? (
+          <div>
+            <div className="px-4 pt-3">
+              <button
+                onClick={() => setLearnSub(null)}
+                className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold"
+                style={{ background: "var(--surface)", color: "var(--text-2)" }}
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                학습 메뉴
+              </button>
+            </div>
+            {learnSub === "vocab" && (
+              <EnVocabStudy
+                category={EN_CATEGORIES[0]} words={EN_VOCAB}
+                onMarkNew={markNew} onExit={() => setLearnSub(null)}
+                onReview={() => { setTab("review"); setLearnSub(null); }}
+                onQuiz={() => { setTab("quiz" as EnTab); }}
+                progress={progress}
+              />
+            )}
+            {learnSub === "grammar" && <EnGrammarView />}
+          </div>
+        ) : (
+          <EnLearnHub onOpen={setLearnSub} />
+        )
       )}
       {tab === "review" && (
         <EnReviewMode
@@ -170,7 +191,6 @@ export default function EnglishApp({ onBack }: { onBack?: () => void }) {
           progress={progress}
         />
       )}
-      {tab === "grammar" && <EnGrammarView />}
       {tab === "stats" && (
         <EnStats
           progress={progress}
@@ -181,7 +201,7 @@ export default function EnglishApp({ onBack }: { onBack?: () => void }) {
         />
       )}
 
-      <EnBottomNav tab={tab} onChange={setTab} accentColor="#4361EE" />
+      <EnBottomNav tab={tab} onChange={(t) => { setLearnSub(null); setTab(t); }} accentColor="#4361EE" />
     </div>
   );
 }
