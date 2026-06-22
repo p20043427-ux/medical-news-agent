@@ -14,6 +14,7 @@ import Stats from "./Stats";
 import BottomNav, { type Tab } from "./BottomNav";
 import KanaView from "./KanaView";
 import MockExam from "./MockExam";
+import PhrasebookView from "./PhrasebookView";
 import LearnHub, { type LearnView } from "./LearnHub";
 import LibraryView from "./LibraryView";
 
@@ -185,6 +186,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
             {learnView === "conversation" && <ConversationView showFurigana={showFurigana} onToggleFurigana={toggleFurigana} />}
             {learnView === "verbs" && <VerbView showFurigana={showFurigana} />}
             {learnView === "kana" && <KanaView />}
+            {learnView === "phrasebook" && <PhrasebookView />}
             {learnView === "exam" && <MockExam onExit={() => setLearnView(null)} onMistake={addMistakes} />}
           </div>
         ) : (
