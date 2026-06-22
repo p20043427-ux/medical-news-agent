@@ -5,7 +5,7 @@ import type { Word } from "@/lib/jp/types";
 import { posTag } from "@/lib/jp/extras";
 import Furigana, { tokensToText } from "./Furigana";
 import SpeakerButton from "./SpeakerButton";
-import CardArt from "./CardArt";
+import WordImage from "./WordImage";
 
 export default function Flashcard({
   word,
@@ -93,7 +93,7 @@ export default function Flashcard({
         <>
           {/* 이미지 헤더 (일러스트 아트) */}
           <div className="relative h-44">
-            <CardArt category={word.category} emoji={emoji} />
+            <WordImage id={word.id} category={word.category} emoji={emoji} />
             <button
               onClick={() => setMarked((m) => !m)}
               aria-label="북마크"

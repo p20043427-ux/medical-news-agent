@@ -4,7 +4,7 @@ import { VOCAB, VOCAB_CATEGORIES } from "@/lib/jp/vocab";
 import { VERBS } from "@/lib/jp/verbs";
 import { CONVERSATIONS } from "@/lib/jp/conversations";
 import { type Progress, isKnown } from "@/lib/jp/progress";
-import CardArt from "./CardArt";
+import WordImage from "./WordImage";
 
 export default function Home({ progress, onStudyCategory, onGo }: {
   progress: Progress;
@@ -58,7 +58,7 @@ export default function Home({ progress, onStudyCategory, onGo }: {
                 {/* 앞 카드 */}
                 <div className="absolute inset-x-0 top-2 mx-auto h-40 w-full overflow-hidden rounded-2xl"
                   style={{ boxShadow: "0 6px 18px rgba(0,0,0,.12)" }}>
-                  <CardArt category={cat.key} emoji={cat.emoji} />
+                  <WordImage id={first.id} category={cat.key} emoji={cat.emoji} />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-3">
                     <p className="text-lg font-extrabold text-white">{first.word}</p>
                     <p className="truncate text-xs text-white/85">{first.reading} · {first.meaning}</p>
