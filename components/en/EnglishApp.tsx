@@ -9,6 +9,7 @@ import EnReviewMode from "./ReviewMode";
 import EnQuizMode from "./QuizMode";
 import EnGrammarView from "./GrammarView";
 import EnMockExam from "./MockExam";
+import EnReviewLibrary from "./ReviewLibrary";
 import EnStats from "./Stats";
 import EnBottomNav, { type EnTab } from "./BottomNav";
 import EnLearnHub, { type EnLearnView } from "./LearnHub";
@@ -185,14 +186,7 @@ export default function EnglishApp({ onBack }: { onBack?: () => void }) {
         )
       )}
       {tab === "review" && (
-        <EnReviewMode
-          category={{ key: "all", label: "전체 복습", emoji: "🔁", cefrRange: "A1-C1" }}
-          words={EN_VOCAB}
-          onGrade={grade}
-          onExit={() => setTab("home")}
-          onQuiz={() => setTab("quiz" as EnTab)}
-          progress={progress}
-        />
+        <EnReviewLibrary progress={progress} onGrade={grade} onExit={() => setTab("home")} />
       )}
       {tab === "stats" && (
         <EnStats
