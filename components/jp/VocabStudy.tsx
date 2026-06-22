@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import type { Word, Category } from "@/lib/jp/types";
 import Flashcard from "./Flashcard";
 import SwipeCard from "./SwipeCard";
-import { Button } from "@/components/ui";
+import { Button, Switch } from "@/components/ui";
 
 export default function VocabStudy({
   category,
@@ -127,20 +127,22 @@ export default function VocabStudy({
           <>
             <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
             <div className="absolute right-4 top-12 z-30 w-44 overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/5">
-              <button
-                onClick={onToggleFurigana}
-                className="flex w-full items-center justify-between px-4 py-3 text-sm text-slate-700 hover:bg-slate-50"
-              >
+              <div className="flex w-full items-center justify-between px-4 py-3 text-sm text-slate-700">
                 후리가나
-                <Toggle on={showFurigana} />
-              </button>
-              <button
-                onClick={() => setHideMeaning((h) => !h)}
-                className="flex w-full items-center justify-between border-t border-slate-100 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50"
-              >
+                <Switch
+                  checked={showFurigana}
+                  onCheckedChange={() => onToggleFurigana()}
+                  aria-label="후리가나 표시"
+                />
+              </div>
+              <div className="flex w-full items-center justify-between border-t border-slate-100 px-4 py-3 text-sm text-slate-700">
                 뜻 숨기기
-                <Toggle on={hideMeaning} />
-              </button>
+                <Switch
+                  checked={hideMeaning}
+                  onCheckedChange={setHideMeaning}
+                  aria-label="뜻 숨기기"
+                />
+              </div>
             </div>
           </>
         )}
@@ -184,13 +186,5 @@ export default function VocabStudy({
         </Button>
       </div>
     </div>
-  );
-}
-
-function Toggle({ on }: { on: boolean }) {
-  return (
-    <span className={`relative h-5 w-9 rounded-full transition ${on ? "bg-emerald-500" : "bg-slate-300"}`}>
-      <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${on ? "left-4" : "left-0.5"}`} />
-    </span>
   );
 }
