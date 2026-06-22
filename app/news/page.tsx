@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getPublicClient, type Article } from "@/lib/supabase";
-import { SOURCES } from "@/lib/sources";
+import { SOURCES, TIERS, TIER_ORDER, getSourceTier } from "@/lib/sources";
 import { CATEGORIES } from "@/lib/llm";
 import ArticleCard from "@/components/ArticleCard";
 import CrawlButton from "@/components/CrawlButton";
@@ -70,6 +70,11 @@ export default async function Home({
   const chipOff =
     "bg-white text-slate-600 border-slate-200 hover:border-blue-400";
 
+  // 신뢰도 높은 순으로 소스 정렬 (동점은 기존 순서 유지)
+  const sortedSources = [...SOURCES].sort(
+    (a, b) => TIERS[b.tier].score - TIERS[a.tier].score
+  );
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
       {/* 헤더 */}
@@ -93,20 +98,46 @@ export default async function Home({
         </div>
       </header>
 
-      {/* 필터: 소스 */}
+      {/* 신뢰도 등급 범례 */}
+      <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-xs">
+        <span className="font-semibold text-slate-700">소스 신뢰도</span>
+        {TIER_ORDER.map((t) => {
+          const m = TIERS[t];
+          return (
+            <span key={t} className="flex items-center gap-1.5 text-slate-500">
+              <span className={`rounded border px-1.5 py-0.5 font-medium ${m.badgeClass}`}>
+                {m.short}
+              </span>
+              <span title={m.description}>{m.label}</span>
+            </span>
+          );
+        })}
+      </div>
+
+      {/* 필터: 소스 (신뢰도 높은 순) */}
       <div className="mb-3 flex flex-wrap gap-2">
         <Link href={buildQuery(sp, { source: undefined })} className={`${chip} ${!sp.source ? chipOn : chipOff}`}>
           전체 소스
         </Link>
-        {SOURCES.map((s) => (
-          <Link
-            key={s.key}
-            href={buildQuery(sp, { source: sp.source === s.key ? undefined : s.key })}
-            className={`${chip} ${sp.source === s.key ? chipOn : chipOff}`}
-          >
-            {s.label}
-          </Link>
-        ))}
+        {sortedSources.map((s) => {
+          const tier = getSourceTier(s.key);
+          const active = sp.source === s.key;
+          return (
+            <Link
+              key={s.key}
+              href={buildQuery(sp, { source: active ? undefined : s.key })}
+              className={`${chip} flex items-center gap-1.5 ${active ? chipOn : chipOff}`}
+            >
+              {tier && (
+                <span
+                  className={`inline-block h-2 w-2 rounded-full ${tier.badgeClass}`}
+                  aria-hidden
+                />
+              )}
+              {s.label}
+            </Link>
+          );
+        })}
       </div>
 
       {/* 필터: 카테고리 */}

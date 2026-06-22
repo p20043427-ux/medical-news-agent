@@ -1,5 +1,5 @@
 import type { Article } from "@/lib/supabase";
-import { SOURCE_LABELS } from "@/lib/sources";
+import { SOURCE_LABELS, getSourceTier } from "@/lib/sources";
 
 const CATEGORY_STYLE: Record<string, string> = {
   "감염병/발병": "bg-red-100 text-red-700",
@@ -23,6 +23,7 @@ function formatDate(iso: string | null): string {
 
 export default function ArticleCard({ article }: { article: Article }) {
   const catStyle = CATEGORY_STYLE[article.category ?? "기타"] ?? CATEGORY_STYLE["기타"];
+  const tier = getSourceTier(article.source);
 
   return (
     <article className="flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
@@ -30,6 +31,14 @@ export default function ArticleCard({ article }: { article: Article }) {
         <span className="rounded bg-slate-800 px-2 py-0.5 font-medium text-white">
           {SOURCE_LABELS[article.source] ?? article.source}
         </span>
+        {tier && (
+          <span
+            className={`rounded border px-2 py-0.5 font-medium ${tier.badgeClass}`}
+            title={`신뢰도 등급: ${tier.label} — ${tier.description}`}
+          >
+            {tier.short}
+          </span>
+        )}
         {article.category && (
           <span className={`rounded px-2 py-0.5 font-medium ${catStyle}`}>
             {article.category}
