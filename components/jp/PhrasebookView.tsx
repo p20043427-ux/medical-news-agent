@@ -4,14 +4,27 @@ import { useState } from "react";
 import { TRAVEL_PHRASEBOOK } from "@/lib/jp/phrasebook";
 import { speakJa } from "@/lib/jp/speech";
 import { useFavorites } from "@/lib/favorites";
+import PhraseQuiz from "@/components/PhraseQuiz";
+
+const ALL_JP_KO = TRAVEL_PHRASEBOOK.flatMap((s) => s.phrases).map((p) => p.ko);
 
 export default function PhrasebookView() {
   const [active, setActive] = useState<string>("__fav");
+  const [quiz, setQuiz] = useState(false);
   const { has, toggle, favs } = useFavorites("jp-phrase");
   const isFavTab = active === "__fav";
   const situation = TRAVEL_PHRASEBOOK.find((s) => s.key === active) ?? TRAVEL_PHRASEBOOK[0];
   const favPhrases = TRAVEL_PHRASEBOOK.flatMap((s) => s.phrases).filter((p) => favs.includes(p.jp));
   const phrases = isFavTab ? favPhrases : (situation?.phrases ?? []);
+
+  if (quiz) {
+    return (
+      <PhraseQuiz
+        items={favPhrases.map((p) => ({ audio: p.reading || p.jp, ko: p.ko, label: p.jp }))}
+        distractors={ALL_JP_KO} speak={speakJa} accent="#00b894" onExit={() => setQuiz(false)}
+      />
+    );
+  }
 
   return (
     <div className="pb-28 pt-3">
@@ -43,6 +56,16 @@ export default function PhrasebookView() {
           );
         })}
       </div>
+
+      {isFavTab && favPhrases.length > 0 && (
+        <div className="px-4 pb-3">
+          <button onClick={() => setQuiz(true)}
+            className="w-full rounded-2xl py-3 text-sm font-bold text-white"
+            style={{ background: "linear-gradient(135deg,#00b894,#00cec9)", boxShadow: "0 4px 12px rgba(0,184,148,.3)" }}>
+            ⭐ 즐겨찾기 복습 퀴즈 ({favPhrases.length})
+          </button>
+        </div>
+      )}
 
       {/* 문장 리스트 */}
       {isFavTab && phrases.length === 0 ? (

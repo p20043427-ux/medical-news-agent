@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const KEY = "app-onboarded";
+const KEY = "app-onboarded-v2";
 
 export function shouldOnboard(): boolean {
   if (typeof window === "undefined") return false;
@@ -29,9 +29,21 @@ const SLIDES = [
     grad: "linear-gradient(135deg,#0984e3,#74b9ff)",
   },
   {
+    emoji: "🗣️",
+    title: "회화 · 여행 회화집 · 롤플레이",
+    desc: "상황별 회화와 여행 표현집을 듣고, 롤플레이로 직접 골라 대화를 완성해요. ⭐ 즐겨찾기와 발음 따라하기(🎤)도 가능해요.",
+    grad: "linear-gradient(135deg,#6c5ce7,#0984e3)",
+  },
+  {
+    emoji: "📝",
+    title: "모의시험 · 약점 분석",
+    desc: "입문·표준·도전 난이도의 모의시험으로 실력을 점검하고, 약점 분석과 오답 복습으로 약한 부분을 메워요.",
+    grad: "linear-gradient(135deg,#0984e3,#74b9ff)",
+  },
+  {
     emoji: "🔥",
-    title: "매일 목표 · 스트릭",
-    desc: "일일 목표를 채우고 연속 학습일을 쌓아 보세요. 꾸준함이 실력이 됩니다.",
+    title: "매일 목표 · 오늘의 표현",
+    desc: "일일 목표와 연속 학습일(스트릭)을 쌓고, 홈의 '오늘의 표현'으로 매일 새 표현을 만나요.",
     grad: "linear-gradient(135deg,#00b894,#55efc4)",
   },
 ];

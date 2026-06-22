@@ -4,14 +4,27 @@ import { useState } from "react";
 import { EN_TRAVEL_PHRASEBOOK } from "@/lib/en/phrasebook";
 import { speakEn } from "@/lib/en/speech";
 import { useFavorites } from "@/lib/favorites";
+import PhraseQuiz from "@/components/PhraseQuiz";
+
+const ALL_EN_KO = EN_TRAVEL_PHRASEBOOK.flatMap((s) => s.phrases).map((p) => p.ko);
 
 export default function EnPhrasebookView() {
   const [active, setActive] = useState<string>("__fav");
+  const [quiz, setQuiz] = useState(false);
   const { has, toggle, favs } = useFavorites("en-phrase");
   const isFavTab = active === "__fav";
   const situation = EN_TRAVEL_PHRASEBOOK.find((s) => s.key === active) ?? EN_TRAVEL_PHRASEBOOK[0];
   const favPhrases = EN_TRAVEL_PHRASEBOOK.flatMap((s) => s.phrases).filter((p) => favs.includes(p.en));
   const phrases = isFavTab ? favPhrases : (situation?.phrases ?? []);
+
+  if (quiz) {
+    return (
+      <PhraseQuiz
+        items={favPhrases.map((p) => ({ audio: p.en, ko: p.ko, label: p.en }))}
+        distractors={ALL_EN_KO} speak={speakEn} accent="#4361EE" onExit={() => setQuiz(false)}
+      />
+    );
+  }
 
   return (
     <div className="pb-28 pt-3">
@@ -42,6 +55,16 @@ export default function EnPhrasebookView() {
           );
         })}
       </div>
+
+      {isFavTab && favPhrases.length > 0 && (
+        <div className="px-4 pb-3">
+          <button onClick={() => setQuiz(true)}
+            className="w-full rounded-2xl py-3 text-sm font-bold text-white"
+            style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)", boxShadow: "0 4px 12px rgba(67,97,238,.3)" }}>
+            ⭐ 즐겨찾기 복습 퀴즈 ({favPhrases.length})
+          </button>
+        </div>
+      )}
 
       {isFavTab && phrases.length === 0 ? (
         <p className="px-6 py-12 text-center text-sm" style={{ color: "var(--text-3)" }}>⭐ 별을 눌러 자주 쓰는 표현을 모아 보세요.</p>

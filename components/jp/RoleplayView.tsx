@@ -5,6 +5,7 @@ import { CONVERSATIONS, CONVERSATION_CATEGORIES } from "@/lib/jp/conversations";
 import type { Conversation, DialogueLine } from "@/lib/jp/types";
 import { speakJa } from "@/lib/jp/speech";
 import { Button } from "@/components/ui";
+import PronounceButton from "@/components/PronounceButton";
 
 const text = (l: DialogueLine) => l.tokens.map((t) => t.t).join("");
 
@@ -97,7 +98,7 @@ function RoleplayRunner({ convo, onExit }: { convo: Conversation; onExit: () => 
         {lines.slice(0, revealed).map((l, i) => {
           const mine = l.speaker === "B";
           return (
-            <div key={i} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+            <div key={i} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
               <button onClick={() => speakJa(text(l))}
                 className="max-w-[80%] rounded-2xl px-4 py-2.5 text-left"
                 style={mine
@@ -106,6 +107,7 @@ function RoleplayRunner({ convo, onExit }: { convo: Conversation; onExit: () => 
                 <p className="text-[15px] font-semibold leading-snug">{text(l)}</p>
                 <p className="mt-0.5 text-[11px]" style={{ color: mine ? "rgba(255,255,255,.8)" : "var(--text-3)" }}>{l.ko}</p>
               </button>
+              <div className="mt-1 px-1"><PronounceButton target={text(l)} lang="ja" accent="#6c5ce7" /></div>
             </div>
           );
         })}

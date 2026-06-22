@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { EN_CONVERSATIONS, type EnConversation } from "@/lib/en/conversations";
 import { speakEn } from "@/lib/en/speech";
 import { Button } from "@/components/ui";
+import PronounceButton from "@/components/PronounceButton";
 
 const ALL_B_LINES = Array.from(
   new Set(EN_CONVERSATIONS.flatMap((c) => c.lines.filter((l) => l.speaker === "B").map((l) => l.en))),
@@ -84,7 +85,7 @@ function Runner({ convo, onExit }: { convo: EnConversation; onExit: () => void }
         {lines.slice(0, revealed).map((l, i) => {
           const mine = l.speaker === "B";
           return (
-            <div key={i} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+            <div key={i} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
               <button onClick={() => speakEn(l.en)}
                 className="max-w-[80%] rounded-2xl px-4 py-2.5 text-left"
                 style={mine
@@ -93,6 +94,7 @@ function Runner({ convo, onExit }: { convo: EnConversation; onExit: () => void }
                 <p className="text-[15px] font-semibold leading-snug">{l.en}</p>
                 <p className="mt-0.5 text-[11px]" style={{ color: mine ? "rgba(255,255,255,.8)" : "var(--text-3)" }}>{l.ko}</p>
               </button>
+              <div className="mt-1 px-1"><PronounceButton target={l.en} lang="en" accent="#4361EE" /></div>
             </div>
           );
         })}
