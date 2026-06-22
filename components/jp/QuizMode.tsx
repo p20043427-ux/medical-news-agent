@@ -99,12 +99,12 @@ export default function QuizMode({
                 setWrong([]);
                 setFinished(false);
               }}
-              className="rounded-2xl bg-rose-500 py-3.5 font-bold text-white"
+              className="btn btn-rose py-3.5"
             >
               오답 {wrong.length}개 다시 풀기
             </button>
           )}
-          <button onClick={onReview} className="rounded-2xl border border-slate-300 bg-white py-3.5 font-bold text-slate-700">
+          <button onClick={onReview} className="btn btn-outline py-3.5">
             🔁 복습 카드
           </button>
           <button onClick={onExit} className="rounded-2xl py-2 text-sm font-semibold text-slate-400">
@@ -185,11 +185,7 @@ export default function QuizMode({
 
       {/* 다음 */}
       <div className="sticky bottom-16 z-10 mt-auto bg-gradient-to-t from-[#f5f6f8] via-[#f5f6f8] to-transparent px-4 pb-4 pt-6">
-        <button
-          onClick={next}
-          disabled={!picked}
-          className="w-full rounded-2xl bg-slate-900 py-4 font-bold text-white shadow-sm transition active:scale-95 disabled:bg-slate-300"
-        >
+        <button onClick={next} disabled={!picked} className="btn btn-primary w-full py-4">
           {qi + 1 >= questions.length ? "결과 보기" : "다음"}
         </button>
       </div>

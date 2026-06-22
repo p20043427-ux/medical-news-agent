@@ -53,7 +53,7 @@ export default function ConversationView({
           onClick={() =>
             speakJa(active.lines.map((l) => tokensToText(l.tokens)).join(" 。 "))
           }
-          className="mb-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 py-3 font-semibold text-white"
+          className="btn btn-primary mb-4 w-full py-3"
         >
           ▶ 대화 전체 듣기
         </button>

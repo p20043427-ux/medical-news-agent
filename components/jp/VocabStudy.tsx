@@ -60,16 +60,10 @@ export default function VocabStudy({
           모르는 <strong className="text-slate-700">{unknown}개</strong>를 복습·퀴즈로 익혀요.
         </p>
         <div className="mt-2 grid w-full max-w-xs gap-2.5">
-          <button
-            onClick={onReview}
-            className="rounded-2xl bg-slate-900 py-3.5 font-bold text-white shadow-sm"
-          >
+          <button onClick={onReview} className="btn btn-primary py-3.5">
             🔁 복습 카드 시작
           </button>
-          <button
-            onClick={onQuiz}
-            className="rounded-2xl border border-slate-300 bg-white py-3.5 font-bold text-slate-700"
-          >
+          <button onClick={onQuiz} className="btn btn-outline py-3.5">
             📝 퀴즈로 점검
           </button>
           <button
@@ -173,16 +167,10 @@ export default function VocabStudy({
 
       {/* 하단 액션 */}
       <div className="sticky bottom-16 z-10 flex gap-3 bg-gradient-to-t from-[#f5f6f8] via-[#f5f6f8] to-transparent px-4 pb-4 pt-6">
-        <button
-          onClick={() => next(true)}
-          className="flex-1 rounded-2xl border border-slate-300 bg-white py-4 font-bold text-slate-700 shadow-sm transition active:scale-95"
-        >
+        <button onClick={() => next(true)} className="btn btn-outline flex-1 py-4">
           알고 있어요
         </button>
-        <button
-          onClick={() => next(false)}
-          className="flex-1 rounded-2xl bg-slate-900 py-4 font-bold text-white shadow-sm transition active:scale-95"
-        >
+        <button onClick={() => next(false)} className="btn btn-primary flex-1 py-4">
           학습할게요
         </button>
       </div>

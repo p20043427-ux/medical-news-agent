@@ -153,7 +153,7 @@ export default function Home({
           </div>
           <button
             onClick={() => onStudyCategory(recommend.key)}
-            className="mt-4 w-full rounded-2xl bg-slate-900 py-3.5 font-bold text-white shadow-sm transition active:scale-[0.98]"
+            className="btn btn-light mt-4 w-full py-3.5 text-base"
           >
             바로 시작
           </button>

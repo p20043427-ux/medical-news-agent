@@ -42,10 +42,10 @@ export default function ReviewMode({
           {category.label} 단어 <strong className="text-slate-800">{reviewed}회</strong> 복습했어요.
         </p>
         <div className="mt-2 grid w-full max-w-xs gap-2.5">
-          <button onClick={onQuiz} className="rounded-2xl bg-slate-900 py-3.5 font-bold text-white">
+          <button onClick={onQuiz} className="btn btn-primary py-3.5">
             📝 퀴즈로 점검
           </button>
-          <button onClick={onExit} className="rounded-2xl border border-slate-300 bg-white py-3.5 font-bold text-slate-700">
+          <button onClick={onExit} className="btn btn-outline py-3.5">
             홈으로
           </button>
         </div>
@@ -124,21 +124,21 @@ export default function ReviewMode({
       <div className="sticky bottom-16 z-10 bg-gradient-to-t from-[#f5f6f8] via-[#f5f6f8] to-transparent px-4 pb-4 pt-6">
         {revealed ? (
           <div className="grid grid-cols-3 gap-2.5">
-            <button onClick={() => grade("again")} className="rounded-2xl bg-rose-500 py-4 font-bold text-white shadow-sm active:scale-95">
+            <button onClick={() => grade("again")} className="btn btn-rose flex-col py-3.5">
               다시
-              <span className="block text-[11px] font-medium text-white/70">1일</span>
+              <span className="block text-[11px] font-medium text-white/75">1일</span>
             </button>
-            <button onClick={() => grade("good")} className="rounded-2xl bg-slate-900 py-4 font-bold text-white shadow-sm active:scale-95">
+            <button onClick={() => grade("good")} className="btn btn-primary flex-col py-3.5">
               좋음
-              <span className="block text-[11px] font-medium text-white/60">며칠 뒤</span>
+              <span className="block text-[11px] font-medium text-white/65">며칠 뒤</span>
             </button>
-            <button onClick={() => grade("easy")} className="rounded-2xl bg-emerald-500 py-4 font-bold text-white shadow-sm active:scale-95">
+            <button onClick={() => grade("easy")} className="btn btn-emerald flex-col py-3.5">
               쉬움
-              <span className="block text-[11px] font-medium text-white/70">길게</span>
+              <span className="block text-[11px] font-medium text-white/75">길게</span>
             </button>
           </div>
         ) : (
-          <button onClick={() => setRevealed(true)} className="w-full rounded-2xl bg-slate-900 py-4 font-bold text-white shadow-sm active:scale-95">
+          <button onClick={() => setRevealed(true)} className="btn btn-primary w-full py-4">
             답 확인
           </button>
         )}
