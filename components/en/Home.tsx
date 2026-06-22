@@ -1,193 +1,122 @@
 "use client";
 
 import { EN_VOCAB, EN_CATEGORIES } from "@/lib/en/vocab";
-import { type EnProgress, isLearned, learnedCount, enStreak, todayKey } from "@/lib/en/progress";
+import { type EnProgress, isLearned } from "@/lib/en/progress";
 
-const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+const LEVEL_GRAD: Record<string, [string, string]> = {
+  A1: ["#10B981", "#4361EE"],
+  A2: ["#3B82F6", "#7209B7"],
+  B1: ["#8B5CF6", "#4361EE"],
+  B2: ["#EC4899", "#7209B7"],
+  C1: ["#F59E0B", "#EF4444"],
+  C2: ["#4361EE", "#7209B7"],
+};
 
-function MiniRing({ pct }: { pct: number }) {
-  const r = 20;
-  const c = 2 * Math.PI * r;
-  return (
-    <svg viewBox="0 0 48 48" className="h-12 w-12 -rotate-90">
-      <circle cx="24" cy="24" r={r} fill="none" stroke="var(--surface)" strokeWidth="5" />
-      <circle cx="24" cy="24" r={r} fill="none" stroke="#4361EE" strokeWidth="5"
-        strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c - (pct / 100) * c}
-        style={{ transition: "stroke-dashoffset 0.7s" }} />
-    </svg>
-  );
-}
-
-export default function EnHome({ progress, onStudyCategory }: {
+export default function EnHome({ progress, onStudyCategory, onGrammar }: {
   progress: EnProgress;
   onStudyCategory: (key: string) => void;
+  onGrammar?: () => void;
 }) {
-  const total = EN_VOCAB.length;
-  const learned = learnedCount(progress);
-  const pct = total ? Math.round((learned / total) * 100) : 0;
-  const todayCount = progress.daily[todayKey()] ?? 0;
-  const str = enStreak(progress);
+  const start = new Date(progress.startedAt);
+  const dayN = Math.floor((Date.now() - start.getTime()) / 86400000) + 1;
 
-  const now = new Date();
-  const week = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(now);
-    d.setDate(now.getDate() - now.getDay() + i);
-    return d;
+  const ordered = [...EN_CATEGORIES].sort((a, b) => {
+    const aDone = EN_VOCAB.filter((w) => w.category === a.key).every((w) => isLearned(progress, w.id));
+    const bDone = EN_VOCAB.filter((w) => w.category === b.key).every((w) => isLearned(progress, w.id));
+    return Number(aDone) - Number(bDone);
   });
-  const isStudied = (d: Date) => (progress.daily[d.toISOString().slice(0, 10)] ?? 0) > 0;
-
-  const recommend = EN_CATEGORIES.find((cat) =>
-    EN_VOCAB.filter((w) => w.category === cat.key).some((w) => !isLearned(progress, w.id))
-  ) ?? EN_CATEGORIES[0];
-
-  const recWords = EN_VOCAB.filter((w) => w.category === recommend.key);
-  const recLearned = recWords.filter((w) => isLearned(progress, w.id)).length;
-
-  // CEFR 레벨별 진도
-  const levels = ["A1", "A2", "B1", "B2", "C1"] as const;
-  const levelStats = levels.map((lv) => {
-    const ws = EN_VOCAB.filter((w) => w.cefrLevel === lv);
-    const ln = ws.filter((w) => isLearned(progress, w.id)).length;
-    return { level: lv, total: ws.length, learned: ln, pct: ws.length ? Math.round((ln / ws.length) * 100) : 0 };
-  });
-
-  const levelColors: Record<string, string> = {
-    A1: "#10B981", A2: "#3B82F6", B1: "#8B5CF6", B2: "#EC4899", C1: "#F59E0B",
-  };
 
   return (
-    <div className="px-4 pb-28 pt-2">
-      {/* 배지 줄 */}
-      <div className="mb-4 flex flex-wrap gap-2">
-        <span className="rounded-full px-3 py-1.5 text-xs font-bold text-white"
-          style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
-          CEFR A1→C1
-        </span>
-        {str > 0 && (
-          <span className="rounded-full px-3 py-1.5 text-xs font-bold"
-            style={{ background: "var(--card)", color: "#F97316", boxShadow: "0 1px 3px rgba(0,0,0,.08)" }}>
-            🔥 {str}일 연속
-          </span>
-        )}
-        <span className="rounded-full px-3 py-1.5 text-xs font-bold"
-          style={{ background: "var(--card)", color: "var(--text-2)", boxShadow: "0 1px 3px rgba(0,0,0,.08)" }}>
-          오늘 {todayCount}개
-        </span>
+    <div className="pb-28">
+      <div className="px-5 pb-3 pt-1">
+        <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "var(--text-1)" }}>
+          Day {dayN}
+        </h1>
       </div>
 
-      {/* 전체 진도 + 캘린더 */}
-      <div className="mb-4 rounded-3xl p-4 shadow-sm" style={{ background: "var(--card)" }}>
-        <div className="mb-3 flex items-center gap-4">
-          <MiniRing pct={pct} />
-          <div className="flex-1">
-            <p className="text-lg font-extrabold" style={{ color: "var(--text-1)" }}>영어 단어 진도</p>
-            <p className="text-sm" style={{ color: "var(--text-3)" }}>
-              {learned} / {total} 단어 ({pct}%)
-            </p>
-            <div className="progress-bar mt-2">
-              <div className="progress-bar-fill" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
-            </div>
-          </div>
-        </div>
-        {/* 주간 캘린더 */}
-        <div className="grid grid-cols-7 text-center text-xs" style={{ color: "var(--text-3)" }}>
-          {WEEKDAYS.map((w) => <span key={w}>{w}</span>)}
-        </div>
-        <div className="mt-2 grid grid-cols-7 text-center">
-          {week.map((d, i) => {
-            const isToday = d.toDateString() === now.toDateString();
-            const studied = isStudied(d);
-            return (
-              <div key={i} className="flex flex-col items-center gap-1">
-                <span className="grid h-8 w-8 place-items-center rounded-full text-sm font-semibold"
-                  style={{
-                    background: isToday ? "#4361EE" : "transparent",
-                    color: isToday ? "white" : studied ? "var(--text-1)" : "var(--text-3)",
-                  }}>
-                  {d.getDate()}
-                </span>
-                <span className="h-1.5 w-1.5 rounded-full" style={{ background: studied ? "#10B981" : "transparent" }} />
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <div className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-1">
+        {ordered.map((cat) => {
+          const words = EN_VOCAB.filter((w) => w.category === cat.key);
+          const total = words.length;
+          const learned = words.filter((w) => isLearned(progress, w.id)).length;
+          const unknown = total - learned;
+          const pct = total ? Math.round((learned / total) * 100) : 0;
+          const est = Math.max(1, Math.round(total * 0.3));
+          const first = words[0];
+          const status = learned === 0 ? "시작 전" : learned >= total ? "완료 🎉" : `${learned}/${total} 완료`;
+          const grad = LEVEL_GRAD[first?.cefrLevel] ?? ["#4361EE", "#7209B7"];
 
-      {/* 추천 카테고리 */}
-      <div className="mb-4 overflow-hidden rounded-3xl shadow-sm" style={{ background: "var(--card)" }}>
-        <div className="h-16 flex items-center justify-center text-5xl"
-          style={{ background: "linear-gradient(135deg,#4361EE22,#7209B722)" }}>
-          {recommend.emoji}
-        </div>
-        <div className="p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <p className="font-extrabold text-lg" style={{ color: "var(--text-1)" }}>{recommend.label}</p>
-              <p className="text-xs" style={{ color: "var(--text-3)" }}>
-                {recLearned}/{recWords.length} 완료 · {recommend.cefrRange}
-              </p>
-            </div>
-            <span className="rounded-full px-3 py-1 text-xs font-bold text-white"
-              style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
-              추천
-            </span>
-          </div>
-          <div className="progress-bar mb-4">
-            <div className="progress-bar-fill"
-              style={{ width: `${recWords.length ? (recLearned / recWords.length) * 100 : 0}%`, background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
-          </div>
-          <button onClick={() => onStudyCategory(recommend.key)}
-            className="w-full rounded-2xl py-3.5 font-bold text-white shadow-sm active:scale-[0.98] transition"
-            style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
-            학습 시작 →
-          </button>
-        </div>
-      </div>
-
-      {/* CEFR 레벨 진도 */}
-      <div className="mb-4 rounded-3xl p-4 shadow-sm" style={{ background: "var(--card)" }}>
-        <h3 className="mb-3 font-bold" style={{ color: "var(--text-1)" }}>CEFR 레벨별 진도</h3>
-        <div className="space-y-3">
-          {levelStats.map(({ level, total: t, learned: l, pct: p }) => (
-            <div key={level}>
-              <div className="mb-1 flex items-center justify-between">
-                <span className="rounded-full px-2 py-0.5 text-xs font-bold text-white"
-                  style={{ background: levelColors[level] }}>
-                  {level}
-                </span>
-                <span className="text-xs" style={{ color: "var(--text-3)" }}>{l}/{t} ({p}%)</span>
-              </div>
-              <div className="progress-bar">
-                <div className="progress-bar-fill" style={{ width: `${p}%`, background: levelColors[level] }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 카테고리 그리드 */}
-      <h3 className="mb-3 font-bold" style={{ color: "var(--text-1)" }}>카테고리별 학습</h3>
-      <div className="grid grid-cols-2 gap-3">
-        {EN_CATEGORIES.map((cat) => {
-          const ws = EN_VOCAB.filter((w) => w.category === cat.key);
-          const ln = ws.filter((w) => isLearned(progress, w.id)).length;
           return (
-            <button key={cat.key} onClick={() => onStudyCategory(cat.key)}
-              className="rounded-2xl p-4 text-left shadow-sm active:scale-95 transition"
-              style={{ background: "var(--card)" }}>
-              <div className="flex items-center justify-between">
-                <span className="text-2xl">{cat.emoji}</span>
-                <span className="text-xs font-semibold" style={{ color: "var(--text-3)" }}>{ln}/{ws.length}</span>
+            <div key={cat.key} className="w-[300px] shrink-0 snap-start rounded-[28px] p-3 shadow-sm"
+              style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+              {/* 레이어드 카드 스택 */}
+              <div className="relative h-44 pt-2">
+                <div className="absolute left-1/2 top-0 h-40 w-[82%] -translate-x-1/2 rounded-2xl"
+                  style={{ background: "var(--surface)", border: "1px solid var(--border)" }} />
+                <div className="absolute left-1/2 top-1 h-40 w-[90%] -translate-x-1/2 rounded-2xl"
+                  style={{ background: "var(--card)", border: "1px solid var(--border)", boxShadow: "0 2px 8px rgba(0,0,0,.06)" }} />
+                <div className="absolute inset-x-0 top-2 mx-auto h-40 w-full overflow-hidden rounded-2xl"
+                  style={{ boxShadow: "0 6px 18px rgba(0,0,0,.12)", background: `linear-gradient(135deg, ${grad[0]}, ${grad[1]})` }}>
+                  <div className="absolute right-3 top-3 text-5xl opacity-25 select-none">{cat.emoji}</div>
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent p-3">
+                    <p className="text-xl font-extrabold text-white">{first?.word}</p>
+                    <p className="truncate text-xs text-white/85">{first?.pronunciation} · {first?.meaning}</p>
+                  </div>
+                  <span className="absolute right-2 top-2 rounded-full bg-black/35 px-2 py-0.5 text-[11px] font-bold text-white backdrop-blur-sm">
+                    {total}장
+                  </span>
+                </div>
               </div>
-              <p className="mt-2 font-bold text-sm" style={{ color: "var(--text-1)" }}>{cat.label}</p>
-              <p className="text-xs mb-2" style={{ color: "var(--text-3)" }}>{cat.cefrRange}</p>
-              <div className="progress-bar">
-                <div className="progress-bar-fill"
-                  style={{ width: `${ws.length ? (ln / ws.length) * 100 : 0}%`, background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
+
+              <div className="px-1 pt-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-base">{cat.emoji}</span>
+                    <h3 className="text-lg font-extrabold" style={{ color: "var(--text-1)" }}>{cat.label}</h3>
+                  </div>
+                  <span className="rounded-full px-2 py-0.5 text-[11px] font-bold"
+                    style={{ background: "var(--surface)", color: "var(--text-3)" }}>
+                    {cat.cefrRange}
+                  </span>
+                </div>
+
+                <div className="progress-bar mt-3">
+                  <div className="progress-bar-fill" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
+                </div>
+                <div className="mt-1.5 flex items-center justify-between text-xs" style={{ color: "var(--text-3)" }}>
+                  <span>{status}</span>
+                  <span>~{est}분</span>
+                </div>
+
+                <p className="pt-3 text-center text-sm" style={{ color: "var(--text-2)" }}>
+                  {unknown > 0 ? <>모르는 단어 <strong style={{ color: "var(--text-1)" }}>{unknown}개</strong>를 골라주세요.</> : "모두 익혔어요! 복습해 볼까요?"}
+                </p>
+
+                <button onClick={() => onStudyCategory(cat.key)}
+                  className="mt-3 w-full rounded-2xl py-3.5 text-sm font-bold transition active:scale-[0.98]"
+                  style={{ background: "var(--text-1)", color: "var(--card)" }}>
+                  바로 시작
+                </button>
               </div>
-            </button>
+            </div>
           );
         })}
+      </div>
+
+      <div className="mb-3 mt-7 px-5">
+        <h2 className="text-lg font-extrabold" style={{ color: "var(--text-1)" }}>더 학습하기</h2>
+      </div>
+      <div className="px-5">
+        <button onClick={onGrammar}
+          className="flex w-full items-center gap-3 rounded-2xl p-4 text-left shadow-sm transition active:scale-95"
+          style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+          <span className="text-2xl">📖</span>
+          <div>
+            <p className="font-bold" style={{ color: "var(--text-1)" }}>문법 · 구동사</p>
+            <p className="text-xs" style={{ color: "var(--text-3)" }}>핵심 문법과 구동사를 한 번에</p>
+          </div>
+          <svg viewBox="0 0 24 24" className="ml-auto h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text-3)" }}><path d="m9 18 6-6-6-6" /></svg>
+        </button>
       </div>
     </div>
   );

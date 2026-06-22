@@ -3,190 +3,125 @@
 import { VOCAB, VOCAB_CATEGORIES } from "@/lib/jp/vocab";
 import { VERBS } from "@/lib/jp/verbs";
 import { CONVERSATIONS } from "@/lib/jp/conversations";
-import { type Progress, todayKey, isKnown, knownCount, streak, daysUntilGoal, dueIds } from "@/lib/jp/progress";
+import { type Progress, isKnown } from "@/lib/jp/progress";
 import CardArt from "./CardArt";
-
-const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
-
-function ProgressRing({ pct, color = "#E63946" }: { pct: number; color?: string }) {
-  const r = 26;
-  const c = 2 * Math.PI * r;
-  return (
-    <svg viewBox="0 0 64 64" className="h-16 w-16 -rotate-90">
-      <circle cx="32" cy="32" r={r} fill="none" stroke="var(--surface)" strokeWidth="6" />
-      <circle cx="32" cy="32" r={r} fill="none" stroke={color} strokeWidth="6"
-        strokeLinecap="round" strokeDasharray={c}
-        strokeDashoffset={c - (pct / 100) * c}
-        className="transition-all duration-700" />
-    </svg>
-  );
-}
 
 export default function Home({ progress, onStudyCategory, onGo }: {
   progress: Progress;
   onStudyCategory: (key: string) => void;
   onGo: (tab: "conversation" | "verbs") => void;
 }) {
-  const totalWords = VOCAB.length;
-  const known = knownCount(progress);
-  const pct = totalWords ? Math.round((known / totalWords) * 100) : 0;
-  const todayCount = progress.daily[todayKey()] ?? 0;
-  const str = streak(progress);
-  const dday = daysUntilGoal(progress);
-  const dueCount = dueIds(progress).length;
-
   const start = new Date(progress.startedAt);
   const dayN = Math.floor((Date.now() - start.getTime()) / 86400000) + 1;
 
-  const now = new Date();
-  const week = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(now);
-    d.setDate(now.getDate() - now.getDay() + i);
-    return d;
+  // 추천(아직 다 못 익힌) 카테고리를 앞으로 정렬
+  const ordered = [...VOCAB_CATEGORIES].sort((a, b) => {
+    const aDone = VOCAB.filter((w) => w.category === a.key).every((w) => isKnown(progress, w.id));
+    const bDone = VOCAB.filter((w) => w.category === b.key).every((w) => isKnown(progress, w.id));
+    return Number(aDone) - Number(bDone);
   });
-  const isStudied = (d: Date) => (progress.daily[d.toISOString().slice(0, 10)] ?? 0) > 0;
-
-  const recommend = VOCAB_CATEGORIES.find((cat) => {
-    return VOCAB.filter((w) => w.category === cat.key).some((w) => !isKnown(progress, w.id));
-  }) ?? VOCAB_CATEGORIES[0];
-  const recWords = VOCAB.filter((w) => w.category === recommend.key);
-  const recKnown = recWords.filter((w) => isKnown(progress, w.id)).length;
 
   return (
-    <div className="px-4 pb-28 pt-2">
-      {/* 오늘 요약 배지 줄 */}
-      <div className="mb-4 flex flex-wrap gap-2">
-        <span className="rounded-full px-3 py-1.5 text-xs font-bold text-white"
-          style={{ background: "linear-gradient(135deg,#E63946,#F4A261)" }}>
+    <div className="pb-28">
+      {/* Day N */}
+      <div className="px-5 pb-3 pt-1">
+        <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "var(--text-1)" }}>
           Day {dayN}
-        </span>
-        {str > 0 && (
-          <span className="rounded-full px-3 py-1.5 text-xs font-bold"
-            style={{ background: "var(--card)", color: "#F97316", boxShadow: "0 1px 3px rgba(0,0,0,.08)" }}>
-            🔥 {str}일 연속
-          </span>
-        )}
-        {dueCount > 0 && (
-          <span className="rounded-full px-3 py-1.5 text-xs font-bold"
-            style={{ background: "var(--card)", color: "#3B82F6", boxShadow: "0 1px 3px rgba(0,0,0,.08)" }}>
-            🔁 복습 {dueCount}장
-          </span>
-        )}
-        {dday !== null && (
-          <span className="rounded-full px-3 py-1.5 text-xs font-bold"
-            style={{ background: "var(--card)", color: "var(--text-2)", boxShadow: "0 1px 3px rgba(0,0,0,.08)" }}>
-            {dday > 0 ? `D-${dday}` : dday === 0 ? "D-DAY 🎯" : `D+${-dday}`}
-          </span>
-        )}
-        <span className="rounded-full px-3 py-1.5 text-xs font-bold"
-          style={{ background: "var(--card)", color: "var(--text-2)", boxShadow: "0 1px 3px rgba(0,0,0,.08)" }}>
-          오늘 {todayCount}장
-        </span>
+        </h1>
       </div>
 
-      {/* 전체 진도 + 주간 캘린더 */}
-      <div className="mb-4 rounded-3xl p-4 shadow-sm" style={{ background: "var(--card)" }}>
-        <div className="mb-3 flex items-center gap-4">
-          <ProgressRing pct={pct} />
-          <div className="flex-1">
-            <p className="text-lg font-extrabold" style={{ color: "var(--text-1)" }}>JLPT N5 진도</p>
-            <p className="text-sm" style={{ color: "var(--text-3)" }}>
-              {known} / {totalWords} 단어 ({pct}%)
-            </p>
-            <div className="progress-bar mt-2">
-              <div className="progress-bar-fill" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
-            </div>
-          </div>
-        </div>
-        {/* 주간 캘린더 */}
-        <div className="grid grid-cols-7 text-center text-xs" style={{ color: "var(--text-3)" }}>
-          {WEEKDAYS.map((w) => <span key={w}>{w}</span>)}
-        </div>
-        <div className="mt-2 grid grid-cols-7 text-center">
-          {week.map((d, i) => {
-            const isToday = d.toDateString() === now.toDateString();
-            const studied = isStudied(d);
-            return (
-              <div key={i} className="flex flex-col items-center gap-1">
-                <span className="grid h-8 w-8 place-items-center rounded-full text-sm font-semibold"
-                  style={{
-                    background: isToday ? "#E63946" : "transparent",
-                    color: isToday ? "white" : studied ? "var(--text-1)" : "var(--text-3)",
-                    fontWeight: isToday ? 700 : studied ? 600 : 400,
-                  }}>
-                  {d.getDate()}
-                </span>
-                <span className="h-1.5 w-1.5 rounded-full" style={{ background: studied ? "#10B981" : "transparent" }} />
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* 덱 카드 캐러셀 */}
+      <div className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-1">
+        {ordered.map((cat) => {
+          const words = VOCAB.filter((w) => w.category === cat.key);
+          const total = words.length;
+          const known = words.filter((w) => isKnown(progress, w.id)).length;
+          const unknown = total - known;
+          const pct = total ? Math.round((known / total) * 100) : 0;
+          const est = Math.max(1, Math.round(total * 0.3));
+          const first = words[0];
+          const status = known === 0 ? "시작 전" : known >= total ? "완료 🎉" : `${known}/${total} 완료`;
 
-      {/* 오늘의 추천 학습 */}
-      <div className="mb-4 overflow-hidden rounded-3xl shadow-sm" style={{ background: "var(--card)" }}>
-        <div className="h-24">
-          <CardArt category={recommend.key} emoji={recommend.emoji} />
-        </div>
-        <div className="p-5">
-          <div className="flex items-center gap-3">
-            <ProgressRing pct={recWords.length ? Math.round((recKnown / recWords.length) * 100) : 0} />
-            <div className="flex-1">
-              <p className="text-lg font-bold" style={{ color: "var(--text-1)" }}>
-                {recommend.emoji} {recommend.label}
-              </p>
-              <p className="text-sm" style={{ color: "var(--text-3)" }}>
-                {recKnown}/{recWords.length} 학습 · 약 3분
-              </p>
-            </div>
-          </div>
-          <button onClick={() => onStudyCategory(recommend.key)}
-            className="mt-4 w-full rounded-2xl py-3.5 font-bold text-white shadow-sm transition active:scale-[0.98]"
-            style={{ background: "linear-gradient(135deg,#E63946,#F4A261)" }}>
-            바로 시작 →
-          </button>
-        </div>
-      </div>
-
-      {/* 카테고리 그리드 */}
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-lg font-bold" style={{ color: "var(--text-1)" }}>단어 카테고리</h2>
-        <span className="text-xs" style={{ color: "var(--text-3)" }}>{totalWords}개 단어</span>
-      </div>
-      <div className="mb-5 grid grid-cols-2 gap-3">
-        {VOCAB_CATEGORIES.map((cat) => {
-          const ws = VOCAB.filter((w) => w.category === cat.key);
-          const kn = ws.filter((w) => isKnown(progress, w.id)).length;
-          const catPct = ws.length ? (kn / ws.length) * 100 : 0;
           return (
-            <button key={cat.key} onClick={() => onStudyCategory(cat.key)}
-              className="rounded-2xl p-4 text-left shadow-sm transition active:scale-95"
-              style={{ background: "var(--card)" }}>
-              <div className="flex items-center justify-between">
-                <span className="text-2xl">{cat.emoji}</span>
-                <span className="text-xs font-semibold" style={{ color: "var(--text-3)" }}>{kn}/{ws.length}</span>
+            <div
+              key={cat.key}
+              className="w-[300px] shrink-0 snap-start rounded-[28px] p-3 shadow-sm"
+              style={{ background: "var(--card)", border: "1px solid var(--border)" }}
+            >
+              {/* 레이어드 카드 스택 (덱 느낌) */}
+              <div className="relative h-44 pt-2">
+                {/* 뒤에 쌓인 카드들 */}
+                <div className="absolute left-1/2 top-0 h-40 w-[82%] -translate-x-1/2 rounded-2xl"
+                  style={{ background: "var(--surface)", border: "1px solid var(--border)" }} />
+                <div className="absolute left-1/2 top-1 h-40 w-[90%] -translate-x-1/2 rounded-2xl"
+                  style={{ background: "var(--card)", border: "1px solid var(--border)", boxShadow: "0 2px 8px rgba(0,0,0,.06)" }} />
+                {/* 앞 카드 */}
+                <div className="absolute inset-x-0 top-2 mx-auto h-40 w-full overflow-hidden rounded-2xl"
+                  style={{ boxShadow: "0 6px 18px rgba(0,0,0,.12)" }}>
+                  <CardArt category={cat.key} emoji={cat.emoji} />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-3">
+                    <p className="text-lg font-extrabold text-white">{first.word}</p>
+                    <p className="truncate text-xs text-white/85">{first.reading} · {first.meaning}</p>
+                  </div>
+                  <span className="absolute right-2 top-2 rounded-full bg-black/35 px-2 py-0.5 text-[11px] font-bold text-white backdrop-blur-sm">
+                    {total}장
+                  </span>
+                </div>
               </div>
-              <p className="mt-2 font-bold" style={{ color: "var(--text-1)" }}>{cat.label}</p>
-              <div className="progress-bar mt-2">
-                <div className="progress-bar-fill" style={{ width: `${catPct}%`, background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
+
+              {/* 세션 정보 */}
+              <div className="px-1 pt-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-base">{cat.emoji}</span>
+                    <h3 className="text-lg font-extrabold" style={{ color: "var(--text-1)" }}>스키밍</h3>
+                  </div>
+                  <span className="rounded-full px-2 py-0.5 text-[11px] font-bold"
+                    style={{ background: "var(--surface)", color: "var(--text-3)" }}>
+                    {cat.label}
+                  </span>
+                </div>
+
+                <div className="progress-bar mt-3">
+                  <div className="progress-bar-fill" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
+                </div>
+                <div className="mt-1.5 flex items-center justify-between text-xs" style={{ color: "var(--text-3)" }}>
+                  <span>{status}</span>
+                  <span>~{est}분</span>
+                </div>
+
+                <p className="pt-3 text-center text-sm" style={{ color: "var(--text-2)" }}>
+                  {unknown > 0 ? <>모르는 단어 <strong style={{ color: "var(--text-1)" }}>{unknown}개</strong>를 골라주세요.</> : "모두 익혔어요! 복습해 볼까요?"}
+                </p>
+
+                <button
+                  onClick={() => onStudyCategory(cat.key)}
+                  className="mt-3 w-full rounded-2xl py-3.5 text-sm font-bold transition active:scale-[0.98]"
+                  style={{ background: "var(--text-1)", color: "var(--card)" }}
+                >
+                  바로 시작
+                </button>
               </div>
-            </button>
+            </div>
           );
         })}
       </div>
 
-      {/* 회화 / 동사 */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* 빠른 이동: 회화 / 동사 */}
+      <div className="mb-3 mt-7 flex items-center justify-between px-5">
+        <h2 className="text-lg font-extrabold" style={{ color: "var(--text-1)" }}>더 학습하기</h2>
+      </div>
+      <div className="grid grid-cols-2 gap-3 px-5">
         <button onClick={() => onGo("conversation")}
           className="rounded-2xl p-4 text-left shadow-sm transition active:scale-95"
-          style={{ background: "var(--card)" }}>
+          style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
           <span className="text-2xl">💬</span>
           <p className="mt-2 font-bold" style={{ color: "var(--text-1)" }}>생활 회화</p>
           <p className="text-xs" style={{ color: "var(--text-3)" }}>{CONVERSATIONS.length}개 상황</p>
         </button>
         <button onClick={() => onGo("verbs")}
           className="rounded-2xl p-4 text-left shadow-sm transition active:scale-95"
-          style={{ background: "var(--card)" }}>
+          style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
           <span className="text-2xl">🔤</span>
           <p className="mt-2 font-bold" style={{ color: "var(--text-1)" }}>필수 동사</p>
           <p className="text-xs" style={{ color: "var(--text-3)" }}>{VERBS.length}개 동사</p>
