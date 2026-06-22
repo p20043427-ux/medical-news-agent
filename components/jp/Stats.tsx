@@ -54,6 +54,15 @@ export default function Stats({
   const weakCats = [...catStats].sort((a, b) => a.pct - b.pct).slice(0, 3);
   const lapseWords = Object.values(progress.cards).filter((c) => (c.lapses ?? 0) > 0).length;
 
+  // 주간 리포트
+  const DAY = 86400000;
+  const dayAgo = (i: number) => progress.daily?.[todayKey(new Date(Date.now() - i * DAY))] ?? 0;
+  const sumWeek = (off: number) => Array.from({ length: 7 }, (_, i) => dayAgo(off + i)).reduce((a, b) => a + b, 0);
+  const thisWeek = sumWeek(0);
+  const lastWeek = sumWeek(7);
+  const activeDays = Array.from({ length: 7 }, (_, i) => dayAgo(i)).filter((n) => n > 0).length;
+  const weekDelta = thisWeek - lastWeek;
+
   function changeRate(v: number) { setRateState(v); saveRate(v); }
 
   function exportFile() {
@@ -149,6 +158,29 @@ export default function Stats({
             </div>
           ))}
         </div>
+      </div>
+
+      {/* 주간 리포트 */}
+      <div className="mb-4 rounded-3xl p-5 shadow-sm" style={{ background: "var(--card)" }}>
+        <p className="mb-3 font-bold" style={{ color: "var(--text-1)" }}>이번 주 리포트</p>
+        <div className="grid grid-cols-3 gap-3 text-center">
+          <div>
+            <p className="text-2xl font-extrabold" style={{ color: "#E63946" }}>{thisWeek}</p>
+            <p className="mt-0.5 text-xs" style={{ color: "var(--text-3)" }}>학습 카드</p>
+          </div>
+          <div>
+            <p className="text-2xl font-extrabold" style={{ color: "#0984e3" }}>{activeDays}<span className="text-sm" style={{ color: "var(--text-3)" }}>/7</span></p>
+            <p className="mt-0.5 text-xs" style={{ color: "var(--text-3)" }}>학습일</p>
+          </div>
+          <div>
+            <p className="text-2xl font-extrabold" style={{ color: weekDelta >= 0 ? "#10B981" : "#F59E0B" }}>{weekDelta >= 0 ? "+" : ""}{weekDelta}</p>
+            <p className="mt-0.5 text-xs" style={{ color: "var(--text-3)" }}>지난주 대비</p>
+          </div>
+        </div>
+        <p className="mt-3 rounded-xl p-2.5 text-center text-xs" style={{ background: "var(--surface)", color: "var(--text-2)" }}>
+          {weekDelta > 0 ? `지난주보다 ${weekDelta}장 더 했어요 🔥` : weekDelta < 0 ? `이번 주 조금 더 힘내볼까요? 💪` : "꾸준히 이어가고 있어요 👍"}
+          {weakCats[0] && weakCats[0].pct < 1 ? ` · 보완 추천: ${weakCats[0].emoji} ${weakCats[0].label}` : ""}
+        </p>
       </div>
 
       {/* 최근 2주 그래프 */}

@@ -39,8 +39,30 @@ export default function EnHome({ progress, onStudyCategory, onGrammar }: {
     return Number(aDone) - Number(bDone);
   });
 
+  // 이어서 학습 — 가장 덜 익힌 카테고리
+  const resume = ordered[0];
+  const resumeWords = resume ? EN_VOCAB.filter((w) => w.category === resume.key) : [];
+  const resumeKnown = resumeWords.filter((w) => isLearned(progress, w.id)).length;
+
   return (
     <div className="pb-28">
+      {/* 이어서 학습 */}
+      {resume && (
+        <div className="px-5 pb-2 pt-2">
+          <button onClick={() => onStudyCategory(resume.key)}
+            className="flex w-full items-center gap-3 rounded-2xl p-4 text-left shadow-sm transition active:scale-[0.98]"
+            style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-2xl" style={{ background: "rgba(255,255,255,.2)" }}>{resume.emoji}</span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-xs font-bold text-white/80">이어서 학습</span>
+              <span className="block font-extrabold text-white">{resume.label}</span>
+              <span className="block text-xs text-white/85">{resumeKnown}/{resumeWords.length} 익힘 · 탭하여 계속</span>
+            </span>
+            <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+          </button>
+        </div>
+      )}
+
       <div className="px-5 pb-3 pt-1">
         <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "var(--text-1)" }}>
           Day {dayN}

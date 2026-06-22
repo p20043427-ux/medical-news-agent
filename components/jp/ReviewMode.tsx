@@ -5,6 +5,7 @@ import type { Word, Category } from "@/lib/jp/types";
 import type { Grade } from "@/lib/jp/progress";
 import Furigana from "./Furigana";
 import SpeakerButton from "./SpeakerButton";
+import PronounceButton from "@/components/PronounceButton";
 import { Button, Progress } from "@/components/ui";
 
 const GRADE_CONFIG: Record<Grade, { label: string; sub: string; grad: [string, string]; xp: string; icon: string }> = {
@@ -106,9 +107,11 @@ export default function ReviewMode({
 
       {/* 카드 */}
       <div className="flex flex-1 items-start px-4 pt-2">
-        <button
+        <div
+          role="button"
+          tabIndex={0}
           onClick={() => !revealed && setRevealed(true)}
-          className="flex min-h-[340px] w-full flex-col items-center justify-center gap-4 rounded-3xl p-8 text-center shadow-xl transition"
+          className="flex min-h-[340px] w-full cursor-pointer flex-col items-center justify-center gap-4 rounded-3xl p-8 text-center shadow-xl transition"
           style={{ background: "var(--card)" }}
         >
           <span className="text-xs font-semibold" style={{ color: "var(--text-3)" }}>
@@ -119,6 +122,7 @@ export default function ReviewMode({
             <SpeakerButton text={word.reading} size={40} />
           </div>
           <p className="text-sm" style={{ color: "var(--text-3)" }}>[{word.reading}]</p>
+          <PronounceButton target={word.reading} lang="ja" accent="#E63946" />
 
           {revealed ? (
             <div className="mt-2 w-full space-y-4">
@@ -140,7 +144,7 @@ export default function ReviewMode({
               <span className="text-sm">탭하면 답이 보여요</span>
             </div>
           )}
-        </button>
+        </div>
       </div>
 
       {/* XP 획득 알림 */}

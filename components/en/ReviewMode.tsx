@@ -5,6 +5,7 @@ import type { EnWord, EnCategory } from "@/lib/en/types";
 import type { EnGrade, EnProgress } from "@/lib/en/progress";
 import { dueIds } from "@/lib/en/progress";
 import { speakEn } from "@/lib/en/speech";
+import PronounceButton from "@/components/PronounceButton";
 import { Button, Progress } from "@/components/ui";
 
 const GRADE_CONFIG: Record<EnGrade, { label: string; sub: string; bg: string; xp: string }> = {
@@ -101,9 +102,11 @@ export default function EnReviewMode({
 
       {/* 카드 */}
       <div className="flex flex-1 items-start px-4 pt-2">
-        <button
+        <div
+          role="button"
+          tabIndex={0}
           onClick={() => !revealed && setRevealed(true)}
-          className="flex min-h-[340px] w-full flex-col items-center justify-center gap-4 rounded-3xl p-8 text-center shadow-xl"
+          className="flex min-h-[340px] w-full cursor-pointer flex-col items-center justify-center gap-4 rounded-3xl p-8 text-center shadow-xl"
           style={{ background: "var(--card)" }}
         >
           <div className="flex items-center gap-2">
@@ -123,6 +126,7 @@ export default function EnReviewMode({
             </button>
           </div>
           <p className="font-mono text-sm" style={{ color: "var(--text-3)" }}>{word.pronunciation}</p>
+          <PronounceButton target={word.word} lang="en" accent="#4361EE" />
 
           {revealed ? (
             <div className="mt-2 w-full space-y-3">
@@ -148,7 +152,7 @@ export default function EnReviewMode({
               👆 탭하면 답이 보여요
             </p>
           )}
-        </button>
+        </div>
       </div>
 
       {lastXP && (
