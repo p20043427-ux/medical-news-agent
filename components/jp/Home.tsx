@@ -50,8 +50,8 @@ export default function Home({ progress, onStudyCategory }: {
         </h1>
       </div>
 
-      {/* 덱 카드 캐러셀 */}
-      <div className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-1">
+      {/* 덱 카드 캐러셀 — 중앙 정렬(양쪽 대칭 peek) */}
+      <div className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto px-[7%] pb-1">
         {ordered.map((cat) => {
           const words = VOCAB.filter((w) => w.category === cat.key);
           const total = words.length;
@@ -65,7 +65,7 @@ export default function Home({ progress, onStudyCategory }: {
           return (
             <div
               key={cat.key}
-              className="w-[86vw] max-w-[320px] shrink-0 snap-start rounded-[28px] p-3 shadow-sm"
+              className="w-[86%] shrink-0 snap-center rounded-[28px] p-3 shadow-sm"
               style={{ background: "var(--card)", border: "1px solid var(--border)" }}
             >
               {/* 레이어드 카드 스택 (덱 느낌) */}

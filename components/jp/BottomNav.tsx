@@ -30,21 +30,22 @@ export default function BottomNav({
       className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md border-t backdrop-blur"
       style={{ background: "var(--card)", borderColor: "var(--border)" }}
     >
-      <div className="flex items-stretch justify-around px-2 pb-[env(safe-area-inset-bottom)] pt-1.5">
+      <div className="flex items-stretch justify-around gap-1 px-2 pb-[env(safe-area-inset-bottom)] pt-1.5">
         {(Object.keys(LABEL) as Tab[]).map((t) => {
           const on = tab === t;
           return (
             <button
               key={t}
               onClick={() => onChange(t)}
-              className="flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 transition"
-              style={{ color: on ? accentColor : "var(--text-3)" }}
+              aria-current={on ? "page" : undefined}
+              className="flex flex-1 flex-col items-center gap-1 rounded-2xl py-1.5 transition active:scale-95"
+              style={{ color: on ? accentColor : "var(--text-3)", background: on ? `${accentColor}14` : "transparent" }}
             >
-              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor"
-                strokeWidth={on ? 2.3 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+              <svg viewBox="0 0 24 24" className="h-6 w-6 transition-transform" style={{ transform: on ? "translateY(-1px)" : "none" }}
+                fill="none" stroke="currentColor" strokeWidth={on ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
                 {ICONS[t]}
               </svg>
-              <span className={`text-[11px] ${on ? "font-bold" : "font-medium"}`}>{LABEL[t]}</span>
+              <span className={`text-[11px] leading-none ${on ? "font-extrabold" : "font-medium"}`}>{LABEL[t]}</span>
             </button>
           );
         })}
