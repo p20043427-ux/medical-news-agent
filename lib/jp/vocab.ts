@@ -1,6 +1,11 @@
 import type { Word, Category } from "./types";
 import { EXTRAS } from "./extras";
 import { EXTRA_VOCAB } from "./vocab-extra";
+import { VOCAB_B1 } from "./vocab-b1";
+import { VOCAB_B2 } from "./vocab-b2";
+import { VOCAB_B3 } from "./vocab-b3";
+import { VOCAB_B4 } from "./vocab-b4";
+import { VOCAB_B5 } from "./vocab-b5";
 
 export const VOCAB_CATEGORIES: Category[] = [
   { key: "greeting", label: "인사·표현", emoji: "👋" },
@@ -428,7 +433,19 @@ function highlightExample(w: Word): Word {
   return { ...w, example: { ...w.example, tokens } };
 }
 
-// 본 데이터 + 확장 데이터에 유사어·팁(extras)·레벨 기본값(N5)·예문 강조를 병합한다.
-export const VOCAB: Word[] = [...RAW_VOCAB, ...EXTRA_VOCAB].map((w) =>
-  highlightExample({ level: "N5", ...w, ...EXTRAS[w.id] }),
-);
+// 표제어(word) 기준 중복 제거 — 먼저 등장한 항목을 유지한다.
+function dedupeByWord(list: Word[]): Word[] {
+  const seen = new Set<string>();
+  return list.filter((w) => (seen.has(w.word) ? false : (seen.add(w.word), true)));
+}
+
+// 본 데이터 + 확장 배치(B1~B5)에 유사어·팁(extras)·레벨 기본값(N5)·예문 강조를 병합한다.
+export const VOCAB: Word[] = dedupeByWord([
+  ...RAW_VOCAB,
+  ...EXTRA_VOCAB,
+  ...VOCAB_B1,
+  ...VOCAB_B2,
+  ...VOCAB_B3,
+  ...VOCAB_B4,
+  ...VOCAB_B5,
+]).map((w) => highlightExample({ level: "N5", ...w, ...EXTRAS[w.id] }));
