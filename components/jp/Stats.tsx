@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { VOCAB } from "@/lib/jp/vocab";
+import { VOCAB, VOCAB_CATEGORIES } from "@/lib/jp/vocab";
 import {
   type Progress as JpProgress, knownCount, streak, recentDaily, daysUntilGoal, todayKey, totalReviews,
 } from "@/lib/jp/progress";
@@ -44,6 +44,15 @@ export default function Stats({
   const days14 = recentDaily(progress, 14);
   const maxCount = Math.max(1, ...days14.map((d) => d.count));
   const dday = daysUntilGoal(progress);
+
+  // 약점 분석 — 카테고리별 정복률 + 자주 틀리는 단어
+  const catStats = VOCAB_CATEGORIES.map((c) => {
+    const ws = VOCAB.filter((w) => w.category === c.key);
+    const kn = ws.filter((w) => (progress.cards[w.id]?.box ?? 0) >= 3).length;
+    return { key: c.key, label: c.label, emoji: c.emoji, total: ws.length, known: kn, pct: ws.length ? kn / ws.length : 1 };
+  }).filter((c) => c.total > 0);
+  const weakCats = [...catStats].sort((a, b) => a.pct - b.pct).slice(0, 3);
+  const lapseWords = Object.values(progress.cards).filter((c) => (c.lapses ?? 0) > 0).length;
 
   function changeRate(v: number) { setRateState(v); saveRate(v); }
 
@@ -110,6 +119,36 @@ export default function Stats({
           </span>
         </div>
         <Progress value={total ? (known / total) * 100 : 0} indicatorStyle={{ background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
+      </div>
+
+      {/* 약점 분석 */}
+      <div className="mb-4 rounded-3xl p-5 shadow-sm" style={{ background: "var(--card)" }}>
+        <div className="mb-3 flex items-center justify-between">
+          <span className="font-bold" style={{ color: "var(--text-1)" }}>약점 분석</span>
+          {lapseWords > 0 && (
+            <span className="rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "#E6394612", color: "#E63946" }}>
+              자주 틀림 {lapseWords}개
+            </span>
+          )}
+        </div>
+        <p className="mb-3 text-xs" style={{ color: "var(--text-3)" }}>아직 약한 카테고리 — 여기부터 복습해요.</p>
+        <div className="space-y-2.5">
+          {weakCats.map((c) => (
+            <div key={c.key} className="flex items-center gap-3">
+              <span className="text-lg">{c.emoji}</span>
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 flex items-center justify-between">
+                  <span className="truncate text-sm font-semibold" style={{ color: "var(--text-1)" }}>{c.label}</span>
+                  <span className="text-xs font-bold" style={{ color: c.pct >= 0.6 ? "#10B981" : "#E63946" }}>{Math.round(c.pct * 100)}%</span>
+                </div>
+                <div className="h-1.5 overflow-hidden rounded-full" style={{ background: "var(--surface)" }}>
+                  <div className="h-full rounded-full" style={{ width: `${c.pct * 100}%`, background: c.pct >= 0.6 ? "#10B981" : "linear-gradient(90deg,#E63946,#F4A261)" }} />
+                </div>
+              </div>
+              <span className="shrink-0 text-xs" style={{ color: "var(--text-3)" }}>{c.known}/{c.total}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* 최근 2주 그래프 */}
