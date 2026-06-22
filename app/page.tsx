@@ -6,6 +6,7 @@ import EnglishApp from "@/components/en/EnglishApp";
 import { AuthProvider } from "@/lib/auth";
 import AccountButton from "@/components/auth/AccountButton";
 import { track } from "@/lib/analytics";
+import Onboarding, { shouldOnboard } from "@/components/Onboarding";
 
 type Lang = "jp" | "en";
 
@@ -20,11 +21,13 @@ export default function Root() {
 function RootInner() {
   const [lang, setLang] = useState<Lang | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [onboarding, setOnboarding] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     const saved = window.localStorage.getItem("app-lang") as Lang | null;
     if (saved === "jp" || saved === "en") setLang(saved);
+    else if (shouldOnboard()) setOnboarding(true);
   }, []);
 
   function selectLang(l: Lang) {
@@ -41,6 +44,7 @@ function RootInner() {
     );
   }
 
+  if (onboarding) return <Onboarding onDone={() => setOnboarding(false)} />;
   if (lang === "jp") return <JapaneseApp onBack={() => setLang(null)} />;
   if (lang === "en") return <EnglishApp onBack={() => setLang(null)} />;
 
