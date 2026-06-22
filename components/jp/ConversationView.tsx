@@ -8,6 +8,8 @@ import SpeakerButton from "./SpeakerButton";
 import { speakJa } from "@/lib/jp/speech";
 import { Button } from "@/components/ui";
 
+const ACCENT = "linear-gradient(135deg,#E63946,#F4A261)";
+
 export default function ConversationView({
   showFurigana,
   onToggleFurigana,
@@ -18,44 +20,44 @@ export default function ConversationView({
   const [active, setActive] = useState<Conversation | null>(null);
   const [showKo, setShowKo] = useState(true);
 
+  function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
+    return (
+      <button
+        onClick={onClick}
+        className="rounded-full px-3 py-1 text-xs font-bold transition active:scale-95"
+        style={on ? { background: "#E63946", color: "#fff" } : { background: "var(--surface)", color: "var(--text-3)" }}
+      >
+        {children}
+      </button>
+    );
+  }
+
   if (active) {
     return (
-      <div className="px-4 pb-24 pt-2">
+      <div className="px-4 pb-28 pt-2">
         <div className="mb-4 flex items-center gap-3">
           <button
             onClick={() => setActive(null)}
             aria-label="뒤로"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+            style={{ background: "var(--surface)", color: "var(--text-2)" }}
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
           </button>
           <div className="min-w-0 flex-1">
-            <h2 className="truncate text-lg font-bold text-slate-900">
+            <h2 className="truncate text-lg font-bold" style={{ color: "var(--text-1)" }}>
               {active.emoji} {active.title}
             </h2>
-            <p className="truncate text-xs text-slate-400">{active.situation}</p>
+            <p className="truncate text-xs" style={{ color: "var(--text-3)" }}>{active.situation}</p>
           </div>
-          <button
-            onClick={() => setShowKo((s) => !s)}
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${showKo ? "bg-slate-900 text-white" : "border border-slate-300 bg-white text-slate-500"}`}
-          >
-            한글
-          </button>
-          <button
-            onClick={onToggleFurigana}
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${showFurigana ? "bg-slate-900 text-white" : "border border-slate-300 bg-white text-slate-500"}`}
-          >
-            ふり
-          </button>
+          <Chip on={showKo} onClick={() => setShowKo((s) => !s)}>한글</Chip>
+          <Chip on={showFurigana} onClick={onToggleFurigana}>ふり</Chip>
         </div>
 
-        {/* 전체 듣기 */}
         <Button
           variant="brand"
           size="free"
-          onClick={() =>
-            speakJa(active.lines.map((l) => tokensToText(l.tokens)).join(" 。 "))
-          }
+          onClick={() => speakJa(active.lines.map((l) => tokensToText(l.tokens)).join(" 。 "))}
           className="mb-4 w-full py-3"
         >
           ▶ 대화 전체 듣기
@@ -65,20 +67,18 @@ export default function ConversationView({
           {active.lines.map((line, i) => {
             const mine = i % 2 === 1;
             return (
-              <div
-                key={i}
-                className={`flex ${mine ? "justify-end" : "justify-start"}`}
-              >
-                <div className={`max-w-[85%] ${mine ? "items-end" : "items-start"}`}>
-                  <span className="mb-1 block px-1 text-xs text-slate-400">
+              <div key={i} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                <div className="max-w-[85%]">
+                  <span className="mb-1 block px-1 text-xs" style={{ color: "var(--text-3)" }}>
                     {line.speaker}
                   </span>
                   <div
-                    className={`rounded-3xl px-4 py-3 shadow-sm ${
+                    className="rounded-3xl px-4 py-3"
+                    style={
                       mine
-                        ? "rounded-br-md bg-slate-900 text-white"
-                        : "rounded-bl-md bg-white text-slate-800"
-                    }`}
+                        ? { background: ACCENT, color: "#fff", borderBottomRightRadius: 8 }
+                        : { background: "var(--card)", color: "var(--text-1)", border: "1px solid var(--border)", borderBottomLeftRadius: 8 }
+                    }
                   >
                     <div className="flex items-start gap-2">
                       <p className="text-lg leading-relaxed">
@@ -87,13 +87,11 @@ export default function ConversationView({
                       <SpeakerButton
                         text={tokensToText(line.tokens)}
                         size={30}
-                        className={mine ? "border-white/30 bg-white/15 text-white" : ""}
+                        className={mine ? "border-white/30 bg-white/20 text-white" : ""}
                       />
                     </div>
                     {showKo && (
-                      <p
-                        className={`mt-1.5 text-sm ${mine ? "text-white/70" : "text-slate-500"}`}
-                      >
+                      <p className="mt-1.5 text-sm" style={{ color: mine ? "rgba(255,255,255,.8)" : "var(--text-3)" }}>
                         {line.ko}
                       </p>
                     )}
@@ -108,31 +106,30 @@ export default function ConversationView({
   }
 
   return (
-    <div className="px-4 pb-24 pt-2">
-      <h1 className="mb-1 text-2xl font-bold text-slate-900">생활 회화</h1>
-      <p className="mb-5 text-sm text-slate-400">
+    <div className="px-4 pb-28 pt-2">
+      <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>생활 회화</h1>
+      <p className="mb-4 text-sm" style={{ color: "var(--text-3)" }}>
         상황별 필수 회화를 듣고 따라 말해 보세요.
       </p>
       <div className="space-y-3">
         {CONVERSATIONS.map((c) => (
           <button
             key={c.id}
-            onClick={() => {
-              setActive(c);
-              setShowKo(true);
-            }}
-            className="flex w-full items-center gap-4 rounded-2xl bg-white p-4 text-left shadow-sm ring-1 ring-black/5 transition active:scale-[0.98]"
+            onClick={() => { setActive(c); setShowKo(true); }}
+            className="flex w-full items-center gap-4 rounded-2xl p-4 text-left transition active:scale-[0.98]"
+            style={{ background: "var(--card)", border: "1px solid var(--border)" }}
           >
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-2xl">
+            <span
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-2xl"
+              style={{ background: "var(--surface)" }}
+            >
               {c.emoji}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block font-bold text-slate-900">{c.title}</span>
-              <span className="block truncate text-sm text-slate-400">
-                {c.situation}
-              </span>
+              <span className="block font-bold" style={{ color: "var(--text-1)" }}>{c.title}</span>
+              <span className="block truncate text-sm" style={{ color: "var(--text-3)" }}>{c.situation}</span>
             </span>
-            <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0 text-slate-300" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+            <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" style={{ color: "var(--text-3)" }} fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
           </button>
         ))}
       </div>
