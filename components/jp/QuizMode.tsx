@@ -99,12 +99,12 @@ export default function QuizMode({
                 setWrong([]);
                 setFinished(false);
               }}
-              className="rounded-2xl bg-rose-500 py-3.5 font-bold text-white"
+              className="ui-btn ui-btn-rose py-3.5"
             >
               오답 {wrong.length}개 다시 풀기
             </button>
           )}
-          <button onClick={onReview} className="rounded-2xl border border-slate-300 bg-white py-3.5 font-bold text-slate-700">
+          <button onClick={onReview} className="ui-btn ui-btn-surface py-3.5">
             🔁 복습 카드
           </button>
           <button onClick={onExit} className="rounded-2xl py-2 text-sm font-semibold text-slate-400">
@@ -119,7 +119,7 @@ export default function QuizMode({
     return (
       <div className="px-6 py-20 text-center text-slate-400">
         퀴즈를 만들 단어가 부족해요.
-        <button onClick={onExit} className="mt-4 block w-full rounded-2xl bg-slate-900 py-3 font-bold text-white">홈으로</button>
+        <button onClick={onExit} className="ui-btn ui-btn-brand mt-4 w-full py-3">홈으로</button>
       </div>
     );
   }
@@ -131,7 +131,7 @@ export default function QuizMode({
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
         </button>
         <div className="mx-auto flex items-center gap-2">
-          <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-bold text-white">📝 퀴즈</span>
+          <span className="rounded-full px-3 py-1 text-xs font-bold text-white" style={{ background: "linear-gradient(135deg,#E63946,#c0392b)" }}>📝 퀴즈</span>
           <span className="rounded-full bg-white px-2.5 py-1 text-sm font-bold text-slate-500 shadow-sm">
             {qi + 1} / {questions.length}
           </span>
@@ -141,7 +141,7 @@ export default function QuizMode({
 
       <div className="px-5 pb-4">
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200/70">
-          <div className="h-full rounded-full bg-slate-900 transition-all" style={{ width: `${(qi / questions.length) * 100}%` }} />
+          <div className="h-full rounded-full transition-all" style={{ width: `${(qi / questions.length) * 100}%`, background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
         </div>
       </div>
 
@@ -150,7 +150,7 @@ export default function QuizMode({
         <div className="flex flex-col items-center gap-3 rounded-3xl bg-white p-8 shadow-lg ring-1 ring-black/5">
           <span className="text-xs font-semibold text-slate-400">알맞은 뜻을 고르세요</span>
           <div className="flex items-center gap-2">
-            <h2 className="text-4xl font-extrabold text-amber-500">{q.word.word}</h2>
+            <h2 className="text-4xl font-extrabold" style={{ color: "#E63946" }}>{q.word.word}</h2>
             <SpeakerButton text={q.word.reading} size={40} />
           </div>
           <p className="text-sm text-slate-400">[{q.word.reading}]</p>
@@ -185,11 +185,7 @@ export default function QuizMode({
 
       {/* 다음 */}
       <div className="sticky bottom-16 z-10 mt-auto bg-gradient-to-t from-[#f5f6f8] via-[#f5f6f8] to-transparent px-4 pb-4 pt-6">
-        <button
-          onClick={next}
-          disabled={!picked}
-          className="w-full rounded-2xl bg-slate-900 py-4 font-bold text-white shadow-sm transition active:scale-95 disabled:bg-slate-300"
-        >
+        <button onClick={next} disabled={!picked} className="ui-btn ui-btn-brand w-full py-4">
           {qi + 1 >= questions.length ? "결과 보기" : "다음"}
         </button>
       </div>

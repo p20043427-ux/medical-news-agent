@@ -96,8 +96,7 @@ export default function Home({ progress, onStudyCategory, onGo }: {
 
                 <button
                   onClick={() => onStudyCategory(cat.key)}
-                  className="mt-3 w-full rounded-2xl py-3.5 text-sm font-bold transition active:scale-[0.98]"
-                  style={{ background: "var(--text-1)", color: "var(--card)" }}
+                  className="ui-btn ui-btn-brand mt-3 w-full py-3.5 text-sm"
                 >
                   바로 시작
                 </button>
