@@ -5,6 +5,7 @@ import { VERBS } from "@/lib/jp/verbs";
 import { CONVERSATIONS } from "@/lib/jp/conversations";
 import { type Progress, isKnown } from "@/lib/jp/progress";
 import WordImage from "./WordImage";
+import { Button } from "@/components/ui";
 
 export default function Home({ progress, onStudyCategory, onGo }: {
   progress: Progress;
@@ -94,12 +95,14 @@ export default function Home({ progress, onStudyCategory, onGo }: {
                   {unknown > 0 ? <>모르는 단어 <strong style={{ color: "var(--text-1)" }}>{unknown}개</strong>를 골라주세요.</> : "모두 익혔어요! 복습해 볼까요?"}
                 </p>
 
-                <button
+                <Button
+                  variant="brand"
+                  size="free"
                   onClick={() => onStudyCategory(cat.key)}
-                  className="ui-btn ui-btn-brand mt-3 w-full py-3.5 text-sm"
+                  className="mt-3 w-full py-3.5 text-sm"
                 >
                   바로 시작
-                </button>
+                </Button>
               </div>
             </div>
           );

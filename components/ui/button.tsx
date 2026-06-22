@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/ui/cn";
 
 type Variant = "brand" | "accent" | "dark" | "surface" | "success" | "destructive" | "ghost";
-type Size = "sm" | "md" | "lg" | "icon";
+type Size = "sm" | "md" | "lg" | "icon" | "free";
 
 const VARIANT: Record<Variant, string> = {
   brand: "bg-primary text-primary-foreground shadow-token active:shadow-none",
@@ -19,6 +19,7 @@ const SIZE: Record<Size, string> = {
   md: "h-11 px-4 text-sm",
   lg: "h-13 px-5 text-base",
   icon: "h-10 w-10",
+  free: "", // 치수를 className 으로 직접 제어 (기존 화면 마이그레이션용)
 };
 
 export interface ButtonProps

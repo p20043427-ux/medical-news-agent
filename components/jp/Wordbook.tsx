@@ -4,6 +4,7 @@ import { useState } from "react";
 import { VOCAB, VOCAB_CATEGORIES } from "@/lib/jp/vocab";
 import type { Word } from "@/lib/jp/types";
 import Flashcard from "./Flashcard";
+import { Button } from "@/components/ui";
 
 const EMOJI: Record<string, string> = Object.fromEntries(
   VOCAB_CATEGORIES.map((c) => [c.key, c.emoji])
@@ -50,12 +51,14 @@ export default function Wordbook({
             단어장 <span className="text-base font-bold" style={{ color: "var(--text-3)" }}>{words.length}개</span>
           </p>
         </div>
-        <button
+        <Button
+          variant="brand"
+          size="free"
           onClick={() => onStudy(bookmarks)}
-          className="ui-btn ui-btn-brand px-4 py-2 text-sm"
+          className="px-4 py-2 text-sm"
         >
           복습하기
-        </button>
+        </Button>
       </div>
 
       <div style={{ height: 1, background: "var(--border)" }} className="mx-4" />

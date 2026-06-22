@@ -6,6 +6,7 @@ import type { Conversation } from "@/lib/jp/types";
 import Furigana, { tokensToText } from "./Furigana";
 import SpeakerButton from "./SpeakerButton";
 import { speakJa } from "@/lib/jp/speech";
+import { Button } from "@/components/ui";
 
 export default function ConversationView({
   showFurigana,
@@ -49,14 +50,16 @@ export default function ConversationView({
         </div>
 
         {/* 전체 듣기 */}
-        <button
+        <Button
+          variant="brand"
+          size="free"
           onClick={() =>
             speakJa(active.lines.map((l) => tokensToText(l.tokens)).join(" 。 "))
           }
-          className="ui-btn ui-btn-brand mb-4 w-full py-3"
+          className="mb-4 w-full py-3"
         >
           ▶ 대화 전체 듣기
-        </button>
+        </Button>
 
         <div className="space-y-3">
           {active.lines.map((line, i) => {

@@ -5,6 +5,7 @@ import type { Word, Category } from "@/lib/jp/types";
 import type { Grade } from "@/lib/jp/progress";
 import Furigana from "./Furigana";
 import SpeakerButton from "./SpeakerButton";
+import { Button } from "@/components/ui";
 
 const GRADE_CONFIG: Record<Grade, { label: string; sub: string; grad: [string, string]; xp: string; icon: string }> = {
   again: { label: "다시",   sub: "1일",   grad: ["#ff7675", "#d63031"], xp: "+2",  icon: "↺" },
@@ -53,9 +54,9 @@ export default function ReviewMode({
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
             퀴즈로 점검
           </button>
-          <button onClick={onExit} className="ui-btn ui-btn-surface py-3.5">
+          <Button variant="surface" size="free" onClick={onExit} className="py-3.5">
             홈으로
-          </button>
+          </Button>
         </div>
       </div>
     );

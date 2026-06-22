@@ -5,6 +5,7 @@ import type { Word, Category } from "@/lib/jp/types";
 import type { Grade } from "@/lib/jp/progress";
 import { VOCAB } from "@/lib/jp/vocab";
 import SpeakerButton from "./SpeakerButton";
+import { Button } from "@/components/ui";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -90,7 +91,9 @@ export default function QuizMode({
         <p className="text-slate-500">정답률 {score}%</p>
         <div className="mt-2 grid w-full max-w-xs gap-2.5">
           {wrong.length > 0 && (
-            <button
+            <Button
+              variant="destructive"
+              size="free"
               onClick={() => {
                 setPool(wrong);
                 setQi(0);
@@ -99,14 +102,14 @@ export default function QuizMode({
                 setWrong([]);
                 setFinished(false);
               }}
-              className="ui-btn ui-btn-rose py-3.5"
+              className="py-3.5"
             >
               오답 {wrong.length}개 다시 풀기
-            </button>
+            </Button>
           )}
-          <button onClick={onReview} className="ui-btn ui-btn-surface py-3.5">
+          <Button variant="surface" size="free" onClick={onReview} className="py-3.5">
             🔁 복습 카드
-          </button>
+          </Button>
           <button onClick={onExit} className="rounded-2xl py-2 text-sm font-semibold text-slate-400">
             홈으로
           </button>
@@ -119,7 +122,7 @@ export default function QuizMode({
     return (
       <div className="px-6 py-20 text-center text-slate-400">
         퀴즈를 만들 단어가 부족해요.
-        <button onClick={onExit} className="ui-btn ui-btn-brand mt-4 w-full py-3">홈으로</button>
+        <Button variant="brand" size="free" onClick={onExit} className="mt-4 w-full py-3">홈으로</Button>
       </div>
     );
   }
@@ -185,9 +188,9 @@ export default function QuizMode({
 
       {/* 다음 */}
       <div className="sticky bottom-16 z-10 mt-auto bg-gradient-to-t from-[#f5f6f8] via-[#f5f6f8] to-transparent px-4 pb-4 pt-6">
-        <button onClick={next} disabled={!picked} className="ui-btn ui-btn-brand w-full py-4">
+        <Button variant="brand" size="free" onClick={next} disabled={!picked} className="w-full py-4">
           {qi + 1 >= questions.length ? "결과 보기" : "다음"}
-        </button>
+        </Button>
       </div>
     </div>
   );
