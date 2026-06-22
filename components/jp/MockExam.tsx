@@ -12,6 +12,8 @@ const ROUNDS: Round[] = [
   { id: "r1", label: "모의 1회", seed: 1001 },
   { id: "r2", label: "모의 2회", seed: 1002 },
   { id: "r3", label: "모의 3회", seed: 1003 },
+  { id: "r4", label: "모의 4회", seed: 1004 },
+  { id: "r5", label: "모의 5회", seed: 1005 },
   { id: "random", label: "랜덤 모의", seed: undefined },
 ];
 
@@ -182,7 +184,7 @@ export default function MockExam({
   // ── 시험 진행 ──
   const selected = answers[q.key];
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] flex-col px-4 pb-4 pt-3">
+    <div className="flex min-h-[calc(100vh-4rem)] flex-col px-4 pb-28 pt-3">
       <div className="mb-3 flex items-center justify-between">
         <span className="rounded-full px-2.5 py-1 text-xs font-bold text-white" style={{ background: "#E63946" }}>{q.section}</span>
         <span className="text-sm font-bold" style={{ color: "var(--text-2)" }}>{idx + 1} / {questions.length}</span>

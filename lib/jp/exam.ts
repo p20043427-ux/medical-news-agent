@@ -80,12 +80,22 @@ export function buildExam(opts?: { seed?: number; count?: number }): ExamQuestio
 
   const qs: ExamQuestion[] = [];
 
-  sh(VOCAB).slice(0, nVocab).forEach((w, i) => {
+  // 읽기·표기 문제는 '한자가 있는 단어'에서만 생성 (가나 단어는 prompt==answer 가 되어 무의미)
+  const kanji = sh(kanjiWords);
+  const vshuf = sh(VOCAB);
+  for (let i = 0; i < nVocab; i++) {
     const mode = i % 3;
-    if (mode === 0) qs.push({ key: `v-r-${w.id}`, wordId: w.id, section: "문자·어휘", prompt: w.word, question: "읽는 법으로 알맞은 것은?", options: opt(w.reading, readings), answer: w.reading });
-    else if (mode === 1) qs.push({ key: `v-m-${w.id}`, wordId: w.id, section: "문자·어휘", prompt: w.word, sub: `[${w.reading}]`, question: "뜻으로 알맞은 것은?", options: opt(w.meaning, meanings), answer: w.meaning });
-    else { const kw = kanjiWords.includes(w) ? w : kanjiWords[i % kanjiWords.length]; qs.push({ key: `v-k-${kw.id}`, wordId: kw.id, section: "문자·어휘", prompt: kw.reading, question: "한자 표기로 알맞은 것은?", options: opt(kw.word, words), answer: kw.word }); }
-  });
+    if (mode === 1) {
+      const w = vshuf[i % vshuf.length];
+      qs.push({ key: `v-m-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.word, sub: `[${w.reading}]`, question: "뜻으로 알맞은 것은?", options: opt(w.meaning, meanings), answer: w.meaning });
+    } else if (mode === 0) {
+      const w = kanji[i % kanji.length];
+      qs.push({ key: `v-r-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.word, question: "읽는 법으로 알맞은 것은?", options: opt(w.reading, readings), answer: w.reading });
+    } else {
+      const w = kanji[(i + 1) % kanji.length];
+      qs.push({ key: `v-k-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.reading, question: "한자 표기로 알맞은 것은?", options: opt(w.word, words), answer: w.word });
+    }
+  }
 
   sh(VERBS).slice(0, nGrammar).forEach((v) => {
     qs.push({ key: `g-${v.id}`, section: "문법", prompt: v.dict, sub: `[${v.reading}] · ${v.meaning}`, question: "ます형으로 알맞은 것은?", options: opt(v.masu, masus), answer: v.masu });
