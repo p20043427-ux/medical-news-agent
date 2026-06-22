@@ -5,6 +5,7 @@ import JapaneseApp from "@/components/jp/JapaneseApp";
 import EnglishApp from "@/components/en/EnglishApp";
 import { AuthProvider } from "@/lib/auth";
 import AccountButton from "@/components/auth/AccountButton";
+import { track } from "@/lib/analytics";
 
 type Lang = "jp" | "en";
 
@@ -28,6 +29,7 @@ function RootInner() {
 
   function selectLang(l: Lang) {
     window.localStorage.setItem("app-lang", l);
+    track("select_language", { lang: l });
     setLang(l);
   }
 

@@ -7,6 +7,7 @@ import Furigana, { tokensToText } from "./Furigana";
 import SpeakerButton from "./SpeakerButton";
 import { speakJa } from "@/lib/jp/speech";
 import { Button } from "@/components/ui";
+import { track } from "@/lib/analytics";
 
 const ACCENT = "linear-gradient(135deg,#E63946,#F4A261)";
 
@@ -173,7 +174,7 @@ export default function ConversationView({
         {list.map((c) => (
           <button
             key={c.id}
-            onClick={() => { setActive(c); setShowKo(true); }}
+            onClick={() => { track("conversation_open", { id: c.id, level: c.level ?? "N5" }); setActive(c); setShowKo(true); }}
             className="flex w-full items-center gap-4 rounded-2xl p-4 text-left transition active:scale-[0.98]"
             style={{ background: "var(--card)", border: "1px solid var(--border)" }}
           >

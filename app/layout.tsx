@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import ServiceWorker from "@/components/jp/ServiceWorker";
 
 export const metadata: Metadata = {
@@ -33,6 +35,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen antialiased" style={{ background: "var(--bg)", color: "var(--text-1)" }}>
         {children}
         <ServiceWorker />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
