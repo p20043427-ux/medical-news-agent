@@ -1,28 +1,30 @@
 "use client";
 
-export type Tab = "home" | "conversation" | "verbs" | "stats";
+export type EnTab = "home" | "learn" | "review" | "grammar" | "stats";
 
-const ICONS: Record<Tab, React.ReactNode> = {
+const ICONS: Record<EnTab, React.ReactNode> = {
   home: <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" />,
-  conversation: <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />,
-  verbs: <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />,
+  learn: <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />,
+  review: <path d="M1 4v6h6M23 20v-6h-6M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15" />,
+  grammar: <path d="M4 7V4h16v3M9 20h6M12 4v16" />,
   stats: <path d="M3 3v18h18M8 16V9m5 7V5m5 11v-4" />,
 };
 
-const LABEL: Record<Tab, string> = {
+const LABEL: Record<EnTab, string> = {
   home: "홈",
-  conversation: "회화",
-  verbs: "동사",
+  learn: "학습",
+  review: "복습",
+  grammar: "문법",
   stats: "분석",
 };
 
-export default function BottomNav({
+export default function EnBottomNav({
   tab,
   onChange,
-  accentColor = "#1A1A2E",
+  accentColor = "#4361EE",
 }: {
-  tab: Tab;
-  onChange: (t: Tab) => void;
+  tab: EnTab;
+  onChange: (t: EnTab) => void;
   accentColor?: string;
 }) {
   return (
@@ -31,7 +33,7 @@ export default function BottomNav({
       style={{ background: "var(--card)", borderColor: "var(--border)" }}
     >
       <div className="flex items-stretch justify-around px-2 pb-[env(safe-area-inset-bottom)] pt-1.5">
-        {(Object.keys(LABEL) as Tab[]).map((t) => {
+        {(Object.keys(LABEL) as EnTab[]).map((t) => {
           const on = tab === t;
           return (
             <button

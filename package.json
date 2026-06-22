@@ -1,8 +1,8 @@
 {
-  "name": "medical-news-agent",
-  "version": "1.0.0",
+  "name": "lingua-flow",
+  "version": "2.0.0",
   "private": true,
-  "description": "최신 질병 정보를 자동 수집·요약하는 의료 뉴스 Agent",
+  "description": "일본어 & 영어 상업 수준 언어 학습 앱",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,8 +10,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.4",
-    "fast-xml-parser": "^4.5.0",
     "next": "^15.5.19",
     "react": "19.0.0",
     "react-dom": "19.0.0"

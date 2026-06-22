@@ -1,54 +1,54 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Word, Category } from "@/lib/jp/types";
-import type { Grade } from "@/lib/jp/progress";
-import Furigana from "./Furigana";
-import SpeakerButton from "./SpeakerButton";
+import type { EnWord, EnCategory } from "@/lib/en/types";
+import type { EnGrade, EnProgress } from "@/lib/en/progress";
+import { dueIds } from "@/lib/en/progress";
+import { speakEn } from "@/lib/en/speech";
 
-const GRADE_CONFIG: Record<Grade, { label: string; sub: string; bg: string; xp: string }> = {
-  again: { label: "다시",  sub: "1일",    bg: "#EF4444", xp: "+2" },
+const GRADE_CONFIG: Record<EnGrade, { label: string; sub: string; bg: string; xp: string }> = {
+  again: { label: "다시",   sub: "1일",    bg: "#EF4444", xp: "+2" },
   hard:  { label: "어려움", sub: "짧게",   bg: "#F97316", xp: "+10" },
-  good:  { label: "좋음",  sub: "며칠 뒤", bg: "#3B82F6", xp: "+15" },
-  easy:  { label: "쉬움",  sub: "길게",   bg: "#10B981", xp: "+20" },
+  good:  { label: "좋음",   sub: "며칠 뒤", bg: "#3B82F6", xp: "+15" },
+  easy:  { label: "쉬움",   sub: "길게",   bg: "#10B981", xp: "+20" },
 };
 
-export default function ReviewMode({
-  category, words, showFurigana, onGrade, onExit, onQuiz,
+export default function EnReviewMode({
+  category, words, onGrade, onExit, onQuiz, progress,
 }: {
-  category: Category;
-  words: Word[];
-  showFurigana: boolean;
-  onGrade: (id: string, g: Grade) => void;
+  category: EnCategory;
+  words: EnWord[];
+  onGrade: (id: string, g: EnGrade) => void;
   onExit: () => void;
   onQuiz: () => void;
+  progress: EnProgress;
 }) {
-  const initial = useMemo(() => words.map((w) => w.id), [words]);
+  const dueList = useMemo(() => dueIds(progress, words.map((w) => w.id)), [progress, words]);
   const byId = useMemo(() => new Map(words.map((w) => [w.id, w])), [words]);
 
-  const [queue, setQueue] = useState<string[]>(initial);
+  const [queue, setQueue] = useState<string[]>(() => {
+    const pool = dueList.length > 0 ? dueList : words.map((w) => w.id);
+    return pool;
+  });
   const [pos, setPos] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [reviewed, setReviewed] = useState(0);
   const [lastXP, setLastXP] = useState<string | null>(null);
 
-  const totalPlanned = initial.length;
-  const id = queue[pos];
-  const word = id ? byId.get(id) : undefined;
+  const totalPlanned = queue.length;
+  const word = queue[pos] ? byId.get(queue[pos]) : undefined;
 
   if (!word) {
     return (
       <div className="flex flex-col items-center justify-center gap-5 px-6 py-20 text-center">
         <div className="text-6xl">✅</div>
         <h2 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>복습 완료!</h2>
-        <p style={{ color: "var(--text-3)" }}>
-          {category.label} 카드 <strong style={{ color: "var(--text-1)" }}>{reviewed}회</strong> 복습했어요.
-        </p>
-        <div className="mt-2 grid w-full max-w-xs gap-2.5">
+        <p style={{ color: "var(--text-3)" }}>총 <strong style={{ color: "var(--text-1)" }}>{reviewed}개</strong> 복습했어요.</p>
+        <div className="grid w-full max-w-xs gap-2.5">
           <button onClick={onQuiz}
-            className="rounded-2xl py-3.5 font-bold text-white shadow-sm"
-            style={{ background: "linear-gradient(135deg,#E63946,#F4A261)" }}>
-            📝 퀴즈로 점검
+            className="rounded-2xl py-3.5 font-bold text-white"
+            style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
+            📝 퀴즈 도전
           </button>
           <button onClick={onExit}
             className="rounded-2xl border py-3.5 font-bold"
@@ -60,13 +60,12 @@ export default function ReviewMode({
     );
   }
 
-  function handleGrade(g: Grade) {
-    if (!word) return;
-    onGrade(word.id, g);
+  function handleGrade(g: EnGrade) {
+    onGrade(word!.id, g);
     setReviewed((r) => r + 1);
     setLastXP(GRADE_CONFIG[g].xp);
     setTimeout(() => setLastXP(null), 1200);
-    if (g === "again") setQueue((q) => [...q, word.id]);
+    if (g === "again") setQueue((q) => [...q, word!.id]);
     setRevealed(false);
     setPos((p) => p + 1);
   }
@@ -78,28 +77,28 @@ export default function ReviewMode({
     <div className="flex min-h-[calc(100vh-4rem)] flex-col" style={{ background: "var(--bg)" }}>
       {/* 헤더 */}
       <div className="flex items-center px-4 pb-2 pt-3">
-        <button onClick={onExit} aria-label="뒤로"
+        <button onClick={onExit}
           className="flex h-9 w-9 items-center justify-center rounded-full"
           style={{ background: "var(--surface)", color: "var(--text-2)" }}>
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2}
             strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
         </button>
         <div className="mx-auto flex items-center gap-2">
-          <span className="rounded-full px-3 py-1 text-xs font-bold text-white" style={{ background: "#E63946" }}>
+          <span className="rounded-full px-3 py-1 text-xs font-bold text-white"
+            style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
             🔁 SM-2 복습
           </span>
           <span className="rounded-full px-2.5 py-1 text-sm font-bold"
-            style={{ background: "var(--card)", color: "var(--text-3)", boxShadow: "0 1px 3px rgba(0,0,0,.1)" }}>
+            style={{ background: "var(--card)", color: "var(--text-3)" }}>
             남은 {remaining}장
           </span>
         </div>
         <span className="h-9 w-9" />
       </div>
 
-      {/* 진행바 */}
       <div className="px-5 pb-2">
         <div className="progress-bar">
-          <div className="progress-bar-fill" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
+          <div className="progress-bar-fill" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
         </div>
       </div>
 
@@ -107,27 +106,44 @@ export default function ReviewMode({
       <div className="flex flex-1 items-start px-4 pt-2">
         <button
           onClick={() => !revealed && setRevealed(true)}
-          className="flex min-h-[340px] w-full flex-col items-center justify-center gap-4 rounded-3xl p-8 text-center shadow-xl transition"
+          className="flex min-h-[340px] w-full flex-col items-center justify-center gap-4 rounded-3xl p-8 text-center shadow-xl"
           style={{ background: "var(--card)" }}
         >
-          <span className="text-xs font-semibold" style={{ color: "var(--text-3)" }}>
-            {revealed ? "뜻 · 예문" : "이 단어의 뜻은?"}
-          </span>
           <div className="flex items-center gap-2">
-            <h2 className="text-4xl font-extrabold" style={{ color: "#E63946" }}>{word.word}</h2>
-            <SpeakerButton text={word.reading} size={40} />
+            <span className="rounded-full px-2 py-0.5 text-xs font-bold"
+              style={{ background: "var(--surface)", color: "var(--text-3)" }}>
+              {word.partOfSpeech}
+            </span>
+            <span className="text-xs" style={{ color: "var(--text-3)" }}>{word.cefrLevel}</span>
           </div>
-          <p className="text-sm" style={{ color: "var(--text-3)" }}>[{word.reading}]</p>
+
+          <div className="flex items-center gap-3">
+            <h2 className="text-4xl font-extrabold" style={{ color: "#4361EE" }}>{word.word}</h2>
+            <button onClick={(e) => { e.stopPropagation(); speakEn(word.word); }}
+              className="flex h-10 w-10 items-center justify-center rounded-full text-white"
+              style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
+              🔊
+            </button>
+          </div>
+          <p className="font-mono text-sm" style={{ color: "var(--text-3)" }}>{word.pronunciation}</p>
 
           {revealed ? (
-            <div className="mt-2 w-full space-y-4">
+            <div className="mt-2 w-full space-y-3">
               <p className="text-2xl font-bold" style={{ color: "var(--text-1)" }}>{word.meaning}</p>
               <div className="rounded-2xl p-4 text-left" style={{ background: "var(--surface)" }}>
-                <p className="text-lg leading-relaxed" style={{ color: "var(--text-2)" }}>
-                  <Furigana tokens={word.example.tokens} showFurigana={showFurigana} />
-                </p>
-                <p className="mt-2 text-sm" style={{ color: "var(--text-3)" }}>{word.example.ko}</p>
+                <p className="leading-relaxed" style={{ color: "var(--text-2)" }}>"{word.example.en}"</p>
+                <p className="mt-1.5 text-sm" style={{ color: "var(--text-3)" }}>{word.example.ko}</p>
               </div>
+              {word.synonyms && (
+                <div className="flex flex-wrap gap-1.5 justify-center">
+                  {word.synonyms.slice(0, 3).map((s) => (
+                    <span key={s} className="rounded-full px-2 py-0.5 text-xs"
+                      style={{ background: "var(--surface)", color: "var(--text-3)" }}>
+                      = {s}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
             <p className="mt-4 rounded-full px-4 py-2 text-sm"
@@ -138,7 +154,6 @@ export default function ReviewMode({
         </button>
       </div>
 
-      {/* XP 획득 알림 */}
       {lastXP && (
         <div className="pointer-events-none fixed inset-0 flex items-center justify-center z-50">
           <span className="animate-bounce rounded-full px-5 py-2 text-lg font-extrabold text-white shadow-xl"
@@ -153,7 +168,7 @@ export default function ReviewMode({
         style={{ background: `linear-gradient(to top, var(--bg) 70%, transparent)` }}>
         {revealed ? (
           <div className="grid grid-cols-4 gap-2">
-            {(["again", "hard", "good", "easy"] as Grade[]).map((g) => {
+            {(["again", "hard", "good", "easy"] as EnGrade[]).map((g) => {
               const cfg = GRADE_CONFIG[g];
               return (
                 <button key={g} onClick={() => handleGrade(g)}
@@ -168,7 +183,7 @@ export default function ReviewMode({
         ) : (
           <button onClick={() => setRevealed(true)}
             className="w-full rounded-2xl py-4 font-bold text-white shadow-sm active:scale-95"
-            style={{ background: "linear-gradient(135deg,#E63946,#F4A261)" }}>
+            style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
             답 확인
           </button>
         )}

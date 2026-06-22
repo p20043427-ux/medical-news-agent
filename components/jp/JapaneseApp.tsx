@@ -15,14 +15,10 @@ import BottomNav, { type Tab } from "./BottomNav";
 const FURIGANA_KEY = "jp-app-furigana";
 
 type Mode = "skim" | "review" | "quiz";
-interface Session {
-  category: string;
-  mode: Mode;
-}
+interface Session { category: string; mode: Mode }
 
-export default function JapaneseApp() {
-  const { progress, ready, markSkim, grade, setGoalDate, reset, exportJson, importJson } =
-    useProgress();
+export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
+  const { progress, ready, markNew, grade, setGoalDate, reset, exportJson, importJson } = useProgress();
   const [tab, setTab] = useState<Tab>("home");
   const [session, setSession] = useState<Session | null>(null);
   const [showFurigana, setShowFurigana] = useState(true);
@@ -31,6 +27,7 @@ export default function JapaneseApp() {
     const saved = window.localStorage.getItem(FURIGANA_KEY);
     if (saved !== null) setShowFurigana(saved === "1");
   }, []);
+
   const toggleFurigana = () =>
     setShowFurigana((s) => {
       const next = !s;
@@ -40,90 +37,88 @@ export default function JapaneseApp() {
 
   if (!ready) {
     return (
-      <div className="grid min-h-screen place-items-center text-slate-400">
-        <div className="animate-pulse text-3xl">🌸</div>
+      <div className="flex min-h-screen items-center justify-center" style={{ background: "var(--bg)" }}>
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200" style={{ borderTopColor: "#E63946" }} />
+          <p className="text-sm" style={{ color: "var(--text-3)" }}>불러오는 중…</p>
+        </div>
       </div>
     );
   }
 
-  // ───── 학습 세션 (스키밍 / 복습 / 퀴즈) ─────
   if (session) {
     const category = VOCAB_CATEGORIES.find((c) => c.key === session.category)!;
     const all = VOCAB.filter((w) => w.category === session.category);
-    // 복습/퀴즈 풀: 아직 익히지 않은 단어 우선, 없으면 전체
     const learning = all.filter((w) => !isKnown(progress, w.id));
     const pool = learning.length > 0 ? learning : all;
     const go = (mode: Mode) => setSession({ category: session.category, mode });
     const exit = () => setSession(null);
 
     return (
-      <main className="mx-auto min-h-screen max-w-md bg-[#f5f6f8]">
+      <div className="mx-auto min-h-screen max-w-md" style={{ background: "var(--bg)" }}>
         {session.mode === "skim" && (
           <VocabStudy
-            category={category}
-            words={all}
-            showFurigana={showFurigana}
-            onToggleFurigana={toggleFurigana}
-            onSkim={markSkim}
-            onExit={exit}
-            onReview={() => go("review")}
-            onQuiz={() => go("quiz")}
+            category={category} words={all} showFurigana={showFurigana}
+            onToggleFurigana={toggleFurigana} onSkim={markNew} onExit={exit}
+            onReview={() => go("review")} onQuiz={() => go("quiz")}
           />
         )}
         {session.mode === "review" && (
           <ReviewMode
-            category={category}
-            words={pool}
-            showFurigana={showFurigana}
-            onGrade={grade}
-            onExit={exit}
-            onQuiz={() => go("quiz")}
+            category={category} words={pool} showFurigana={showFurigana}
+            onGrade={grade} onExit={exit} onQuiz={() => go("quiz")}
           />
         )}
         {session.mode === "quiz" && (
-          <QuizMode
-            category={category}
-            words={pool}
-            onGrade={grade}
-            onExit={exit}
-            onReview={() => go("review")}
-          />
+          <QuizMode category={category} words={pool} onGrade={grade} onExit={exit} onReview={() => go("review")} />
         )}
-        <BottomNav
-          tab="home"
-          onChange={(t) => {
-            setSession(null);
-            setTab(t);
-          }}
-        />
-      </main>
+        <BottomNav tab="home" onChange={(t) => { setSession(null); setTab(t); }} accentColor="#E63946" />
+      </div>
     );
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-md bg-[#f5f6f8]">
+    <div className="mx-auto min-h-screen max-w-md" style={{ background: "var(--bg)" }}>
+      {/* 헤더 — XP 바 + 뒤로가기 */}
+      <header className="sticky top-0 z-30 px-4 pt-3 pb-2" style={{ background: "var(--bg)" }}>
+        <div className="flex items-center gap-3">
+          {onBack && (
+            <button onClick={onBack} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg"
+              style={{ background: "var(--surface)", color: "var(--text-2)" }}>
+              ←
+            </button>
+          )}
+          <div className="flex-1">
+            <div className="mb-1 flex items-center justify-between">
+              <span className="text-xs font-bold" style={{ color: "#E63946" }}>
+                🇯🇵 일본어
+              </span>
+              <span className="text-xs font-semibold" style={{ color: "var(--xp)" }}>
+                ⚡ {progress.xp.toLocaleString()} XP
+              </span>
+            </div>
+            <div className="progress-bar">
+              <div
+                className="progress-bar-fill xp-bar-fill"
+                style={{ width: `${Math.min((progress.xp % 1000) / 10, 100)}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      </header>
+
       {tab === "home" && (
-        <Home
-          progress={progress}
-          onStudyCategory={(key) => setSession({ category: key, mode: "skim" })}
-          onGo={(t) => setTab(t)}
-        />
+        <Home progress={progress} onStudyCategory={(key) => setSession({ category: key, mode: "skim" })} onGo={(t) => setTab(t)} />
       )}
       {tab === "conversation" && (
         <ConversationView showFurigana={showFurigana} onToggleFurigana={toggleFurigana} />
       )}
       {tab === "verbs" && <VerbView showFurigana={showFurigana} />}
       {tab === "stats" && (
-        <Stats
-          progress={progress}
-          onSetGoal={setGoalDate}
-          onReset={reset}
-          onExport={exportJson}
-          onImport={importJson}
-        />
+        <Stats progress={progress} onSetGoal={setGoalDate} onReset={reset} onExport={exportJson} onImport={importJson} />
       )}
 
-      <BottomNav tab={tab} onChange={setTab} />
-    </main>
+      <BottomNav tab={tab} onChange={setTab} accentColor="#E63946" />
+    </div>
   );
 }

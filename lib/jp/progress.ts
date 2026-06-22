@@ -2,43 +2,42 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-const KEY = "jp-app-progress-v2";
-const OLD_KEY = "jp-app-progress-v1";
+const KEY = "jp-app-progress-v3";
 
-/** Leitner 박스별 다음 복습까지 간격(일). box 0 = 미학습. */
-const INTERVALS = [0, 1, 2, 4, 7, 15, 30];
-const MAX_BOX = 6;
-/** box 이상이면 '학습 완료'로 간주 */
-const KNOWN_BOX = 3;
+// SM-2 기본값
+const DEFAULT_EF = 2.5;
+const MIN_EF = 1.3;
 
 export interface CardState {
-  /** Leitner 박스 (0~6) */
-  box: number;
-  /** 다음 복습 예정일 (yyyy-mm-dd) */
-  due: string;
-  /** 총 복습 횟수 */
+  box: number;          // 0=신규, 1~5=학습중, 6=완료 (하위 호환)
+  due: string;          // yyyy-mm-dd
   reps: number;
-  /** 틀린 횟수 */
   lapses: number;
+  easeFactor: number;   // SM-2 EF (default 2.5)
+  interval: number;     // 다음 복습까지 일 수
+  lastGrade?: number;   // 마지막 점수 0~5
 }
 
 export interface Progress {
-  /** 단어 id별 SRS 상태 */
   cards: Record<string, CardState>;
-  /** 날짜별 학습 카드 수 (yyyy-mm-dd -> count) */
-  daily: Record<string, number>;
-  /** 학습 시작일 */
+  daily: Record<string, number>;  // yyyy-mm-dd → count
   startedAt: string;
-  /** 목표 시험일 (yyyy-mm-dd) — D-day 계산용 */
   goalDate?: string;
+  xp: number;
+  achievements: string[];
 }
 
-export type Grade = "again" | "good" | "easy";
+export type Grade = "again" | "hard" | "good" | "easy";
+
+const GRADE_MAP: Record<Grade, number> = { again: 0, hard: 3, good: 4, easy: 5 };
+const XP_MAP: Record<Grade, number> = { again: 2, hard: 10, good: 15, easy: 20 };
 
 const EMPTY: Progress = {
   cards: {},
   daily: {},
   startedAt: todayKey(),
+  xp: 0,
+  achievements: [],
 };
 
 export function todayKey(d: Date = new Date()): string {
@@ -51,41 +50,62 @@ function addDays(days: number): string {
   return todayKey(d);
 }
 
+// ── SM-2 알고리즘 ──
+function sm2(cur: CardState, q: number): { interval: number; easeFactor: number; box: number } {
+  let { interval, easeFactor, box } = cur;
+  if (q >= 3) {
+    if (cur.reps === 0) interval = 1;
+    else if (cur.reps === 1) interval = 6;
+    else interval = Math.max(1, Math.round(interval * easeFactor));
+    box = Math.min(box + 1, 6);
+  } else {
+    interval = 1;
+    box = 1;
+  }
+  easeFactor = Math.max(MIN_EF, easeFactor + 0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+  return { interval, easeFactor, box };
+}
+
 function load(): Progress {
   if (typeof window === "undefined") return EMPTY;
   try {
     const raw = window.localStorage.getItem(KEY);
-    if (raw) return { ...EMPTY, ...(JSON.parse(raw) as Progress) };
-    // v1 → v2 마이그레이션
-    const old = window.localStorage.getItem(OLD_KEY);
-    if (old) {
-      const o = JSON.parse(old) as {
-        knownWords?: string[];
-        studyWords?: string[];
-        daily?: Record<string, number>;
-        startedAt?: string;
-      };
+    if (raw) {
+      const parsed = JSON.parse(raw) as Progress;
+      // 기존 카드에 SM-2 필드 기본값 보장
       const cards: Record<string, CardState> = {};
-      (o.knownWords ?? []).forEach((id) => {
-        cards[id] = { box: KNOWN_BOX, due: addDays(INTERVALS[KNOWN_BOX]), reps: 1, lapses: 0 };
-      });
-      (o.studyWords ?? []).forEach((id) => {
-        cards[id] = { box: 1, due: todayKey(), reps: 1, lapses: 0 };
-      });
-      return { cards, daily: o.daily ?? {}, startedAt: o.startedAt ?? todayKey() };
+      for (const [id, c] of Object.entries(parsed.cards)) {
+        cards[id] = {
+          ...c,
+          easeFactor: c.easeFactor ?? DEFAULT_EF,
+          interval: c.interval ?? (c.box <= 1 ? 1 : c.box <= 2 ? 2 : c.box <= 3 ? 4 : c.box <= 4 ? 7 : 15),
+        };
+      }
+      return { ...parsed, xp: parsed.xp ?? 0, achievements: parsed.achievements ?? [], cards };
     }
-  } catch {
-    /* 무시 */
-  }
+    // 이전 버전 마이그레이션
+    const old = window.localStorage.getItem("jp-app-progress-v2");
+    if (old) {
+      const o = JSON.parse(old) as { cards?: Record<string, Partial<CardState>>; daily?: Record<string, number>; startedAt?: string };
+      const cards: Record<string, CardState> = {};
+      for (const [id, c] of Object.entries(o.cards ?? {})) {
+        cards[id] = {
+          box: c.box ?? 0,
+          due: c.due ?? todayKey(),
+          reps: c.reps ?? 0,
+          lapses: c.lapses ?? 0,
+          easeFactor: DEFAULT_EF,
+          interval: c.box ? (c.box <= 1 ? 1 : c.box <= 3 ? 4 : 15) : 0,
+        };
+      }
+      return { cards, daily: o.daily ?? {}, startedAt: o.startedAt ?? todayKey(), xp: 0, achievements: [] };
+    }
+  } catch { /* ignore */ }
   return EMPTY;
 }
 
 function save(p: Progress) {
-  try {
-    window.localStorage.setItem(KEY, JSON.stringify(p));
-  } catch {
-    /* 무시 */
-  }
+  try { window.localStorage.setItem(KEY, JSON.stringify(p)); } catch { /* ignore */ }
 }
 
 function bumpDaily(daily: Record<string, number>): Record<string, number> {
@@ -93,144 +113,114 @@ function bumpDaily(daily: Record<string, number>): Record<string, number> {
   return { ...daily, [k]: (daily[k] ?? 0) + 1 };
 }
 
-// ───── 순수 셀렉터 ─────
-
+// ── 셀렉터 ──
 export function isKnown(p: Progress, id: string): boolean {
-  return (p.cards[id]?.box ?? 0) >= KNOWN_BOX;
+  return (p.cards[id]?.box ?? 0) >= 3;
 }
-
 export function knownCount(p: Progress): number {
-  return Object.values(p.cards).filter((c) => c.box >= KNOWN_BOX).length;
+  return Object.values(p.cards).filter((c) => c.box >= 3).length;
 }
-
-/** 오늘 복습 대상 id (복습 예정일이 지난, 아직 미완료 카드) */
 export function dueIds(p: Progress, pool?: string[]): string[] {
   const today = todayKey();
   return Object.entries(p.cards)
-    .filter(([id, c]) => c.box >= 1 && c.box < MAX_BOX && c.due <= today && (!pool || pool.includes(id)))
+    .filter(([id, c]) => c.box >= 1 && c.box < 6 && c.due <= today && (!pool || pool.includes(id)))
     .map(([id]) => id);
 }
-
-/** 연속 학습일 (오늘 또는 어제부터 거꾸로) */
 export function streak(p: Progress): number {
   const days = p.daily;
   let n = 0;
   const d = new Date();
-  // 오늘 학습 안 했으면 어제부터 카운트
   if (!days[todayKey(d)]) d.setDate(d.getDate() - 1);
-  while (days[todayKey(d)] > 0) {
-    n++;
-    d.setDate(d.getDate() - 1);
-  }
+  while (days[todayKey(d)] > 0) { n++; d.setDate(d.getDate() - 1); }
   return n;
 }
-
-/** 최근 N일 학습량 [{date, count}] (오래된→최신) */
-export function recentDaily(p: Progress, n = 7): { date: Date; count: number }[] {
-  const out: { date: Date; count: number }[] = [];
-  for (let i = n - 1; i >= 0; i--) {
+export function recentDaily(p: Progress, n = 14): { date: Date; count: number }[] {
+  return Array.from({ length: n }, (_, i) => {
     const d = new Date();
-    d.setDate(d.getDate() - i);
-    out.push({ date: d, count: p.daily[todayKey(d)] ?? 0 });
-  }
-  return out;
+    d.setDate(d.getDate() - (n - 1 - i));
+    return { date: d, count: p.daily[todayKey(d)] ?? 0 };
+  });
 }
-
-/** 목표일까지 남은 일수 (D-day). 미설정 시 null */
 export function daysUntilGoal(p: Progress): number | null {
   if (!p.goalDate) return null;
-  const diff = new Date(p.goalDate).getTime() - new Date(todayKey()).getTime();
-  return Math.round(diff / 86400000);
+  return Math.round((new Date(p.goalDate).getTime() - new Date(todayKey()).getTime()) / 86400000);
+}
+export function totalReviews(p: Progress): number {
+  return Object.values(p.daily).reduce((a, b) => a + b, 0);
 }
 
-// ───── 상태 변경 ─────
-
-function applySkim(p: Progress, id: string, known: boolean): Progress {
-  const box = known ? KNOWN_BOX : 1;
-  const cards = {
-    ...p.cards,
-    [id]: {
-      box,
-      due: addDays(INTERVALS[box]),
-      reps: (p.cards[id]?.reps ?? 0) + 1,
-      lapses: p.cards[id]?.lapses ?? 0,
+// ── 상태 변경 ──
+function applyMarkNew(p: Progress, id: string, known: boolean): Progress {
+  const box = known ? 3 : 1;
+  const interval = known ? 4 : 1;
+  return {
+    ...p,
+    cards: {
+      ...p.cards,
+      [id]: { box, due: addDays(interval), reps: (p.cards[id]?.reps ?? 0) + 1, lapses: 0, easeFactor: DEFAULT_EF, interval },
     },
+    daily: bumpDaily(p.daily),
+    xp: p.xp + (known ? 8 : 5),
   };
-  return { ...p, cards, daily: bumpDaily(p.daily) };
 }
 
 function applyGrade(p: Progress, id: string, grade: Grade): Progress {
-  const cur = p.cards[id] ?? { box: 0, due: todayKey(), reps: 0, lapses: 0 };
-  let box = cur.box;
-  let lapses = cur.lapses;
-  if (grade === "again") {
-    box = 1;
-    lapses += 1;
-  } else if (grade === "good") {
-    box = Math.min(box + 1, MAX_BOX);
-  } else {
-    box = Math.min(box + 2, MAX_BOX);
-  }
-  const cards = {
-    ...p.cards,
-    [id]: { box, due: addDays(INTERVALS[box]), reps: cur.reps + 1, lapses },
+  const q = GRADE_MAP[grade];
+  const xpGain = XP_MAP[grade];
+  const cur = p.cards[id] ?? { box: 0, due: todayKey(), reps: 0, lapses: 0, easeFactor: DEFAULT_EF, interval: 0 };
+  const { interval, easeFactor, box } = sm2(cur, q);
+  const lapses = grade === "again" ? cur.lapses + 1 : cur.lapses;
+
+  const newCard: CardState = {
+    box,
+    due: addDays(interval),
+    reps: cur.reps + 1,
+    lapses,
+    easeFactor,
+    interval,
+    lastGrade: q,
   };
-  return { ...p, cards, daily: bumpDaily(p.daily) };
+
+  let cards = { ...p.cards, [id]: newCard };
+  return { ...p, cards, daily: bumpDaily(p.daily), xp: p.xp + xpGain };
 }
 
-/** SRS 진도 훅 — localStorage 저장 */
+// ── React 훅 ──
 export function useProgress() {
   const [progress, setProgress] = useState<Progress>(EMPTY);
   const [ready, setReady] = useState(false);
 
-  useEffect(() => {
-    setProgress(load());
-    setReady(true);
-  }, []);
+  useEffect(() => { setProgress(load()); setReady(true); }, []);
 
-  const markSkim = useCallback((id: string, known: boolean) => {
-    setProgress((prev) => {
-      const next = applySkim(prev, id, known);
-      save(next);
-      return next;
-    });
+  const markNew = useCallback((id: string, known: boolean) => {
+    setProgress((prev) => { const next = applyMarkNew(prev, id, known); save(next); return next; });
   }, []);
 
   const grade = useCallback((id: string, g: Grade) => {
-    setProgress((prev) => {
-      const next = applyGrade(prev, id, g);
-      save(next);
-      return next;
-    });
+    setProgress((prev) => { const next = applyGrade(prev, id, g); save(next); return next; });
   }, []);
 
   const setGoalDate = useCallback((date: string | undefined) => {
-    setProgress((prev) => {
-      const next = { ...prev, goalDate: date };
-      save(next);
-      return next;
-    });
+    setProgress((prev) => { const next = { ...prev, goalDate: date }; save(next); return next; });
   }, []);
 
-  const reset = useCallback(() => {
-    save(EMPTY);
-    setProgress(EMPTY);
-  }, []);
+  const reset = useCallback(() => { save(EMPTY); setProgress(EMPTY); }, []);
 
   const exportJson = useCallback(() => JSON.stringify(progress), [progress]);
 
   const importJson = useCallback((json: string): boolean => {
     try {
       const p = JSON.parse(json) as Progress;
-      if (!p || typeof p !== "object" || !p.cards) return false;
-      const next: Progress = { ...EMPTY, ...p };
-      save(next);
-      setProgress(next);
-      return true;
-    } catch {
-      return false;
-    }
+      if (!p?.cards) return false;
+      const next = { ...EMPTY, ...p };
+      save(next); setProgress(next); return true;
+    } catch { return false; }
   }, []);
 
-  return { progress, ready, markSkim, grade, setGoalDate, reset, exportJson, importJson };
+  return { progress, ready, markNew, grade, setGoalDate, reset, exportJson, importJson };
 }
+
+// 하위 호환 alias
+export const markSkim = (
+  setter: (id: string, known: boolean) => void
+) => setter;

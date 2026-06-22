@@ -4,96 +4,125 @@
 
 :root {
   color-scheme: light;
+  --bg: #F8F9FB;
+  --card: #FFFFFF;
+  --surface: #F1F3F7;
+  --text-1: #1A1A2E;
+  --text-2: #4A5568;
+  --text-3: #94A3B8;
+  --border: #E2E8F0;
+  --jp-from: #E63946;
+  --jp-to: #F4A261;
+  --en-from: #4361EE;
+  --en-to: #7209B7;
+  --xp: #F59E0B;
+  --success: #10B981;
+  --danger: #EF4444;
+  --hard: #F97316;
+}
+
+html.dark {
+  color-scheme: dark;
+  --bg: #0F0F1A;
+  --card: #1A1B2E;
+  --surface: #242540;
+  --text-1: #F0F0F7;
+  --text-2: #A0A8C0;
+  --text-3: #5A6480;
+  --border: #2A2D4A;
 }
 
 body {
-  background: #f5f6f8;
+  background: var(--bg);
+  color: var(--text-1);
+  transition: background 0.2s, color 0.2s;
 }
 
-/* ───── 다크 모드 ─────
-   컴포넌트는 라이트용 Tailwind 클래스를 쓰고, .dark 스코프에서 팔레트를 덮어쓴다. */
-html.dark {
-  color-scheme: dark;
-}
-html.dark body {
-  background: #0b1120;
-  color: #e2e8f0;
+/* ── 카드 ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
 }
 
-.dark .bg-\[\#f5f6f8\] {
-  background-color: #0b1120;
+/* ── 그라데이션 버튼 ── */
+.btn-jp {
+  background: linear-gradient(135deg, var(--jp-from), var(--jp-to));
 }
-.dark .bg-white {
-  background-color: #1e293b;
-}
-.dark .bg-white\/90 {
-  background-color: rgb(30 41 59 / 0.92);
-}
-.dark .bg-white\/85,
-.dark .bg-white\/80 {
-  background-color: rgb(30 41 59 / 0.85);
-}
-.dark .bg-slate-50,
-.dark .bg-slate-50\/60 {
-  background-color: #111a2e;
-}
-.dark .bg-slate-100 {
-  background-color: #334155;
-}
-.dark .bg-slate-200\/70 {
-  background-color: #334155;
-}
-.dark .bg-slate-900 {
-  background-color: #475569;
+.btn-en {
+  background: linear-gradient(135deg, var(--en-from), var(--en-to));
 }
 
-/* 텍스트 */
-.dark .text-slate-900 {
-  color: #f1f5f9;
-}
-.dark .text-slate-800 {
-  color: #e2e8f0;
-}
-.dark .text-slate-700,
-.dark .text-slate-600 {
-  color: #cbd5e1;
-}
-.dark .text-slate-500,
-.dark .text-slate-400 {
-  color: #94a3b8;
-}
-.dark .text-slate-300 {
-  color: #64748b;
-}
+/* ── 다크모드 Tailwind 오버라이드 ── */
+html.dark .bg-\[\#F8F9FB\],
+html.dark .bg-\[\#f5f6f8\] { background-color: var(--bg) !important; }
+html.dark .bg-white { background-color: var(--card) !important; }
+html.dark .bg-white\/90 { background-color: rgb(26 27 46 / 0.92) !important; }
+html.dark .bg-white\/80 { background-color: rgb(26 27 46 / 0.85) !important; }
+html.dark .bg-slate-50,
+html.dark .bg-slate-50\/60 { background-color: var(--surface) !important; }
+html.dark .bg-slate-100 { background-color: #2A2D4A !important; }
+html.dark .bg-slate-200\/70 { background-color: #2A2D4A !important; }
 
-/* 테두리 / 링 */
-.dark .border-slate-300 {
-  border-color: #475569;
-}
-.dark .border-slate-200 {
-  border-color: #334155;
-}
-.dark .border-slate-100,
-.dark .divide-slate-100 > * + * {
-  border-color: #273449;
-}
-.dark .ring-black\/5 {
-  --tw-ring-color: rgb(255 255 255 / 0.08);
-}
+html.dark .text-slate-900 { color: var(--text-1) !important; }
+html.dark .text-slate-800 { color: var(--text-1) !important; }
+html.dark .text-slate-700,
+html.dark .text-slate-600 { color: var(--text-2) !important; }
+html.dark .text-slate-500,
+html.dark .text-slate-400 { color: var(--text-3) !important; }
 
-/* 하단 액션 페이드 그라데이션 (스키밍/복습/퀴즈) */
-.dark .from-\[\#f5f6f8\] {
-  --tw-gradient-from: #0b1120 var(--tw-gradient-from-position);
-  --tw-gradient-to: rgb(11 17 32 / 0) var(--tw-gradient-to-position);
+html.dark .border-slate-200,
+html.dark .border-slate-300 { border-color: var(--border) !important; }
+html.dark .border-slate-100 { border-color: var(--border) !important; }
+html.dark .ring-black\/5 { --tw-ring-color: rgb(255 255 255 / 0.06) !important; }
+
+html.dark .from-\[\#f5f6f8\],
+html.dark .from-\[\#F8F9FB\] {
+  --tw-gradient-from: var(--bg) var(--tw-gradient-from-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
-.dark .via-\[\#f5f6f8\] {
-  --tw-gradient-to: rgb(11 17 32 / 0) var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), #0b1120 var(--tw-gradient-via-position),
-    var(--tw-gradient-to);
+html.dark .via-\[\#f5f6f8\],
+html.dark .via-\[\#F8F9FB\] {
+  --tw-gradient-stops: var(--tw-gradient-from), var(--bg) var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
 
-/* 카드 아트 위 글래스 배지는 밝게 유지 */
-.dark .bg-white\/80.text-xl {
-  background-color: rgb(30 41 59 / 0.7);
+/* ── XP 바 애니메이션 ── */
+@keyframes xp-shine {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.xp-bar-fill {
+  background: linear-gradient(90deg, var(--xp), #FBBF24, var(--xp));
+  background-size: 200% auto;
+  animation: xp-shine 2s linear infinite;
+}
+
+/* ── 카드 flip 애니메이션 ── */
+.perspective { perspective: 1000px; }
+.flip-card { transition: transform 0.45s; transform-style: preserve-3d; }
+.flip-card.flipped { transform: rotateY(180deg); }
+.flip-front, .flip-back { backface-visibility: hidden; }
+.flip-back { transform: rotateY(180deg); }
+
+/* ── 스와이프 ── */
+@keyframes swipe-left {
+  to { transform: translateX(-120%) rotate(-15deg); opacity: 0; }
+}
+@keyframes swipe-right {
+  to { transform: translateX(120%) rotate(15deg); opacity: 0; }
+}
+.swipe-out-left { animation: swipe-left 0.3s forwards; }
+.swipe-out-right { animation: swipe-right 0.3s forwards; }
+
+/* ── 진행바 ── */
+.progress-bar {
+  height: 6px;
+  border-radius: 9999px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.6s cubic-bezier(.4,0,.2,1);
 }
