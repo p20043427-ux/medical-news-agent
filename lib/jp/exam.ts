@@ -94,12 +94,26 @@ function smartOpt(answer: string, prefer: string[], full: string[], sh: <T>(a: T
   return sh([answer, ...distract.slice(0, 3)]);
 }
 
+export type Difficulty = "easy" | "normal" | "hard";
+
+// 난이도별 구성(문항 수·고난도 유형 비중·청해 대화 비율·어휘 모드)
+const DIFF_CONF: Record<Difficulty, { count: number; syn: number; kumi: number; info: number; dialog: number; mode: Difficulty }> = {
+  easy: { count: 15, syn: 0, kumi: 0, info: 0, dialog: 0, mode: "easy" },
+  normal: { count: 20, syn: 2, kumi: 2, info: 1, dialog: 0.5, mode: "normal" },
+  hard: { count: 25, syn: 3, kumi: 3, info: 1, dialog: 0.6, mode: "hard" },
+};
+
+const EASY_CATS = new Set(["greeting", "number", "time", "food", "people", "color", "body", "daily"]);
+const isKanjiWord = (w: { word: string }) => /[一-龯]/.test(w.word);
+
 /**
  * JLPT N5 형식의 **모의시험** 문항을 앱 콘텐츠에서 생성(원본 문항, 기출 원문 아님).
- * 문자·어휘 / 문법(동사 활용·조사) / 독해 / 청해(단어·대화). seed 로 회차를 재현.
+ * 문자·어휘 / 문법(동사 활용·조사·문조립) / 독해(정보검색) / 청해(단어·대화).
+ * seed 로 회차 재현, difficulty(입문/표준/도전)로 난이도 조절.
  */
-export function buildExam(opts?: { seed?: number; count?: number }): ExamQuestion[] {
-  const count = opts?.count ?? 20;
+export function buildExam(opts?: { seed?: number; count?: number; difficulty?: Difficulty }): ExamQuestion[] {
+  const conf = DIFF_CONF[opts?.difficulty ?? "normal"];
+  const count = opts?.count ?? conf.count;
   const sh = makeShuffle(opts?.seed);
 
   const readings = VOCAB.map((w) => w.reading);
@@ -107,6 +121,21 @@ export function buildExam(opts?: { seed?: number; count?: number }): ExamQuestio
   const words = VOCAB.map((w) => w.word);
   const masus = VERBS.map((v) => v.masu);
   const kanjiWords = VOCAB.filter((w) => /[一-龯]/.test(w.word));
+
+  // 난이도별 어휘 풀: 입문=짧고 기초적인 단어, 도전=한자·긴 읽기 단어
+  const orEmpty = <T,>(filtered: T[], full: T[]) => (filtered.length >= 8 ? filtered : full);
+  const vocabBase =
+    conf.mode === "easy"
+      ? orEmpty(VOCAB.filter((w) => w.reading.length <= 5 && (EASY_CATS.has(w.category) || !isKanjiWord(w))), VOCAB)
+      : conf.mode === "hard"
+        ? orEmpty(VOCAB.filter((w) => isKanjiWord(w) && w.reading.length >= 3), VOCAB)
+        : VOCAB;
+  const kanjiBase =
+    conf.mode === "easy"
+      ? orEmpty(kanjiWords.filter((w) => w.reading.length <= 3), kanjiWords)
+      : conf.mode === "hard"
+        ? orEmpty(kanjiWords.filter((w) => w.reading.length >= 4), kanjiWords)
+        : kanjiWords;
 
   // 회화 대사 풀 (청해 대화형)
   const lines = CONVERSATIONS.flatMap((c) => c.lines);
@@ -125,13 +154,13 @@ export function buildExam(opts?: { seed?: number; count?: number }): ExamQuestio
 
   // 유의어 단어 풀 (curated synonyms 보유 단어)
   const synPool = VOCAB.filter((w) => w.synonyms && w.synonyms.length > 0);
-  const nSyn = Math.min(2, synPool.length, Math.max(0, nVocabTotal - 2));
+  const nSyn = Math.min(conf.syn, synPool.length, Math.max(0, nVocabTotal - 2));
   const nVocab = nVocabTotal - nSyn;
 
-  const nKumi = Math.min(2, KUMITATE.length, Math.max(0, nGrammarTotal - 2));
+  const nKumi = Math.min(conf.kumi, KUMITATE.length, Math.max(0, nGrammarTotal - 1));
   const nGrammar = nGrammarTotal - nKumi;
 
-  const nInfo = Math.min(1, INFO.length, Math.max(0, nReadingTotal - 1));
+  const nInfo = Math.min(conf.info, INFO.length, Math.max(0, nReadingTotal - 1));
   const nReading = nReadingTotal - nInfo;
 
   const qs: ExamQuestion[] = [];
@@ -148,10 +177,16 @@ export function buildExam(opts?: { seed?: number; count?: number }): ExamQuestio
   const contextCands = sh(VOCAB.filter((w) => w.example.tokens.some((t) => t.hl)));
 
   // 문자·어휘 (읽기·표기는 한자 단어만, 뜻·문맥규정은 전체)
-  const kanji = sh(kanjiWords);
-  const vshuf = sh(VOCAB);
+  const kanji = sh(kanjiBase);
+  const vshuf = sh(vocabBase);
   for (let i = 0; i < nVocab; i++) {
-    const mode = (contextCands.length ? i % 4 : i % 3);
+    // 난이도별 모드 분포: 입문=뜻·읽기, 표준=4종 순환, 도전=문맥·표기 비중↑
+    const mode =
+      conf.mode === "easy"
+        ? (i % 2 === 0 ? 1 : 0)
+        : conf.mode === "hard"
+          ? (contextCands.length ? [3, 2, 3, 1, 0][i % 5] : i % 3)
+          : (contextCands.length ? i % 4 : i % 3);
     if (mode === 1) {
       const w = vshuf[i % vshuf.length];
       qs.push({ key: `v-m-${w.id}-${i}`, wordId: w.id, section: "문자·어휘", prompt: w.word, sub: `[${w.reading}]`, question: "뜻으로 알맞은 것은?", options: smartOpt(w.meaning, catMeanings[w.category] || [], meanings, sh), answer: w.meaning });
@@ -205,10 +240,10 @@ export function buildExam(opts?: { seed?: number; count?: number }): ExamQuestio
     qs.push({ key: `i-${i}-${r.answer}`, section: "독해", passage: r.text, prompt: "", question: r.question, options: sh(r.options), answer: r.answer });
   });
 
-  // 청해 (단어 듣기 + 대화 듣기)
-  const nDialog = Math.min(Math.floor(nListen / 2), lines.length);
+  // 청해 (단어 듣기 + 대화 듣기) — 난이도별 대화 비율
+  const nDialog = Math.min(Math.round(nListen * conf.dialog), lines.length);
   const nWordListen = nListen - nDialog;
-  sh(VOCAB).slice(0, nWordListen).forEach((w, i) => {
+  sh(vocabBase).slice(0, nWordListen).forEach((w, i) => {
     qs.push({ key: `l-w-${w.id}-${i}`, wordId: w.id, section: "청해", prompt: "🔊", audio: w.reading, question: "들리는 단어의 뜻은?", options: opt(w.meaning, meanings, sh), answer: w.meaning });
   });
   sh(lines).slice(0, nDialog).forEach((l, i) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { buildExam, PASS_RATIO, type ExamQuestion, type Section } from "@/lib/jp/exam";
+import { buildExam, PASS_RATIO, type ExamQuestion, type Section, type Difficulty } from "@/lib/jp/exam";
 import { speakJa } from "@/lib/jp/speech";
 import { Button } from "@/components/ui";
 
@@ -18,6 +18,12 @@ const ROUNDS: Round[] = [
 ];
 
 const LIMIT_SEC = 15 * 60; // 제한 시간 15분
+
+const DIFFS: { key: Difficulty; label: string; desc: string }[] = [
+  { key: "easy", label: "입문", desc: "15문항 · 기초 단어" },
+  { key: "normal", label: "표준", desc: "20문항 · 실제 N5급" },
+  { key: "hard", label: "도전", desc: "25문항 · 한자·문맥↑" },
+];
 
 function fmt(sec: number) {
   const m = Math.floor(sec / 60), s = sec % 60;
@@ -41,6 +47,7 @@ export default function MockExam({
   onMistake?: (ids: string[]) => void;
 }) {
   const [round, setRound] = useState<Round | null>(null);
+  const [difficulty, setDifficulty] = useState<Difficulty>("normal");
   const [attempt, setAttempt] = useState(0);
   const [phase, setPhase] = useState<"select" | "intro" | "run" | "result">("select");
   const [idx, setIdx] = useState(0);
@@ -52,8 +59,8 @@ export default function MockExam({
   useEffect(() => { setBest(getBest()); }, [phase]);
 
   const questions = useMemo<ExamQuestion[]>(
-    () => (round ? buildExam({ seed: round.seed }) : []),
-    [round, attempt],
+    () => (round ? buildExam({ seed: round.seed, difficulty }) : []),
+    [round, attempt, difficulty],
   );
 
   useEffect(() => {
@@ -83,7 +90,7 @@ export default function MockExam({
     const wrongIds = questions.filter((qq) => qq.wordId && answers[qq.key] !== qq.answer).map((qq) => qq.wordId!) as string[];
     if (wrongIds.length && onMistake) onMistake([...new Set(wrongIds)]);
     const correct = questions.filter((qq) => answers[qq.key] === qq.answer).length;
-    if (round) saveBest(round.id, Math.round((correct / questions.length) * 100));
+    if (round) saveBest(`${round.id}-${difficulty}`, Math.round((correct / questions.length) * 100));
     setPhase("result");
   }
   function retry() { setAttempt((a) => a + 1); setIdx(0); setAnswers({}); setElapsed(0); setPhase("run"); }
@@ -94,8 +101,24 @@ export default function MockExam({
     return (
       <div className="px-5 pb-28 pt-4">
         <h1 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>JLPT N5 모의시험</h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--text-3)" }}>회차를 골라 풀어보세요 · 20문항</p>
-        <div className="mt-5 space-y-2.5">
+        <p className="mt-1 text-sm" style={{ color: "var(--text-3)" }}>난이도와 회차를 골라 풀어보세요</p>
+
+        {/* 난이도 선택 */}
+        <div className="mt-4 grid grid-cols-3 gap-1.5 rounded-2xl p-1.5" style={{ background: "var(--surface)" }}>
+          {DIFFS.map((d) => {
+            const on = difficulty === d.key;
+            return (
+              <button key={d.key} onClick={() => setDifficulty(d.key)}
+                className="rounded-xl px-2 py-2 text-center transition"
+                style={{ background: on ? "var(--card)" : "transparent", boxShadow: on ? "0 1px 4px rgba(0,0,0,.12)" : "none" }}>
+                <span className="block text-sm font-extrabold" style={{ color: on ? "#0984e3" : "var(--text-2)" }}>{d.label}</span>
+                <span className="block text-[10px]" style={{ color: "var(--text-3)" }}>{d.desc}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 space-y-2.5">
           {ROUNDS.map((r) => (
             <button key={r.id} onClick={() => start(r)}
               className="flex w-full items-center gap-4 rounded-2xl p-4 text-left transition active:scale-[0.98]"
@@ -105,7 +128,7 @@ export default function MockExam({
               <span className="min-w-0 flex-1">
                 <span className="block font-bold" style={{ color: "var(--text-1)" }}>{r.label}</span>
                 <span className="block text-xs" style={{ color: "var(--text-3)" }}>
-                  {best[r.id] !== undefined ? `최고 ${best[r.id]}점` : "미응시"}
+                  {best[`${r.id}-${difficulty}`] !== undefined ? `최고 ${best[`${r.id}-${difficulty}`]}점` : "미응시"}
                 </span>
               </span>
               <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" style={{ color: "var(--text-3)" }} fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>

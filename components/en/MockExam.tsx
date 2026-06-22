@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { buildEnExam, EN_PASS_RATIO, type EnExamQuestion, type EnSection } from "@/lib/en/exam";
+import { buildEnExam, EN_PASS_RATIO, type EnExamQuestion, type EnSection, type EnDifficulty } from "@/lib/en/exam";
 import { speakEn } from "@/lib/en/speech";
 import { Button } from "@/components/ui";
 
@@ -17,12 +17,19 @@ const ROUNDS: Round[] = [
   { id: "random", label: "랜덤 모의", seed: undefined },
 ];
 
+const DIFFS: { key: EnDifficulty; label: string; desc: string }[] = [
+  { key: "easy", label: "입문", desc: "12문항 · A1–A2" },
+  { key: "normal", label: "표준", desc: "20문항 · 전 레벨" },
+  { key: "hard", label: "도전", desc: "25문항 · B1+" },
+];
+
 const fmt = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 function getBest(): Record<string, number> { try { return JSON.parse(localStorage.getItem("en-exam-best") || "{}"); } catch { return {}; } }
 function saveBest(id: string, pct: number) { try { const b = getBest(); if (!b[id] || pct > b[id]) { b[id] = pct; localStorage.setItem("en-exam-best", JSON.stringify(b)); } } catch { /* ignore */ } }
 
 export default function EnMockExam({ onExit }: { onExit: () => void }) {
   const [round, setRound] = useState<Round | null>(null);
+  const [difficulty, setDifficulty] = useState<EnDifficulty>("normal");
   const [attempt, setAttempt] = useState(0);
   const [phase, setPhase] = useState<"select" | "run" | "result">("select");
   const [idx, setIdx] = useState(0);
@@ -32,7 +39,7 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
   const timer = useRef<number | null>(null);
 
   useEffect(() => { setBest(getBest()); }, [phase]);
-  const questions = useMemo<EnExamQuestion[]>(() => (round ? buildEnExam({ seed: round.seed }) : []), [round, attempt]);
+  const questions = useMemo<EnExamQuestion[]>(() => (round ? buildEnExam({ seed: round.seed, difficulty }) : []), [round, attempt, difficulty]);
 
   useEffect(() => {
     if (phase === "run") { timer.current = window.setInterval(() => setElapsed((e) => e + 1), 1000); return () => { if (timer.current) window.clearInterval(timer.current); }; }
@@ -48,7 +55,7 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
   function finish() {
     if (timer.current) window.clearInterval(timer.current);
     const correct = questions.filter((qq) => answers[qq.key] === qq.answer).length;
-    if (round) saveBest(round.id, Math.round((correct / questions.length) * 100));
+    if (round) saveBest(`${round.id}-${difficulty}`, Math.round((correct / questions.length) * 100));
     setPhase("result");
   }
   function retry() { setAttempt((a) => a + 1); setIdx(0); setAnswers({}); setElapsed(0); setPhase("run"); }
@@ -58,14 +65,30 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
     return (
       <div className="px-5 pb-28 pt-4">
         <h1 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>English Mock Test (CEFR)</h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--text-3)" }}>회차를 골라 풀어보세요 · 20문항 · 어휘/구동사/독해/청해</p>
-        <div className="mt-5 space-y-2.5">
+        <p className="mt-1 text-sm" style={{ color: "var(--text-3)" }}>난이도와 회차를 골라 풀어보세요 · 어휘/구동사/독해/청해</p>
+
+        {/* 난이도 선택 */}
+        <div className="mt-4 grid grid-cols-3 gap-1.5 rounded-2xl p-1.5" style={{ background: "var(--surface)" }}>
+          {DIFFS.map((d) => {
+            const on = difficulty === d.key;
+            return (
+              <button key={d.key} onClick={() => setDifficulty(d.key)}
+                className="rounded-xl px-2 py-2 text-center transition"
+                style={{ background: on ? "var(--card)" : "transparent", boxShadow: on ? "0 1px 4px rgba(0,0,0,.12)" : "none" }}>
+                <span className="block text-sm font-extrabold" style={{ color: on ? "#4361EE" : "var(--text-2)" }}>{d.label}</span>
+                <span className="block text-[10px]" style={{ color: "var(--text-3)" }}>{d.desc}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 space-y-2.5">
           {ROUNDS.map((r) => (
             <button key={r.id} onClick={() => start(r)} className="flex w-full items-center gap-4 rounded-2xl p-4 text-left transition active:scale-[0.98]" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-lg font-extrabold text-white" style={{ background: GRAD }}>T</span>
               <span className="min-w-0 flex-1">
                 <span className="block font-bold" style={{ color: "var(--text-1)" }}>{r.label}</span>
-                <span className="block text-xs" style={{ color: "var(--text-3)" }}>{best[r.id] !== undefined ? `최고 ${best[r.id]}점` : "미응시"}</span>
+                <span className="block text-xs" style={{ color: "var(--text-3)" }}>{best[`${r.id}-${difficulty}`] !== undefined ? `최고 ${best[`${r.id}-${difficulty}`]}점` : "미응시"}</span>
               </span>
               <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" style={{ color: "var(--text-3)" }} fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
             </button>

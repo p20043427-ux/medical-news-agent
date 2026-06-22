@@ -51,13 +51,27 @@ function smartOpt(answer: string, prefer: string[], full: string[], sh: <T>(a: T
   return sh([answer, ...d.slice(0, 3)]);
 }
 
-/** CEFR(A1~) 형식의 영어 모의시험. 앱 콘텐츠 기반 원본 문항. seed 로 회차 재현. */
-export function buildEnExam(opts?: { seed?: number; count?: number }): EnExamQuestion[] {
-  const count = opts?.count ?? 20;
+export type EnDifficulty = "easy" | "normal" | "hard";
+
+const EN_DIFF_CONF: Record<EnDifficulty, { count: number; levels: string[] }> = {
+  easy: { count: 12, levels: ["A1", "A2"] },
+  normal: { count: 20, levels: ["A1", "A2", "B1", "B2", "C1", "C2"] },
+  hard: { count: 25, levels: ["B1", "B2", "C1", "C2"] },
+};
+
+/** CEFR(A1~) 형식의 영어 모의시험. 앱 콘텐츠 기반 원본 문항. seed·difficulty 로 재현/조절. */
+export function buildEnExam(opts?: { seed?: number; count?: number; difficulty?: EnDifficulty }): EnExamQuestion[] {
+  const conf = EN_DIFF_CONF[opts?.difficulty ?? "normal"];
+  const count = opts?.count ?? conf.count;
   const sh = makeShuffle(opts?.seed);
   const meanings = EN_VOCAB.map((w) => w.meaning);
   const wordsArr = EN_VOCAB.map((w) => w.word);
   const pvMeanings = PHRASAL_VERBS.map((p) => p.meaning);
+
+  // 난이도별 어휘 풀: CEFR 레벨로 거른다 (충분치 않으면 전체로 보충)
+  const lvSet = new Set(conf.levels);
+  const filtered = EN_VOCAB.filter((w) => lvSet.has(w.cefrLevel));
+  const vocabBase = filtered.length >= 8 ? filtered : EN_VOCAB;
 
   const byCatMeaning: Record<string, string[]> = {};
   const byCatWord: Record<string, string[]> = {};
@@ -70,7 +84,7 @@ export function buildEnExam(opts?: { seed?: number; count?: number }): EnExamQue
 
   const qs: EnExamQuestion[] = [];
 
-  sh(EN_VOCAB).slice(0, nVocab).forEach((w, i) => {
+  sh(vocabBase).slice(0, nVocab).forEach((w, i) => {
     if (i % 2 === 0) qs.push({ key: `v-m-${w.id}`, section: "어휘", prompt: w.word, sub: w.pronunciation, question: "뜻으로 알맞은 것은?", options: smartOpt(w.meaning, byCatMeaning[w.category] || [], meanings, sh), answer: w.meaning });
     else qs.push({ key: `v-w-${w.id}`, section: "어휘", prompt: w.meaning, question: "알맞은 단어는?", options: smartOpt(w.word, byCatWord[w.category] || [], wordsArr, sh), answer: w.word });
   });
@@ -83,7 +97,7 @@ export function buildEnExam(opts?: { seed?: number; count?: number }): EnExamQue
     qs.push({ key: `r-${i}`, section: "독해", passage: r.text, prompt: "", question: r.question, options: sh(r.options), answer: r.answer });
   });
 
-  sh(EN_VOCAB).slice(0, nListen).forEach((w, i) => {
+  sh(vocabBase).slice(0, nListen).forEach((w, i) => {
     qs.push({ key: `l-${w.id}-${i}`, section: "청해", prompt: "🔊", audio: w.word, question: "들리는 단어의 뜻은?", options: smartOpt(w.meaning, byCatMeaning[w.category] || [], meanings, sh), answer: w.meaning });
   });
 
