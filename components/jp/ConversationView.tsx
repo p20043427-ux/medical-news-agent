@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { CONVERSATIONS } from "@/lib/jp/conversations";
-import type { Conversation } from "@/lib/jp/types";
+import { useMemo, useState } from "react";
+import { CONVERSATIONS, CONVERSATION_CATEGORIES } from "@/lib/jp/conversations";
+import type { Conversation, ConversationCategory } from "@/lib/jp/types";
 import Furigana, { tokensToText } from "./Furigana";
 import SpeakerButton from "./SpeakerButton";
 import { speakJa } from "@/lib/jp/speech";
@@ -19,12 +19,23 @@ export default function ConversationView({
 }) {
   const [active, setActive] = useState<Conversation | null>(null);
   const [showKo, setShowKo] = useState(true);
+  const [cat, setCat] = useState<ConversationCategory | "all">("all");
+
+  // 실제 데이터에 존재하는 카테고리만 노출
+  const cats = useMemo(
+    () => CONVERSATION_CATEGORIES.filter((c) => CONVERSATIONS.some((v) => v.category === c.key)),
+    [],
+  );
+  const list = useMemo(
+    () => (cat === "all" ? CONVERSATIONS : CONVERSATIONS.filter((c) => c.category === cat)),
+    [cat],
+  );
 
   function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
     return (
       <button
         onClick={onClick}
-        className="rounded-full px-3 py-1 text-xs font-bold transition active:scale-95"
+        className="shrink-0 rounded-full px-3 py-1.5 text-xs font-bold transition active:scale-95"
         style={on ? { background: "#E63946", color: "#fff" } : { background: "var(--surface)", color: "var(--text-3)" }}
       >
         {children}
@@ -32,6 +43,7 @@ export default function ConversationView({
     );
   }
 
+  // ───── 상세 ─────
   if (active) {
     return (
       <div className="px-4 pb-28 pt-2">
@@ -63,6 +75,7 @@ export default function ConversationView({
           ▶ 대화 전체 듣기
         </Button>
 
+        {/* 대화 */}
         <div className="space-y-3">
           {active.lines.map((line, i) => {
             const mine = i % 2 === 1;
@@ -101,18 +114,63 @@ export default function ConversationView({
             );
           })}
         </div>
+
+        {/* 오늘의 핵심 표현 */}
+        {active.keyPhrases && active.keyPhrases.length > 0 && (
+          <div className="mt-6">
+            <p className="mb-2 px-1 text-sm font-extrabold" style={{ color: "var(--text-1)" }}>
+              ✏️ 오늘의 표현
+            </p>
+            <div className="space-y-2">
+              {active.keyPhrases.map((p, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 rounded-2xl p-3"
+                  style={{ background: "var(--card)", border: "1px solid var(--border)" }}
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold" style={{ color: "var(--text-1)" }}>{p.jp}</p>
+                    <p className="text-xs" style={{ color: "var(--text-3)" }}>{p.ko}</p>
+                  </div>
+                  <SpeakerButton text={p.reading} size={32} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 문화 팁 */}
+        {active.cultureTip && (
+          <div className="mt-4 rounded-2xl p-4" style={{ background: "#E6394612" }}>
+            <p className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>
+              💡 {active.cultureTip}
+            </p>
+          </div>
+        )}
       </div>
     );
   }
 
+  // ───── 목록 ─────
   return (
     <div className="px-4 pb-28 pt-2">
       <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>생활 회화</h1>
-      <p className="mb-4 text-sm" style={{ color: "var(--text-3)" }}>
+      <p className="mb-3 text-sm" style={{ color: "var(--text-3)" }}>
         상황별 필수 회화를 듣고 따라 말해 보세요.
       </p>
+
+      {/* 카테고리 필터 */}
+      <div className="no-scrollbar mb-4 flex gap-2 overflow-x-auto pb-1">
+        <Chip on={cat === "all"} onClick={() => setCat("all")}>전체</Chip>
+        {cats.map((c) => (
+          <Chip key={c.key} on={cat === c.key} onClick={() => setCat(c.key)}>
+            {c.emoji} {c.label}
+          </Chip>
+        ))}
+      </div>
+
       <div className="space-y-3">
-        {CONVERSATIONS.map((c) => (
+        {list.map((c) => (
           <button
             key={c.id}
             onClick={() => { setActive(c); setShowKo(true); }}
@@ -126,7 +184,15 @@ export default function ConversationView({
               {c.emoji}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block font-bold" style={{ color: "var(--text-1)" }}>{c.title}</span>
+              <span className="flex items-center gap-1.5">
+                <span className="truncate font-bold" style={{ color: "var(--text-1)" }}>{c.title}</span>
+                <span
+                  className="shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-extrabold"
+                  style={{ background: "var(--surface)", color: "var(--text-3)" }}
+                >
+                  {c.level ?? "N5"}
+                </span>
+              </span>
               <span className="block truncate text-sm" style={{ color: "var(--text-3)" }}>{c.situation}</span>
             </span>
             <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" style={{ color: "var(--text-3)" }} fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>

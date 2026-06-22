@@ -79,7 +79,26 @@ export interface DialogueLine {
   speaker: string;
   tokens: Token[];
   ko: string;
+  /** 표현 설명 (선택) */
+  note?: string;
 }
+
+/** 회화 핵심 표현 */
+export interface KeyPhrase {
+  jp: string;
+  reading: string;
+  ko: string;
+}
+
+/** 회화 카테고리 */
+export type ConversationCategory =
+  | "greeting"
+  | "food"
+  | "shopping"
+  | "transport"
+  | "daily"
+  | "medical"
+  | "service";
 
 /** 회화 시나리오 */
 export interface Conversation {
@@ -91,6 +110,14 @@ export interface Conversation {
   /** 이모지 아이콘 */
   emoji: string;
   lines: DialogueLine[];
+  /** JLPT 레벨 (미지정 시 N5) */
+  level?: "N5" | "N4";
+  /** 카테고리 */
+  category?: ConversationCategory;
+  /** 오늘의 핵심 표현 */
+  keyPhrases?: KeyPhrase[];
+  /** 문화·매너 팁 (한국어) */
+  cultureTip?: string;
 }
 
 export interface Category {
