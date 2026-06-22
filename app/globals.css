@@ -213,3 +213,62 @@ html.dark .via-\[\#F8F9FB\] {
   background-image: linear-gradient(135deg, #fb7185, #e11d48);
   box-shadow: 0 12px 24px -12px rgba(225, 29, 72, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
+
+
+/* ============================================================
+   디자인 시스템 v2 — 시맨틱 토큰 (HSL, --ds-* 네임스페이스)
+   기존 --card/--border/--success(hex) 와 충돌하지 않도록 분리.
+   tailwind.config 의 colors 와 연결 → bg-primary / text-muted-foreground 등 사용 가능.
+   ============================================================ */
+:root {
+  --ds-background: 220 22% 98%;
+  --ds-foreground: 240 25% 14%;
+  --ds-card: 0 0% 100%;
+  --ds-card-foreground: 240 25% 14%;
+  --ds-muted: 220 16% 95%;
+  --ds-muted-foreground: 215 20% 40%;
+  --ds-primary: 353 78% 52%;          /* 일본어 브랜드 (#E63946) */
+  --ds-primary-foreground: 0 0% 100%;
+  --ds-secondary: 28 87% 62%;         /* 주황 (#F4A261) */
+  --ds-secondary-foreground: 240 25% 14%;
+  --ds-accent: 243 75% 59%;           /* 영어 브랜드 (#4361EE) */
+  --ds-accent-foreground: 0 0% 100%;
+  --ds-success: 160 84% 33%;
+  --ds-warning: 25 95% 48%;
+  --ds-destructive: 0 78% 54%;
+  --ds-border: 220 16% 90%;
+  --ds-input: 220 16% 90%;
+  --ds-ring: 353 78% 52%;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --shadow-sm: 0 1px 2px hsl(240 25% 14% / 0.06);
+  --shadow-md: 0 8px 24px -12px hsl(240 25% 14% / 0.25);
+}
+html.dark {
+  --ds-background: 240 30% 8%;
+  --ds-foreground: 240 20% 96%;
+  --ds-card: 240 33% 14%;
+  --ds-card-foreground: 240 20% 96%;
+  --ds-muted: 240 25% 18%;
+  --ds-muted-foreground: 220 14% 66%;
+  --ds-border: 240 20% 24%;
+  --ds-input: 240 20% 24%;
+  --ds-ring: 353 78% 62%;
+}
+
+/* ── 접근성 베이스라인 ── */
+:where(a, button, [role="button"], [role="switch"], input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid hsl(var(--ds-ring));
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
