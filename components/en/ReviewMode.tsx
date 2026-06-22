@@ -5,6 +5,7 @@ import type { EnWord, EnCategory } from "@/lib/en/types";
 import type { EnGrade, EnProgress } from "@/lib/en/progress";
 import { dueIds } from "@/lib/en/progress";
 import { speakEn } from "@/lib/en/speech";
+import { Button } from "@/components/ui";
 
 const GRADE_CONFIG: Record<EnGrade, { label: string; sub: string; bg: string; xp: string }> = {
   again: { label: "다시",   sub: "1일",    bg: "#EF4444", xp: "+2" },
@@ -45,14 +46,14 @@ export default function EnReviewMode({
         <h2 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>복습 완료!</h2>
         <p style={{ color: "var(--text-3)" }}>총 <strong style={{ color: "var(--text-1)" }}>{reviewed}개</strong> 복습했어요.</p>
         <div className="grid w-full max-w-xs gap-2.5">
-          <button onClick={onQuiz}
-            className="ui-btn ui-btn-brand-en py-3.5">
+          <Button variant="accent" size="free" onClick={onQuiz}
+            className="py-3.5">
             📝 퀴즈 도전
-          </button>
-          <button onClick={onExit}
-            className="ui-btn ui-btn-surface py-3.5">
+          </Button>
+          <Button variant="surface" size="free" onClick={onExit}
+            className="py-3.5">
             홈으로
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -179,10 +180,10 @@ export default function EnReviewMode({
             })}
           </div>
         ) : (
-          <button onClick={() => setRevealed(true)}
-            className="ui-btn ui-btn-brand-en w-full py-4">
+          <Button variant="accent" size="free" onClick={() => setRevealed(true)}
+            className="w-full py-4">
             답 확인
-          </button>
+          </Button>
         )}
       </div>
     </div>

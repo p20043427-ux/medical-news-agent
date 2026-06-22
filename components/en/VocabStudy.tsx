@@ -5,6 +5,7 @@ import type { EnWord, EnCategory } from "@/lib/en/types";
 import type { EnProgress } from "@/lib/en/progress";
 import { speakEn } from "@/lib/en/speech";
 import { isLearned } from "@/lib/en/progress";
+import { Button } from "@/components/ui";
 
 const CEFR_COLORS: Record<string, string> = {
   A1: "#10B981", A2: "#3B82F6", B1: "#8B5CF6", B2: "#EC4899", C1: "#F59E0B", C2: "#EF4444",
@@ -43,18 +44,18 @@ export default function EnVocabStudy({
           <strong style={{ color: "var(--text-1)" }}>{done}</strong>개 단어를 학습했어요.
         </p>
         <div className="grid w-full max-w-xs gap-2.5">
-          <button onClick={onReview}
-            className="ui-btn ui-btn-brand-en py-3.5">
+          <Button variant="accent" size="free" onClick={onReview}
+            className="py-3.5">
             🔁 SM-2 복습하기
-          </button>
-          <button onClick={onQuiz}
-            className="ui-btn ui-btn-brand-en py-3.5">
+          </Button>
+          <Button variant="accent" size="free" onClick={onQuiz}
+            className="py-3.5">
             📝 퀴즈 도전
-          </button>
-          <button onClick={onExit}
-            className="ui-btn ui-btn-surface py-3.5">
+          </Button>
+          <Button variant="surface" size="free" onClick={onExit}
+            className="py-3.5">
             홈으로
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -243,20 +244,20 @@ export default function EnVocabStudy({
         style={{ background: `linear-gradient(to top, var(--bg) 70%, transparent)` }}>
         {showMeaning ? (
           <div className="grid grid-cols-2 gap-3">
-            <button onClick={next}
-              className="ui-btn ui-btn-surface py-4">
+            <Button variant="surface" size="free" onClick={next}
+              className="py-4">
               다음 →
-            </button>
-            <button onClick={handleKnow}
-              className="ui-btn ui-btn-success py-4">
+            </Button>
+            <Button variant="success" size="free" onClick={handleKnow}
+              className="py-4">
               ✓ 알고 있어요
-            </button>
+            </Button>
           </div>
         ) : (
-          <button onClick={() => setShowMeaning(true)}
-            className="ui-btn ui-btn-brand-en w-full py-4">
+          <Button variant="accent" size="free" onClick={() => setShowMeaning(true)}
+            className="w-full py-4">
             뜻 확인하기
-          </button>
+          </Button>
         )}
       </div>
     </div>

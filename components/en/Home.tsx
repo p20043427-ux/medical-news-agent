@@ -2,6 +2,7 @@
 
 import { EN_VOCAB, EN_CATEGORIES } from "@/lib/en/vocab";
 import { type EnProgress, isLearned } from "@/lib/en/progress";
+import { Button } from "@/components/ui";
 
 const LEVEL_GRAD: Record<string, [string, string]> = {
   A1: ["#10B981", "#4361EE"],
@@ -92,10 +93,10 @@ export default function EnHome({ progress, onStudyCategory, onGrammar }: {
                   {unknown > 0 ? <>모르는 단어 <strong style={{ color: "var(--text-1)" }}>{unknown}개</strong>를 골라주세요.</> : "모두 익혔어요! 복습해 볼까요?"}
                 </p>
 
-                <button onClick={() => onStudyCategory(cat.key)}
-                  className="ui-btn ui-btn-brand-en mt-3 w-full py-3.5 text-sm">
+                <Button variant="accent" size="free" onClick={() => onStudyCategory(cat.key)}
+                  className="mt-3 w-full py-3.5 text-sm">
                   바로 시작
-                </button>
+                </Button>
               </div>
             </div>
           );

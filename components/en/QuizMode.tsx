@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { EnWord } from "@/lib/en/types";
 import type { EnGrade } from "@/lib/en/progress";
 import { speakEn } from "@/lib/en/speech";
+import { Button } from "@/components/ui";
 
 function shuffle<T>(arr: T[]): T[] {
   return [...arr].sort(() => Math.random() - 0.5);
@@ -38,14 +39,14 @@ export default function EnQuizMode({
           {pct < 80 && <p className="mt-2 text-sm" style={{ color: "var(--text-3)" }}>복습을 통해 더 완벽하게!</p>}
         </div>
         <div className="grid w-full max-w-xs gap-2.5">
-          <button onClick={onReview}
-            className="ui-btn ui-btn-brand-en py-3.5">
+          <Button variant="accent" size="free" onClick={onReview}
+            className="py-3.5">
             🔁 복습하기
-          </button>
-          <button onClick={onExit}
-            className="ui-btn ui-btn-surface py-3.5">
+          </Button>
+          <Button variant="surface" size="free" onClick={onExit}
+            className="py-3.5">
             홈으로
-          </button>
+          </Button>
         </div>
       </div>
     );
