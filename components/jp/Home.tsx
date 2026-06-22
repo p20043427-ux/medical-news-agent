@@ -45,7 +45,7 @@ export default function Home({ progress, onStudyCategory, onGo }: {
           return (
             <div
               key={cat.key}
-              className="w-[300px] shrink-0 snap-start rounded-[28px] p-3 shadow-sm"
+              className="w-[86vw] max-w-[320px] shrink-0 snap-start rounded-[28px] p-3 shadow-sm"
               style={{ background: "var(--card)", border: "1px solid var(--border)" }}
             >
               {/* 레이어드 카드 스택 (덱 느낌) */}

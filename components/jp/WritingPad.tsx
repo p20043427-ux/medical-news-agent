@@ -4,18 +4,6 @@ import { useRef, useEffect, useCallback } from "react";
 
 const SIZE = 300;
 
-function clientToCanvas(
-  clientX: number,
-  clientY: number,
-  canvas: HTMLCanvasElement
-): [number, number] {
-  const rect = canvas.getBoundingClientRect();
-  return [
-    (clientX - rect.left) * (SIZE / rect.width),
-    (clientY - rect.top) * (SIZE / rect.height),
-  ];
-}
-
 export default function WritingPad({
   character,
   reading,
@@ -27,18 +15,37 @@ export default function WritingPad({
   const isDown = useRef(false);
   const prevPt = useRef<[number, number] | null>(null);
 
+  // 캔버스 좌표(논리 SIZE 기준)로 변환
+  const toCanvas = useCallback(
+    (clientX: number, clientY: number): [number, number] => {
+      const canvas = canvasRef.current!;
+      const rect = canvas.getBoundingClientRect();
+      return [
+        (clientX - rect.left) * (SIZE / rect.width),
+        (clientY - rect.top) * (SIZE / rect.height),
+      ];
+    },
+    [],
+  );
+
   const drawBackground = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // 고해상도(레티나) 대응 — 매번 변환을 초기화하고 다시 스케일
+    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
+    canvas.width = SIZE * dpr;
+    canvas.height = SIZE * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
     ctx.clearRect(0, 0, SIZE, SIZE);
 
-    // Crosshair grid
+    // 십자 가이드
     ctx.save();
-    ctx.strokeStyle = "rgba(0,0,0,0.08)";
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = "rgba(120,130,160,0.25)";
+    ctx.lineWidth = 1;
     ctx.setLineDash([6, 6]);
     ctx.beginPath();
     ctx.moveTo(SIZE / 2, 0); ctx.lineTo(SIZE / 2, SIZE);
@@ -46,11 +53,11 @@ export default function WritingPad({
     ctx.stroke();
     ctx.restore();
 
-    // Guide character (first char only for compounds)
+    // 가이드 글자(연하게)
     const guideChar = character.length <= 2 ? character : character[0];
     ctx.save();
     ctx.font = `bold ${Math.round(SIZE * 0.58)}px serif`;
-    ctx.fillStyle = "rgba(0,0,0,0.06)";
+    ctx.fillStyle = "rgba(120,130,160,0.18)";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(guideChar, SIZE / 2, SIZE / 2);
@@ -59,27 +66,35 @@ export default function WritingPad({
 
   useEffect(() => { drawBackground(); }, [drawBackground]);
 
-  function startStroke(x: number, y: number) {
+  function down(e: React.PointerEvent<HTMLCanvasElement>) {
+    e.preventDefault();
     const canvas = canvasRef.current;
     if (!canvas) return;
+    canvas.setPointerCapture(e.pointerId);
     const ctx = canvas.getContext("2d")!;
+    const [x, y] = toCanvas(e.clientX, e.clientY);
     isDown.current = true;
     prevPt.current = [x, y];
     ctx.beginPath();
-    ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+    ctx.arc(x, y, 3.4, 0, Math.PI * 2);
     ctx.fillStyle = "#1a1a2e";
     ctx.fill();
   }
 
-  function continueStroke(x: number, y: number) {
+  function move(e: React.PointerEvent<HTMLCanvasElement>) {
     if (!isDown.current || !prevPt.current) return;
+    e.preventDefault();
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d")!;
+    const [x, y] = toCanvas(e.clientX, e.clientY);
     const [px, py] = prevPt.current;
+    // 중간점 기준 2차 곡선으로 부드럽게
+    const mx = (px + x) / 2;
+    const my = (py + y) / 2;
     ctx.beginPath();
     ctx.moveTo(px, py);
-    ctx.lineTo(x, y);
+    ctx.quadraticCurveTo(px, py, mx, my);
     ctx.strokeStyle = "#1a1a2e";
     ctx.lineWidth = 7;
     ctx.lineCap = "round";
@@ -88,9 +103,13 @@ export default function WritingPad({
     prevPt.current = [x, y];
   }
 
-  function endStroke() {
+  function up(e: React.PointerEvent<HTMLCanvasElement>) {
     isDown.current = false;
     prevPt.current = null;
+    const canvas = canvasRef.current;
+    if (canvas && canvas.hasPointerCapture?.(e.pointerId)) {
+      canvas.releasePointerCapture(e.pointerId);
+    }
   }
 
   return (
@@ -106,36 +125,13 @@ export default function WritingPad({
       >
         <canvas
           ref={canvasRef}
-          width={SIZE}
-          height={SIZE}
-          className="block h-full w-full touch-none"
-          onMouseDown={(e) => {
-            const [x, y] = clientToCanvas(e.clientX, e.clientY, e.currentTarget);
-            startStroke(x, y);
-          }}
-          onMouseMove={(e) => {
-            if (!isDown.current) return;
-            const [x, y] = clientToCanvas(e.clientX, e.clientY, e.currentTarget);
-            continueStroke(x, y);
-          }}
-          onMouseUp={endStroke}
-          onMouseLeave={endStroke}
-          onTouchStart={(e) => {
-            e.stopPropagation();
-            const t = e.touches[0];
-            const [x, y] = clientToCanvas(t.clientX, t.clientY, e.currentTarget);
-            startStroke(x, y);
-          }}
-          onTouchMove={(e) => {
-            e.stopPropagation();
-            const t = e.touches[0];
-            const [x, y] = clientToCanvas(t.clientX, t.clientY, e.currentTarget);
-            continueStroke(x, y);
-          }}
-          onTouchEnd={(e) => {
-            e.stopPropagation();
-            endStroke();
-          }}
+          className="block h-full w-full"
+          style={{ touchAction: "none" }}
+          onPointerDown={down}
+          onPointerMove={move}
+          onPointerUp={up}
+          onPointerCancel={up}
+          onPointerLeave={up}
         />
       </div>
       <button
