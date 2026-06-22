@@ -7,12 +7,14 @@ import { type Progress as JpProgress, isKnown } from "@/lib/jp/progress";
 import WordImage from "./WordImage";
 import { Button, Progress } from "@/components/ui";
 
-export default function Home({ progress, onStudyCategory, onGo, onKana }: {
+export default function Home({ progress, onStudyCategory, onGo, onKana, onMistakes }: {
   progress: JpProgress;
   onStudyCategory: (key: string) => void;
   onGo: (tab: "conversation" | "verbs") => void;
   onKana?: () => void;
+  onMistakes?: () => void;
 }) {
+  const mistakeCount = progress.mistakes?.length ?? 0;
   const start = new Date(progress.startedAt);
   const dayN = Math.floor((Date.now() - start.getTime()) / 86400000) + 1;
 
@@ -146,6 +148,27 @@ export default function Home({ progress, onStudyCategory, onGo, onKana }: {
               <p className="text-xs" style={{ color: "var(--text-3)" }}>기초 문자 · 발음 듣기 · 퀴즈</p>
             </div>
             <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" style={{ color: "var(--text-3)" }} fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+          </button>
+        )}
+        {onMistakes && (
+          <button onClick={onMistakes}
+            className="col-span-2 flex items-center gap-4 rounded-2xl p-4 text-left shadow-sm transition active:scale-95"
+            style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-xl"
+              style={{ background: "linear-gradient(135deg,#ff7675,#d63031)", boxShadow: "0 4px 12px rgba(214,48,49,.3)" }}>
+              🎯
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-bold" style={{ color: "var(--text-1)" }}>오답노트</p>
+              <p className="text-xs" style={{ color: "var(--text-3)" }}>
+                {mistakeCount > 0 ? `틀린 단어 ${mistakeCount}개 · 집중 복습` : "틀린 단어를 모아 복습해요"}
+              </p>
+            </div>
+            {mistakeCount > 0 && (
+              <span className="shrink-0 rounded-full px-2 py-0.5 text-xs font-extrabold text-white" style={{ background: "#d63031" }}>
+                {mistakeCount}
+              </span>
+            )}
           </button>
         )}
       </div>

@@ -14,6 +14,7 @@ import Stats from "./Stats";
 import BottomNav, { type Tab } from "./BottomNav";
 import Wordbook from "./Wordbook";
 import KanaView from "./KanaView";
+import MistakesView from "./MistakesView";
 
 const FURIGANA_KEY = "jp-app-furigana";
 
@@ -25,6 +26,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
   const [tab, setTab] = useState<Tab>("home");
   const [session, setSession] = useState<Session | null>(null);
   const [kanaOpen, setKanaOpen] = useState(false);
+  const [mistakesOpen, setMistakesOpen] = useState(false);
   const [showFurigana, setShowFurigana] = useState(true);
 
   useEffect(() => {
@@ -51,10 +53,12 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
   }
 
   if (session) {
-    const isWordbook = session.category === "_wordbook";
-    const category = isWordbook
-      ? { key: "_wordbook", label: "단어장", emoji: "📚" }
-      : VOCAB_CATEGORIES.find((c) => c.key === session.category)!;
+    const SPECIAL: Record<string, { key: string; label: string; emoji: string }> = {
+      _wordbook: { key: "_wordbook", label: "단어장", emoji: "📚" },
+      _mistakes: { key: "_mistakes", label: "오답노트", emoji: "🎯" },
+    };
+    const category = SPECIAL[session.category]
+      ?? VOCAB_CATEGORIES.find((c) => c.key === session.category)!;
     const all = session.wordIds
       ? VOCAB.filter((w) => session.wordIds!.includes(w.id))
       : VOCAB.filter((w) => w.category === session.category);
@@ -92,6 +96,21 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
       <div className="mx-auto min-h-screen max-w-md" style={{ background: "var(--bg)" }}>
         <KanaView onBack={() => setKanaOpen(false)} />
         <BottomNav tab="home" onChange={(t) => { setKanaOpen(false); setTab(t); }} accentColor="#E63946" />
+      </div>
+    );
+  }
+
+  if (mistakesOpen) {
+    return (
+      <div className="mx-auto min-h-screen max-w-md" style={{ background: "var(--bg)" }}>
+        <MistakesView
+          mistakes={progress.mistakes ?? []}
+          showFurigana={showFurigana}
+          onReview={(ids) => { setMistakesOpen(false); setSession({ category: "_mistakes", mode: "review", wordIds: ids }); }}
+          onQuiz={(ids) => { setMistakesOpen(false); setSession({ category: "_mistakes", mode: "quiz", wordIds: ids }); }}
+          onBack={() => setMistakesOpen(false)}
+        />
+        <BottomNav tab="home" onChange={(t) => { setMistakesOpen(false); setTab(t); }} accentColor="#E63946" />
       </div>
     );
   }
@@ -171,7 +190,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
       </header>
 
       {tab === "home" && (
-        <Home progress={progress} onStudyCategory={(key) => setSession({ category: key, mode: "skim" })} onGo={(t) => setTab(t)} onKana={() => setKanaOpen(true)} />
+        <Home progress={progress} onStudyCategory={(key) => setSession({ category: key, mode: "skim" })} onGo={(t) => setTab(t)} onKana={() => setKanaOpen(true)} onMistakes={() => setMistakesOpen(true)} />
       )}
       {tab === "conversation" && (
         <ConversationView showFurigana={showFurigana} onToggleFurigana={toggleFurigana} />

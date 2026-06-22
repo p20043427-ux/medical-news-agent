@@ -24,6 +24,7 @@ export interface Progress {
   xp: number;
   achievements: string[];
   bookmarks: string[];            // persisted word ids
+  mistakes: string[];             // 영구 오답 단어 id (오답노트)
 }
 
 export type Grade = "again" | "hard" | "good" | "easy";
@@ -38,6 +39,7 @@ const EMPTY: Progress = {
   xp: 0,
   achievements: [],
   bookmarks: [],
+  mistakes: [],
 };
 
 export function todayKey(d: Date = new Date()): string {
@@ -72,7 +74,7 @@ function load(): Progress {
           interval: c.interval ?? (c.box <= 1 ? 1 : c.box <= 2 ? 2 : c.box <= 3 ? 4 : c.box <= 4 ? 7 : 15),
         };
       }
-      return { ...parsed, xp: parsed.xp ?? 0, achievements: parsed.achievements ?? [], bookmarks: parsed.bookmarks ?? [], cards };
+      return { ...parsed, xp: parsed.xp ?? 0, achievements: parsed.achievements ?? [], bookmarks: parsed.bookmarks ?? [], mistakes: parsed.mistakes ?? [], cards };
     }
     // 이전 버전 마이그레이션
     const old = window.localStorage.getItem("jp-app-progress-v2");
@@ -89,7 +91,7 @@ function load(): Progress {
           interval: c.box ? (c.box <= 1 ? 1 : c.box <= 3 ? 4 : 15) : 0,
         };
       }
-      return { cards, daily: o.daily ?? {}, startedAt: o.startedAt ?? todayKey(), xp: 0, achievements: [], bookmarks: [] };
+      return { cards, daily: o.daily ?? {}, startedAt: o.startedAt ?? todayKey(), xp: 0, achievements: [], bookmarks: [], mistakes: [] };
     }
   } catch { /* ignore */ }
   return EMPTY;
@@ -173,8 +175,12 @@ function applyGrade(p: Progress, id: string, grade: Grade): Progress {
     lastGrade: q,
   };
 
-  let cards = { ...p.cards, [id]: newCard };
-  return { ...p, cards, daily: bumpDaily(p.daily), xp: p.xp + xpGain };
+  const cards = { ...p.cards, [id]: newCard };
+  // 오답노트: 틀리면(again) 추가, 맞히면(good/easy) 제거
+  const mset = new Set(p.mistakes ?? []);
+  if (grade === "again") mset.add(id);
+  else if (grade === "good" || grade === "easy") mset.delete(id);
+  return { ...p, cards, daily: bumpDaily(p.daily), xp: p.xp + xpGain, mistakes: [...mset] };
 }
 
 function applyToggleBookmark(p: Progress, id: string): Progress {
