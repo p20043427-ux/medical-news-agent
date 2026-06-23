@@ -4,15 +4,29 @@ import { useState } from "react";
 import { KO_GRAMMAR } from "@/lib/ko/grammar";
 import { speakKo } from "@/lib/ko/speech";
 import { AccordionItem } from "@/components/ui/accordion";
+import GrammarQuiz from "@/components/GrammarQuiz";
 import { tt, type UiLang } from "@/lib/i18n";
 
 export default function KoGrammarView({ lang }: { lang: UiLang }) {
   const [open, setOpen] = useState<string | null>(KO_GRAMMAR[0]?.id ?? null);
+  const [quiz, setQuiz] = useState(false);
+
+  if (quiz) {
+    return (
+      <GrammarQuiz accent="#2563EB" speak={speakKo} onExit={() => setQuiz(false)}
+        points={KO_GRAMMAR.map((g) => ({ title: g.title, brief: g.brief, examples: g.examples.map((e) => ({ text: e.ko, audio: e.ko, ko: e.ja })) }))}
+      />
+    );
+  }
 
   return (
     <div className="px-4 pb-28 pt-3">
       <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{tt(lang, "문법", "文法")}</h1>
-      <p className="mb-4 text-sm" style={{ color: "var(--text-3)" }}>{tt(lang, "TOPIK 1~2 핵심 문법", "TOPIK 1〜2 の重要文法")} ({KO_GRAMMAR.length})</p>
+      <p className="mb-3 text-sm" style={{ color: "var(--text-3)" }}>{tt(lang, "TOPIK 1~2 핵심 문법", "TOPIK 1〜2 の重要文法")} ({KO_GRAMMAR.length})</p>
+      <button onClick={() => setQuiz(true)} className="mb-4 w-full rounded-2xl py-3 text-sm font-bold text-white"
+        style={{ background: "linear-gradient(135deg,#2563EB,#7C3AED)", boxShadow: "0 4px 12px rgba(37,99,235,.3)" }}>
+        {tt(lang, "📝 문법 퀴즈 풀기", "📝 文法クイズに挑戦")}
+      </button>
 
       <div className="space-y-2.5">
         {KO_GRAMMAR.map((g) => {
