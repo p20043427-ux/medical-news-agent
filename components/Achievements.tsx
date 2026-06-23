@@ -1,5 +1,7 @@
 "use client";
 
+import { useUiLang, tt } from "@/lib/i18n";
+
 export interface Badge {
   emoji: string;
   title: string;
@@ -9,11 +11,12 @@ export interface Badge {
 
 // 업적·뱃지 그리드 (JP·EN Stats 공용)
 export default function Achievements({ badges, accent = "#E63946" }: { badges: Badge[]; accent?: string }) {
+  const lang = useUiLang();
   const earned = badges.filter((b) => b.earned).length;
   return (
     <div className="mb-4 rounded-3xl p-5 shadow-sm" style={{ background: "var(--card)" }}>
       <div className="mb-3 flex items-center justify-between">
-        <span className="font-bold" style={{ color: "var(--text-1)" }}>업적</span>
+        <span className="font-bold" style={{ color: "var(--text-1)" }}>{tt(lang, "업적", "実績")}</span>
         <span className="rounded-full px-2.5 py-1 text-xs font-bold text-white" style={{ background: accent }}>{earned} / {badges.length}</span>
       </div>
       <div className="grid grid-cols-4 gap-2.5">
