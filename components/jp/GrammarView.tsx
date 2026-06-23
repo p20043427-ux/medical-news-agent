@@ -5,10 +5,12 @@ import { JP_GRAMMAR } from "@/lib/jp/grammar";
 import { speakJa } from "@/lib/jp/speech";
 import { AccordionItem } from "@/components/ui/accordion";
 import GrammarQuiz from "@/components/GrammarQuiz";
+import { useUiLang, tt } from "@/lib/i18n";
 
 function SpeakBtn({ text }: { text: string }) {
+  const lang = useUiLang();
   return (
-    <button onClick={(e) => { e.stopPropagation(); speakJa(text); }} aria-label="발음 듣기"
+    <button onClick={(e) => { e.stopPropagation(); speakJa(text); }} aria-label={tt(lang, "발음 듣기", "発音を聞く")}
       className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition active:scale-90"
       style={{ background: "var(--surface)", color: "#E63946" }}>
       <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -19,6 +21,7 @@ function SpeakBtn({ text }: { text: string }) {
 }
 
 export default function GrammarView() {
+  const lang = useUiLang();
   const [open, setOpen] = useState<string | null>(JP_GRAMMAR[0]?.id ?? null);
   const [quiz, setQuiz] = useState(false);
 
@@ -32,11 +35,11 @@ export default function GrammarView() {
 
   return (
     <div className="px-4 pb-28 pt-3">
-      <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>N5 문법</h1>
-      <p className="mb-3 text-sm" style={{ color: "var(--text-3)" }}>조사·활용·표현을 예문과 함께 익혀요. ({JP_GRAMMAR.length}개)</p>
+      <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{tt(lang, "N5 문법", "N5 文法")}</h1>
+      <p className="mb-3 text-sm" style={{ color: "var(--text-3)" }}>{tt(lang, `조사·활용·표현을 예문과 함께 익혀요. (${JP_GRAMMAR.length}개)`, `助詞・活用・表現を例文と一緒に学びます。（${JP_GRAMMAR.length}個）`)}</p>
       <button onClick={() => setQuiz(true)} className="mb-4 w-full rounded-2xl py-3 text-sm font-bold text-white"
         style={{ background: "linear-gradient(135deg,#fdcb6e,#e17055)", boxShadow: "0 4px 12px rgba(225,112,85,.3)" }}>
-        📝 문법 퀴즈 풀기
+        {tt(lang, "📝 문법 퀴즈 풀기", "📝 文法クイズに挑戦")}
       </button>
 
       <div className="space-y-2.5">
@@ -70,7 +73,7 @@ export default function GrammarView() {
                 ))}
               </div>
               {g.commonMistake && (
-                <p className="mt-3 rounded-xl p-2.5 text-xs leading-relaxed" style={{ background: "#E6394610", color: "var(--text-2)" }}>⚠️ 흔한 실수: {g.commonMistake}</p>
+                <p className="mt-3 rounded-xl p-2.5 text-xs leading-relaxed" style={{ background: "#E6394610", color: "var(--text-2)" }}>{tt(lang, "⚠️ 흔한 실수: ", "⚠️ よくある間違い: ")}{g.commonMistake}</p>
               )}
               {g.tip && (
                 <p className="mt-2 rounded-xl p-2.5 text-xs leading-relaxed" style={{ background: "#00b89412", color: "var(--text-2)" }}>💡 {g.tip}</p>

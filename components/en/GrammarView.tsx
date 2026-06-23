@@ -7,6 +7,7 @@ import type { GrammarPoint, PhrasalVerb } from "@/lib/en/types";
 import { speakEn } from "@/lib/en/speech";
 import { AccordionItem } from "@/components/ui/accordion";
 import GrammarQuiz from "@/components/GrammarQuiz";
+import { useUiLang, tt } from "@/lib/i18n";
 
 type Section = "grammar" | "phrasal";
 
@@ -17,10 +18,11 @@ const CEFR_COLORS: Record<string, string> = {
 const BASE_VERBS = ["break", "come", "get", "give", "go", "look", "make", "put", "run", "take", "turn", "work", "figure", "carry", "set", "point"];
 
 function SpeakBtn({ text }: { text: string }) {
+  const lang = useUiLang();
   return (
     <button
       onClick={(e) => { e.stopPropagation(); speakEn(text); }}
-      aria-label="발음 듣기"
+      aria-label={tt(lang, "발음 듣기", "発音を聞く")}
       className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition active:scale-90"
       style={{ background: "var(--surface)", color: "#4361EE" }}
     >
@@ -33,6 +35,7 @@ function SpeakBtn({ text }: { text: string }) {
 
 
 function GrammarCard({ gp }: { gp: GrammarPoint }) {
+  const lang = useUiLang();
   const [open, setOpen] = useState(false);
   return (
     <AccordionItem open={open} onToggle={() => setOpen((s) => !s)} bordered={false}
@@ -50,12 +53,12 @@ function GrammarCard({ gp }: { gp: GrammarPoint }) {
       }>
         <div className="space-y-4">
           <div className="rounded-xl p-3" style={{ background: "var(--surface)" }}>
-            <p className="text-xs font-bold mb-1" style={{ color: "#4361EE" }}>핵심 규칙</p>
+            <p className="text-xs font-bold mb-1" style={{ color: "#4361EE" }}>{tt(lang, "핵심 규칙", "重要ルール")}</p>
             <p className="text-sm" style={{ color: "var(--text-2)" }}>{gp.rule}</p>
           </div>
 
           <div className="space-y-2.5">
-            <p className="text-xs font-bold" style={{ color: "var(--text-3)" }}>예문</p>
+            <p className="text-xs font-bold" style={{ color: "var(--text-3)" }}>{tt(lang, "예문", "例文")}</p>
             {gp.examples.map((ex, i) => (
               <div key={i} className="rounded-xl p-3" style={{ background: "var(--surface)" }}>
                 <div className="flex items-start justify-between gap-2">
@@ -72,7 +75,7 @@ function GrammarCard({ gp }: { gp: GrammarPoint }) {
 
           {gp.commonMistake && (
             <div className="rounded-xl p-3" style={{ background: "#EF444415" }}>
-              <p className="text-xs font-bold mb-1" style={{ color: "#EF4444" }}>⚠ 흔한 실수</p>
+              <p className="text-xs font-bold mb-1" style={{ color: "#EF4444" }}>{tt(lang, "⚠ 흔한 실수", "⚠ よくある間違い")}</p>
               <p className="text-xs" style={{ color: "#EF4444" }}>{gp.commonMistake}</p>
             </div>
           )}
@@ -87,6 +90,7 @@ function GrammarCard({ gp }: { gp: GrammarPoint }) {
 }
 
 function PhrasalVerbCard({ pv }: { pv: PhrasalVerb }) {
+  const lang = useUiLang();
   return (
     <div className="rounded-2xl p-4 shadow-sm" style={{ background: "var(--card)" }}>
       <div className="flex items-center justify-between mb-2">
@@ -106,7 +110,7 @@ function PhrasalVerbCard({ pv }: { pv: PhrasalVerb }) {
       </div>
       {pv.separable && (
         <p className="text-xs mt-1.5" style={{ color: "var(--text-3)" }}>
-          🔀 분리 가능 (예: put it off / put off the meeting)
+          {tt(lang, "🔀 분리 가능 (예: put it off / put off the meeting)", "🔀 分離可能（例: put it off / put off the meeting）")}
         </p>
       )}
     </div>
@@ -114,6 +118,7 @@ function PhrasalVerbCard({ pv }: { pv: PhrasalVerb }) {
 }
 
 export default function EnGrammarView() {
+  const lang = useUiLang();
   const [section, setSection] = useState<Section>("grammar");
   const [selectedBase, setSelectedBase] = useState<string>("break");
   const [quiz, setQuiz] = useState(false);
@@ -135,7 +140,7 @@ export default function EnGrammarView() {
       {/* 섹션 탭 */}
       <div className="sticky top-[56px] z-20 px-4 pb-2" style={{ background: "var(--bg)" }}>
         <div className="flex rounded-2xl p-1 gap-1" style={{ background: "var(--surface)" }}>
-          {([["grammar", "📖 문법 포인트"], ["phrasal", "🔗 구동사"]] as [Section, string][]).map(([s, label]) => (
+          {([["grammar", tt(lang, "📖 문법 포인트", "📖 文法ポイント")], ["phrasal", tt(lang, "🔗 구동사", "🔗 句動詞")]] as [Section, string][]).map(([s, label]) => (
             <button key={s} onClick={() => setSection(s)}
               className="flex-1 rounded-xl py-2.5 text-sm font-bold transition"
               style={{
@@ -152,10 +157,10 @@ export default function EnGrammarView() {
         <div className="px-4 space-y-3">
           <button onClick={() => setQuiz(true)} className="w-full rounded-2xl py-3 text-sm font-bold text-white"
             style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)", boxShadow: "0 4px 12px rgba(67,97,238,.3)" }}>
-            📝 문법 퀴즈 풀기
+            {tt(lang, "📝 문법 퀴즈 풀기", "📝 文法クイズに挑戦")}
           </button>
           <p className="text-xs px-1" style={{ color: "var(--text-3)" }}>
-            탭하면 펼쳐집니다 — {GRAMMAR_POINTS.length}개 문법 포인트
+            {tt(lang, `탭하면 펼쳐집니다 — ${GRAMMAR_POINTS.length}개 문법 포인트`, `タップで展開 — 文法ポイント${GRAMMAR_POINTS.length}個`)}
           </p>
           {GRAMMAR_POINTS.map((gp) => (
             <GrammarCard key={gp.id} gp={gp} />
@@ -166,7 +171,7 @@ export default function EnGrammarView() {
       {section === "phrasal" && (
         <div className="px-4">
           <p className="text-xs mb-3 px-1" style={{ color: "var(--text-3)" }}>
-            기본 동사별로 구동사를 학습합니다
+            {tt(lang, "기본 동사별로 구동사를 학습합니다", "基本動詞ごとに句動詞を学習します")}
           </p>
           {/* 기본 동사 필터 */}
           <div className="flex flex-wrap gap-2 mb-4">
@@ -191,7 +196,7 @@ export default function EnGrammarView() {
               filteredPV.map((pv) => <PhrasalVerbCard key={pv.id} pv={pv} />)
             ) : (
               <div className="text-center py-10" style={{ color: "var(--text-3)" }}>
-                구동사 없음
+                {tt(lang, "구동사 없음", "句動詞なし")}
               </div>
             )}
           </div>
