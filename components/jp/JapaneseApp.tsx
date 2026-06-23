@@ -16,6 +16,7 @@ import KanaView from "./KanaView";
 import MockExam from "./MockExam";
 import PhrasebookView from "./PhrasebookView";
 import RoleplayView from "./RoleplayView";
+import GrammarView from "./GrammarView";
 import LearnHub, { type LearnView } from "./LearnHub";
 import LibraryView from "./LibraryView";
 import { useReminderScheduler } from "@/lib/reminder";
@@ -191,6 +192,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
             {learnView === "kana" && <KanaView />}
             {learnView === "phrasebook" && <PhrasebookView />}
             {learnView === "roleplay" && <RoleplayView />}
+            {learnView === "grammar" && <GrammarView />}
             {learnView === "exam" && <MockExam onExit={() => setLearnView(null)} onMistake={addMistakes} />}
           </div>
         ) : (

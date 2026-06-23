@@ -1,4 +1,8 @@
 import type { EnWord, EnCategory } from "./types";
+import { EN_VOCAB_EA } from "./vocab-ea";
+import { EN_VOCAB_EB } from "./vocab-eb";
+import { EN_VOCAB_EC } from "./vocab-ec";
+import { EN_VOCAB_ED } from "./vocab-ed";
 
 export const EN_CATEGORIES: EnCategory[] = [
   { key: "basic-verbs",   label: "기초 동사",       emoji: "⚡", cefrRange: "A1–A2" },
@@ -13,7 +17,7 @@ export const EN_CATEGORIES: EnCategory[] = [
   { key: "advanced",      label: "고급 어휘",        emoji: "💎", cefrRange: "C1–C2" },
 ];
 
-export const EN_VOCAB: EnWord[] = [
+const EN_VOCAB_BASE: EnWord[] = [
   // ── 기초 동사 A1 ──
   { id: "ev001", word: "achieve", pronunciation: "/əˈtʃiːv/", partOfSpeech: "verb", cefrLevel: "B1", category: "basic-verbs", meaning: "달성하다, 이루다", example: { en: "She worked hard to achieve her goals.", ko: "그녀는 목표를 달성하기 위해 열심히 일했다." }, synonyms: ["accomplish", "attain", "reach"], wordFamily: ["achievement", "achievable", "overachieve"], tip: "achieve + 목표/결과. '열심히 해서 이루다'는 뉘앙스" },
   { id: "ev002", word: "allow", pronunciation: "/əˈlaʊ/", partOfSpeech: "verb", cefrLevel: "A2", category: "basic-verbs", meaning: "허락하다, 허용하다", example: { en: "Please allow me to explain.", ko: "제가 설명할 수 있도록 허락해 주세요." }, synonyms: ["permit", "let", "enable"], antonyms: ["forbid", "prevent", "deny"] },
@@ -112,3 +116,13 @@ export const EN_VOCAB: EnWord[] = [
   { id: "ev108", word: "integrity", pronunciation: "/ɪnˈteɡrɪti/", partOfSpeech: "noun", cefrLevel: "B2", category: "advanced", meaning: "성실성, 청렴; 완전성", example: { en: "Trust is built on a foundation of integrity.", ko: "신뢰는 성실성을 기반으로 쌓인다." }, synonyms: ["honesty", "principles", "virtue"] },
   { id: "ev109", word: "acknowledge", pronunciation: "/əkˈnɒlɪdʒ/", partOfSpeech: "verb", cefrLevel: "B2", category: "advanced", meaning: "인정하다; 감사를 표하다", example: { en: "He acknowledged that he had made a mistake.", ko: "그는 자신이 실수를 했다는 것을 인정했다." }, synonyms: ["admit", "recognize", "accept"], wordFamily: ["acknowledgment"] },
 ];
+
+// 표제어(word) 기준 중복 제거 — 먼저 등장한 항목 유지.
+const seenEn = new Set<string>();
+export const EN_VOCAB: EnWord[] = [
+  ...EN_VOCAB_BASE,
+  ...EN_VOCAB_EA,
+  ...EN_VOCAB_EB,
+  ...EN_VOCAB_EC,
+  ...EN_VOCAB_ED,
+].filter((w) => (seenEn.has(w.word.toLowerCase()) ? false : (seenEn.add(w.word.toLowerCase()), true)));
