@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CONVERSATIONS, CONVERSATION_CATEGORIES } from "@/lib/jp/conversations";
 import type { Conversation, ConversationCategory } from "@/lib/jp/types";
 import Furigana, { tokensToText } from "./Furigana";
@@ -21,6 +21,19 @@ export default function ConversationView({
   const [active, setActive] = useState<Conversation | null>(null);
   const [showKo, setShowKo] = useState(true);
   const [cat, setCat] = useState<ConversationCategory | "all">("all");
+  const [read, setRead] = useState<string[]>([]);
+
+  useEffect(() => {
+    try { setRead(JSON.parse(localStorage.getItem("jp-conv-read") || "[]")); } catch { /* ignore */ }
+  }, []);
+  function markRead(id: string) {
+    setRead((prev) => {
+      if (prev.includes(id)) return prev;
+      const next = [...prev, id];
+      try { localStorage.setItem("jp-conv-read", JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+  }
 
   // 실제 데이터에 존재하는 카테고리만 노출
   const cats = useMemo(
@@ -156,9 +169,14 @@ export default function ConversationView({
   return (
     <div className="px-4 pb-28 pt-2">
       <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>생활 회화</h1>
-      <p className="mb-3 text-sm" style={{ color: "var(--text-3)" }}>
+      <p className="mb-2 text-sm" style={{ color: "var(--text-3)" }}>
         상황별 필수 회화를 듣고 따라 말해 보세요.
       </p>
+      {read.length > 0 && (
+        <p className="mb-3 inline-block rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "#10B98114", color: "#10B981" }}>
+          ✓ 읽음 {read.length} / {CONVERSATIONS.length}
+        </p>
+      )}
 
       {/* 카테고리 필터 */}
       <div className="no-scrollbar mb-4 flex gap-2 overflow-x-auto pb-1">
@@ -174,15 +192,16 @@ export default function ConversationView({
         {list.map((c) => (
           <button
             key={c.id}
-            onClick={() => { track("conversation_open", { id: c.id, level: c.level ?? "N5" }); setActive(c); setShowKo(true); }}
+            onClick={() => { track("conversation_open", { id: c.id, level: c.level ?? "N5" }); markRead(c.id); setActive(c); setShowKo(true); }}
             className="flex w-full items-center gap-4 rounded-2xl p-4 text-left transition active:scale-[0.98]"
             style={{ background: "var(--card)", border: "1px solid var(--border)" }}
           >
             <span
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-2xl"
+              className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-2xl"
               style={{ background: "var(--surface)" }}
             >
               {c.emoji}
+              {read.includes(c.id) && <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full text-[11px] font-bold text-white" style={{ background: "#10B981", border: "2px solid var(--card)" }}>✓</span>}
             </span>
             <span className="min-w-0 flex-1">
               <span className="flex items-center gap-1.5">

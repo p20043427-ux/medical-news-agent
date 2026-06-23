@@ -24,21 +24,26 @@ export default function Wordbook({
   const [selected, setSelected] = useState<Word | null>(null);
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<string | null>(null);
+  const [sort, setSort] = useState<"default" | "reading" | "meaning">("default");
 
   const q = query.trim().toLowerCase();
   const searching = q !== "" || cat !== null;
 
   const words = useMemo(() => {
-    if (!searching) return VOCAB.filter((w) => bookmarks.includes(w.id));
-    return VOCAB.filter((w) =>
-      (cat === null || w.category === cat) &&
-      (q === "" ||
-        w.word.includes(query) ||
-        w.reading.includes(query) ||
-        w.romaji.toLowerCase().includes(q) ||
-        w.meaning.toLowerCase().includes(q)),
-    );
-  }, [searching, bookmarks, cat, q, query]);
+    const base = !searching
+      ? VOCAB.filter((w) => bookmarks.includes(w.id))
+      : VOCAB.filter((w) =>
+          (cat === null || w.category === cat) &&
+          (q === "" ||
+            w.word.includes(query) ||
+            w.reading.includes(query) ||
+            w.romaji.toLowerCase().includes(q) ||
+            w.meaning.toLowerCase().includes(q)),
+        );
+    if (sort === "reading") return [...base].sort((a, b) => a.reading.localeCompare(b.reading, "ja"));
+    if (sort === "meaning") return [...base].sort((a, b) => a.meaning.localeCompare(b.meaning, "ko"));
+    return base;
+  }, [searching, bookmarks, cat, q, query, sort]);
 
   return (
     <div className="pb-28">
@@ -78,9 +83,20 @@ export default function Wordbook({
         <p className="text-sm font-bold" style={{ color: "var(--text-1)" }}>
           {searching ? "검색 결과" : "저장된 단어"} <span className="text-base font-bold" style={{ color: "var(--text-3)" }}>{words.length}개</span>
         </p>
-        {!searching && bookmarks.length > 0 && (
-          <Button variant="brand" size="free" onClick={() => onStudy(bookmarks)} className="px-4 py-2 text-sm">복습하기</Button>
-        )}
+        <div className="flex items-center gap-2">
+          <div className="flex rounded-lg p-0.5" style={{ background: "var(--surface)" }}>
+            {([["default", "기본"], ["reading", "가나"], ["meaning", "뜻"]] as ["default" | "reading" | "meaning", string][]).map(([s, label]) => (
+              <button key={s} onClick={() => setSort(s)}
+                className="rounded-md px-2 py-1 text-xs font-bold transition"
+                style={sort === s ? { background: "var(--card)", color: "var(--text-1)" } : { color: "var(--text-3)" }}>
+                {label}
+              </button>
+            ))}
+          </div>
+          {!searching && bookmarks.length > 0 && (
+            <Button variant="brand" size="free" onClick={() => onStudy(bookmarks)} className="px-3 py-2 text-sm">복습</Button>
+          )}
+        </div>
       </div>
 
       <div style={{ height: 1, background: "var(--border)" }} className="mx-4" />
