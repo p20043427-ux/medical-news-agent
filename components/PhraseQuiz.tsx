@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui";
+import { useUiLang, tt } from "@/lib/i18n";
 
 export interface PhraseQuizItem {
   audio: string;  // 들려줄 텍스트 (가나 읽기 또는 영어)
@@ -25,6 +26,7 @@ export default function PhraseQuiz({
   accent: string;
   onExit: () => void;
 }) {
+  const lang = useUiLang();
   const questions = useMemo(() => shuffle(items).slice(0, 10).map((it) => {
     const pool = shuffle(distractors.filter((k) => k !== it.ko)).slice(0, 3);
     return { ...it, options: shuffle([it.ko, ...pool]) };
@@ -38,8 +40,8 @@ export default function PhraseQuiz({
   if (!q) {
     return (
       <div className="px-6 py-16 text-center">
-        <p className="text-sm" style={{ color: "var(--text-3)" }}>퀴즈로 만들 표현이 부족해요.</p>
-        <Button variant="surface" size="free" onClick={onExit} className="mt-4 px-6 py-3">돌아가기</Button>
+        <p className="text-sm" style={{ color: "var(--text-3)" }}>{tt(lang, "퀴즈로 만들 표현이 부족해요.", "クイズを作るには表現が足りません。")}</p>
+        <Button variant="surface" size="free" onClick={onExit} className="mt-4 px-6 py-3">{tt(lang, "돌아가기", "戻る")}</Button>
       </div>
     );
   }
@@ -50,10 +52,10 @@ export default function PhraseQuiz({
       <div className="px-5 pb-28 pt-10 text-center">
         <div className="animate-reward text-6xl">{pct >= 80 ? "🎉" : "💪"}</div>
         <p className="mt-2 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{score} / {questions.length}</p>
-        <p className="mt-1 text-sm" style={{ color: "var(--text-3)" }}>즐겨찾기 표현 복습 완료 · {pct}점</p>
+        <p className="mt-1 text-sm" style={{ color: "var(--text-3)" }}>{tt(lang, `즐겨찾기 표현 복습 완료 · ${pct}점`, `お気に入り表現の復習完了 · ${pct}点`)}</p>
         <div className="mx-auto mt-6 grid max-w-xs gap-2.5">
-          <Button variant="brand" size="free" onClick={() => { setIdx(0); setPicked(null); setScore(0); }} className="py-3" style={{ background: accent }}>다시 풀기</Button>
-          <Button variant="surface" size="free" onClick={onExit} className="py-3">회화집으로</Button>
+          <Button variant="brand" size="free" onClick={() => { setIdx(0); setPicked(null); setScore(0); }} className="py-3" style={{ background: accent }}>{tt(lang, "다시 풀기", "もう一度")}</Button>
+          <Button variant="surface" size="free" onClick={onExit} className="py-3">{tt(lang, "회화집으로", "会話集へ")}</Button>
         </div>
       </div>
     );
@@ -69,13 +71,13 @@ export default function PhraseQuiz({
   return (
     <div className="flex min-h-[calc(100vh-4rem)] flex-col px-4 pb-28 pt-3">
       <div className="mb-4 flex items-center justify-between">
-        <span className="rounded-full px-2.5 py-1 text-xs font-bold text-white" style={{ background: accent }}>즐겨찾기 복습</span>
+        <span className="rounded-full px-2.5 py-1 text-xs font-bold text-white" style={{ background: accent }}>{tt(lang, "즐겨찾기 복습", "お気に入り復習")}</span>
         <span className="text-sm font-bold" style={{ color: "var(--text-2)" }}>{idx + 1} / {questions.length}</span>
       </div>
 
       <div className="rounded-3xl p-6 text-center shadow-sm" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
-        <p className="text-xs" style={{ color: "var(--text-3)" }}>발음을 듣고 알맞은 뜻을 고르세요</p>
-        <button onClick={() => speak(q.audio)} aria-label="다시 듣기"
+        <p className="text-xs" style={{ color: "var(--text-3)" }}>{tt(lang, "발음을 듣고 알맞은 뜻을 고르세요", "発音を聞いて正しい意味を選んでください")}</p>
+        <button onClick={() => speak(q.audio)} aria-label={tt(lang, "다시 듣기", "もう一度聞く")}
           className="mx-auto mt-3 grid h-20 w-20 place-items-center rounded-full text-3xl text-white" style={{ background: accent }}>🔊</button>
         {picked && <p className="mt-3 text-base font-bold" style={{ color: "var(--text-1)" }}>{q.label}</p>}
       </div>
@@ -102,7 +104,7 @@ export default function PhraseQuiz({
 
       <div className="mt-auto pt-6">
         <Button variant="brand" size="free" onClick={next} disabled={!picked} className="w-full py-4" style={{ background: accent }}>
-          {idx + 1 >= questions.length ? "결과 보기" : "다음"}
+          {idx + 1 >= questions.length ? tt(lang, "결과 보기", "結果を見る") : tt(lang, "다음", "次へ")}
         </Button>
       </div>
     </div>
