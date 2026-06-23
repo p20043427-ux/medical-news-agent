@@ -46,6 +46,7 @@ export interface GrammarPoint {
 export interface EnCategory {
   key: string;
   label: string;           // 한국어
+  labelJa?: string;        // 일본어
   emoji: string;
   cefrRange: string;
 }

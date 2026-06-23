@@ -9,6 +9,7 @@ import { useFavorites } from "@/lib/favorites";
 import { useRoleplay } from "@/lib/roleplay-progress";
 import { useDailyActivity } from "@/lib/daily-activity";
 import DailyMissions from "@/components/DailyMissions";
+import { useUiLang, tt } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import { Button, Progress } from "@/components/ui";
 
@@ -34,6 +35,7 @@ export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewD
   onGrammar?: () => void;
   onReviewDue?: () => void;
 }) {
+  const lang = useUiLang();
   const dueCount = dueIds(progress).length;
   const todayCount = progress.daily?.[todayKey()] ?? 0;
   const activity = useDailyActivity("en");
@@ -63,9 +65,9 @@ export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewD
       {/* 오늘의 미션 */}
       <div className="px-5 pb-2 pt-2">
         <DailyMissions accent="#4361EE" missions={[
-          { emoji: "📖", label: "단어 10개 학습", done: todayCount, goal: 10 },
-          { emoji: "🗣️", label: "회화 1개 보기", done: activity.conversation, goal: 1 },
-          { emoji: "🎯", label: "롤플레이·모의시험 1회", done: activity.roleplay + activity.exam, goal: 1 },
+          { emoji: "📖", label: tt(lang, "단어 10개 학습", "単語10個 学習"), done: todayCount, goal: 10 },
+          { emoji: "🗣️", label: tt(lang, "회화 1개 보기", "会話を1つ見る"), done: activity.conversation, goal: 1 },
+          { emoji: "🎯", label: tt(lang, "롤플레이·모의시험 1회", "ロールプレイ・模試 1回"), done: activity.roleplay + activity.exam, goal: 1 },
         ]} />
       </div>
 
@@ -77,9 +79,9 @@ export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewD
             style={{ background: "linear-gradient(135deg,#0984e3,#7209B7)" }}>
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-2xl" style={{ background: "rgba(255,255,255,.2)" }}>🔁</span>
             <span className="min-w-0 flex-1">
-              <span className="block text-xs font-bold text-white/80">오늘 복습</span>
-              <span className="block font-extrabold text-white">복습할 단어 {dueCount}개</span>
-              <span className="block text-xs text-white/85">간격 반복으로 지금 복습하기</span>
+              <span className="block text-xs font-bold text-white/80">{tt(lang, "오늘 복습", "今日の復習")}</span>
+              <span className="block font-extrabold text-white">{tt(lang, `복습할 단어 ${dueCount}개`, `復習する単語 ${dueCount}個`)}</span>
+              <span className="block text-xs text-white/85">{tt(lang, "간격 반복으로 지금 복습하기", "間隔反復で今すぐ復習")}</span>
             </span>
             <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
           </button>
@@ -94,9 +96,9 @@ export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewD
             style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-2xl" style={{ background: "rgba(255,255,255,.2)" }}>{resume.emoji}</span>
             <span className="min-w-0 flex-1">
-              <span className="block text-xs font-bold text-white/80">이어서 학습</span>
-              <span className="block font-extrabold text-white">{resume.label}</span>
-              <span className="block text-xs text-white/85">{resumeKnown}/{resumeWords.length} 익힘 · 탭하여 계속</span>
+              <span className="block text-xs font-bold text-white/80">{tt(lang, "이어서 학습", "続きから学習")}</span>
+              <span className="block font-extrabold text-white">{lang === "ja" ? (resume.labelJa ?? resume.label) : resume.label}</span>
+              <span className="block text-xs text-white/85">{tt(lang, `${resumeKnown}/${resumeWords.length} 익힘 · 탭하여 계속`, `${resumeKnown}/${resumeWords.length} 習得・タップで続ける`)}</span>
             </span>
             <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
           </button>
@@ -115,14 +117,14 @@ export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewD
           <div className="space-y-3 rounded-2xl p-4" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>📖 회화 읽음</span>
+                <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>{tt(lang, "📖 회화 읽음", "📖 会話を読んだ")}</span>
                 <span className="text-sm font-bold" style={{ color: "var(--text-2)" }}>{convRead} / {rpTotal}</span>
               </div>
               <Progress value={rpTotal ? (convRead / rpTotal) * 100 : 0} indicatorStyle={{ background: "linear-gradient(90deg,#10B981,#55efc4)" }} />
             </div>
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>🗣️ 롤플레이</span>
+                <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>{tt(lang, "🗣️ 롤플레이", "🗣️ ロールプレイ")}</span>
                 <span className="text-sm font-bold" style={{ color: "var(--text-2)" }}>{rpDone} / {rpTotal}</span>
               </div>
               <Progress value={rpTotal ? (rpDone / rpTotal) * 100 : 0} indicatorStyle={{ background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
@@ -136,13 +138,13 @@ export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewD
         <div className="px-5 pb-3">
           <div className="rounded-2xl p-4" style={{ background: "linear-gradient(135deg,#4361EE12,#7209B712)", border: "1px solid var(--border)" }}>
             <div className="mb-1.5 flex items-center justify-between">
-              <span className="text-xs font-extrabold" style={{ color: "#4361EE" }}>🌍 오늘의 표현</span>
-              <button onClick={() => toggle(todayPhrase.en)} aria-label="즐겨찾기" className="text-lg" style={{ color: has(todayPhrase.en) ? "#f0932b" : "var(--text-3)" }}>{has(todayPhrase.en) ? "★" : "☆"}</button>
+              <span className="text-xs font-extrabold" style={{ color: "#4361EE" }}>{tt(lang, "🌍 오늘의 표현", "🌍 今日の表現")}</span>
+              <button onClick={() => toggle(todayPhrase.en)} aria-label={tt(lang, "즐겨찾기", "お気に入り")} className="text-lg" style={{ color: has(todayPhrase.en) ? "#f0932b" : "var(--text-3)" }}>{has(todayPhrase.en) ? "★" : "☆"}</button>
             </div>
             <button onClick={() => speakEn(todayPhrase.en)} className="w-full text-left">
               <p className="text-lg font-extrabold leading-snug" style={{ color: "var(--text-1)" }}>{todayPhrase.en}</p>
               <p className="mt-0.5 text-xs" style={{ color: "var(--text-3)" }}>{todayPhrase.pronunciation}</p>
-              <p className="mt-1 text-sm" style={{ color: "var(--text-2)" }}>{todayPhrase.ko} · 🔊 눌러 듣기</p>
+              <p className="mt-1 text-sm" style={{ color: "var(--text-2)" }}>{todayPhrase.ko} · {tt(lang, "🔊 눌러 듣기", "🔊 タップで再生")}</p>
             </button>
           </div>
         </div>
@@ -157,7 +159,7 @@ export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewD
           const pct = total ? Math.round((learned / total) * 100) : 0;
           const est = Math.max(1, Math.round(total * 0.3));
           const first = words[0];
-          const status = learned === 0 ? "시작 전" : learned >= total ? "완료 🎉" : `${learned}/${total} 완료`;
+          const status = learned === 0 ? tt(lang, "시작 전", "未開始") : learned >= total ? tt(lang, "완료 🎉", "完了 🎉") : tt(lang, `${learned}/${total} 완료`, `${learned}/${total} 完了`);
           const grad = LEVEL_GRAD[first?.cefrLevel] ?? ["#4361EE", "#7209B7"];
 
           return (
@@ -177,7 +179,7 @@ export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewD
                     <p className="truncate text-xs text-white/85">{first?.pronunciation} · {first?.meaning}</p>
                   </div>
                   <span className="absolute right-2 top-2 rounded-full bg-black/35 px-2 py-0.5 text-[11px] font-bold text-white backdrop-blur-sm">
-                    {total}장
+                    {total}{tt(lang, "장", "枚")}
                   </span>
                 </div>
               </div>
@@ -186,7 +188,7 @@ export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewD
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <span className="text-base">{cat.emoji}</span>
-                    <h3 className="text-lg font-extrabold" style={{ color: "var(--text-1)" }}>{cat.label}</h3>
+                    <h3 className="text-lg font-extrabold" style={{ color: "var(--text-1)" }}>{lang === "ja" ? (cat.labelJa ?? cat.label) : cat.label}</h3>
                   </div>
                   <span className="rounded-full px-2 py-0.5 text-[11px] font-bold"
                     style={{ background: "var(--surface)", color: "var(--text-3)" }}>
@@ -197,16 +199,20 @@ export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewD
                 <Progress value={pct} className="mt-3" indicatorStyle={{ background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
                 <div className="mt-1.5 flex items-center justify-between text-xs" style={{ color: "var(--text-3)" }}>
                   <span>{status}</span>
-                  <span>~{est}분</span>
+                  <span>~{est}{tt(lang, "분", "分")}</span>
                 </div>
 
                 <p className="pt-3 text-center text-sm" style={{ color: "var(--text-2)" }}>
-                  {unknown > 0 ? <>모르는 단어 <strong style={{ color: "var(--text-1)" }}>{unknown}개</strong>를 골라주세요.</> : "모두 익혔어요! 복습해 볼까요?"}
+                  {unknown > 0
+                    ? (lang === "ja"
+                        ? <>知らない単語 <strong style={{ color: "var(--text-1)" }}>{unknown}個</strong>を選んでください。</>
+                        : <>모르는 단어 <strong style={{ color: "var(--text-1)" }}>{unknown}개</strong>를 골라주세요.</>)
+                    : tt(lang, "모두 익혔어요! 복습해 볼까요?", "全部覚えました！復習しましょう。")}
                 </p>
 
                 <Button variant="accent" size="free" onClick={() => onStudyCategory(cat.key)}
                   className="mt-3 w-full py-3.5 text-sm">
-                  바로 시작
+                  {tt(lang, "바로 시작", "今すぐ始める")}
                 </Button>
               </div>
             </div>
@@ -215,7 +221,7 @@ export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewD
       </div>
 
       <div className="mb-3 mt-7 px-5">
-        <h2 className="text-lg font-extrabold" style={{ color: "var(--text-1)" }}>더 학습하기</h2>
+        <h2 className="text-lg font-extrabold" style={{ color: "var(--text-1)" }}>{tt(lang, "더 학습하기", "もっと学習")}</h2>
       </div>
       <div className="px-5">
         <button onClick={onGrammar}
@@ -223,8 +229,8 @@ export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewD
           style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
           <span className="text-2xl">📖</span>
           <div>
-            <p className="font-bold" style={{ color: "var(--text-1)" }}>문법 · 구동사</p>
-            <p className="text-xs" style={{ color: "var(--text-3)" }}>핵심 문법과 구동사를 한 번에</p>
+            <p className="font-bold" style={{ color: "var(--text-1)" }}>{tt(lang, "문법 · 구동사", "文法・句動詞")}</p>
+            <p className="text-xs" style={{ color: "var(--text-3)" }}>{tt(lang, "핵심 문법과 구동사를 한 번에", "重要文法と句動詞をまとめて")}</p>
           </div>
           <svg viewBox="0 0 24 24" className="ml-auto h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text-3)" }}><path d="m9 18 6-6-6-6" /></svg>
         </button>

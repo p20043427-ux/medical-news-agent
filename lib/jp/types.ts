@@ -123,5 +123,6 @@ export interface Conversation {
 export interface Category {
   key: string;
   label: string;
+  labelJa?: string;
   emoji: string;
 }

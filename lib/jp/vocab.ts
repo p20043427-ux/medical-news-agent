@@ -8,19 +8,19 @@ import { VOCAB_B4 } from "./vocab-b4";
 import { VOCAB_B5 } from "./vocab-b5";
 
 export const VOCAB_CATEGORIES: Category[] = [
-  { key: "greeting", label: "인사·표현", emoji: "👋" },
-  { key: "people", label: "사람·가족", emoji: "👨‍👩‍👧" },
-  { key: "number", label: "숫자·수량", emoji: "🔢" },
-  { key: "time", label: "시간·날짜", emoji: "🕒" },
-  { key: "food", label: "음식·식사", emoji: "🍙" },
-  { key: "place", label: "장소·교통", emoji: "🚉" },
-  { key: "adjective", label: "형용사", emoji: "✨" },
-  { key: "daily", label: "생활·사물", emoji: "🏠" },
-  { key: "nature", label: "자연·날씨", emoji: "🌿" },
-  { key: "body", label: "신체·건강", emoji: "🩺" },
-  { key: "hobby", label: "취미·활동", emoji: "🎵" },
-  { key: "color", label: "색·모양", emoji: "🎨" },
-  { key: "adverb", label: "부사·기타", emoji: "💬" },
+  { key: "greeting", label: "인사·표현", labelJa: "あいさつ・表現", emoji: "👋" },
+  { key: "people", label: "사람·가족", labelJa: "人・家族", emoji: "👨‍👩‍👧" },
+  { key: "number", label: "숫자·수량", labelJa: "数・数量", emoji: "🔢" },
+  { key: "time", label: "시간·날짜", labelJa: "時間・日付", emoji: "🕒" },
+  { key: "food", label: "음식·식사", labelJa: "食べ物・食事", emoji: "🍙" },
+  { key: "place", label: "장소·교통", labelJa: "場所・交通", emoji: "🚉" },
+  { key: "adjective", label: "형용사", labelJa: "形容詞", emoji: "✨" },
+  { key: "daily", label: "생활·사물", labelJa: "生活・物", emoji: "🏠" },
+  { key: "nature", label: "자연·날씨", labelJa: "自然・天気", emoji: "🌿" },
+  { key: "body", label: "신체·건강", labelJa: "体・健康", emoji: "🩺" },
+  { key: "hobby", label: "취미·활동", labelJa: "趣味・活動", emoji: "🎵" },
+  { key: "color", label: "색·모양", labelJa: "色・形", emoji: "🎨" },
+  { key: "adverb", label: "부사·기타", labelJa: "副詞・その他", emoji: "💬" },
 ];
 
 const RAW_VOCAB: Word[] = [

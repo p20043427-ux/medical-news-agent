@@ -1,6 +1,7 @@
 "use client";
 
 import { Progress } from "@/components/ui";
+import { useUiLang, tt } from "@/lib/i18n";
 
 export interface Mission {
   emoji: string;
@@ -11,13 +12,14 @@ export interface Mission {
 
 // 오늘의 미션 카드 (JP·EN 홈 공용)
 export default function DailyMissions({ missions, accent = "#E63946" }: { missions: Mission[]; accent?: string }) {
+  const lang = useUiLang();
   const cleared = missions.filter((m) => m.done >= m.goal).length;
   const all = cleared === missions.length;
 
   return (
     <div className="rounded-2xl p-4" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
       <div className="mb-2.5 flex items-center justify-between">
-        <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>{all ? "🎉 오늘의 미션 완료!" : "🎯 오늘의 미션"}</span>
+        <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>{all ? tt(lang, "🎉 오늘의 미션 완료!", "🎉 今日のミッション完了！") : tt(lang, "🎯 오늘의 미션", "🎯 今日のミッション")}</span>
         <span className="text-xs font-bold" style={{ color: all ? "#10B981" : "var(--text-3)" }}>{cleared} / {missions.length}</span>
       </div>
       <div className="space-y-2">

@@ -5,16 +5,16 @@ import { EN_VOCAB_EC } from "./vocab-ec";
 import { EN_VOCAB_ED } from "./vocab-ed";
 
 export const EN_CATEGORIES: EnCategory[] = [
-  { key: "basic-verbs",   label: "기초 동사",       emoji: "⚡", cefrRange: "A1–A2" },
-  { key: "daily-life",    label: "일상생활",         emoji: "🏠", cefrRange: "A1–A2" },
-  { key: "emotions",      label: "감정·성격",        emoji: "❤️", cefrRange: "A2–B1" },
-  { key: "travel",        label: "여행·교통",        emoji: "✈️", cefrRange: "A2–B1" },
-  { key: "health",        label: "건강·신체",        emoji: "🏥", cefrRange: "A2–B1" },
-  { key: "workplace",     label: "직장·비즈니스",    emoji: "💼", cefrRange: "B1–B2" },
-  { key: "academic",      label: "학문·교육",        emoji: "📚", cefrRange: "B2–C1" },
-  { key: "adjectives",    label: "형용사",           emoji: "🎨", cefrRange: "A1–B1" },
-  { key: "society",       label: "사회·환경",        emoji: "🌍", cefrRange: "B1–B2" },
-  { key: "advanced",      label: "고급 어휘",        emoji: "💎", cefrRange: "C1–C2" },
+  { key: "basic-verbs",   label: "기초 동사",       labelJa: "基礎動詞",       emoji: "⚡", cefrRange: "A1–A2" },
+  { key: "daily-life",    label: "일상생활",         labelJa: "日常生活",       emoji: "🏠", cefrRange: "A1–A2" },
+  { key: "emotions",      label: "감정·성격",        labelJa: "感情・性格",     emoji: "❤️", cefrRange: "A2–B1" },
+  { key: "travel",        label: "여행·교통",        labelJa: "旅行・交通",     emoji: "✈️", cefrRange: "A2–B1" },
+  { key: "health",        label: "건강·신체",        labelJa: "健康・体",       emoji: "🏥", cefrRange: "A2–B1" },
+  { key: "workplace",     label: "직장·비즈니스",    labelJa: "職場・ビジネス", emoji: "💼", cefrRange: "B1–B2" },
+  { key: "academic",      label: "학문·교육",        labelJa: "学問・教育",     emoji: "📚", cefrRange: "B2–C1" },
+  { key: "adjectives",    label: "형용사",           labelJa: "形容詞",         emoji: "🎨", cefrRange: "A1–B1" },
+  { key: "society",       label: "사회·환경",        labelJa: "社会・環境",     emoji: "🌍", cefrRange: "B1–B2" },
+  { key: "advanced",      label: "고급 어휘",        labelJa: "上級語彙",       emoji: "💎", cefrRange: "C1–C2" },
 ];
 
 const EN_VOCAB_BASE: EnWord[] = [
