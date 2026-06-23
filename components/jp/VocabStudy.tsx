@@ -6,6 +6,7 @@ import Flashcard from "./Flashcard";
 import SwipeCard from "./SwipeCard";
 import { Button, Switch, Progress } from "@/components/ui";
 import { track } from "@/lib/analytics";
+import { useUiLang, tt } from "@/lib/i18n";
 
 export default function VocabStudy({
   category,
@@ -30,6 +31,8 @@ export default function VocabStudy({
   bookmarks?: string[];
   onToggleBookmark?: (id: string) => void;
 }) {
+  const lang = useUiLang();
+  const catLabel = lang === "ja" ? (category.labelJa ?? category.label) : category.label;
   const [index, setIndex] = useState(0);
   const [known, setKnown] = useState(0);
   const [unknown, setUnknown] = useState(0);
@@ -60,19 +63,19 @@ export default function VocabStudy({
     return (
       <div className="flex flex-col items-center justify-center gap-5 px-6 py-16 text-center">
         <div className="animate-reward text-6xl">🎉</div>
-        <h2 className="text-2xl font-bold text-slate-900">스키밍 완료!</h2>
+        <h2 className="text-2xl font-bold text-slate-900">{tt(lang, "스키밍 완료!", "スキミング完了！")}</h2>
         <p className="text-slate-500">
-          {category.label} · 총 {total}개 중{" "}
-          <strong className="text-emerald-600">{known}개</strong> 알고 있어요.
+          {catLabel} · {tt(lang, `총 ${total}개 중 `, `全${total}個中 `)}
+          <strong className="text-emerald-600">{tt(lang, `${known}개`, `${known}個`)}</strong> {tt(lang, "알고 있어요.", "知っています。")}
           <br />
-          모르는 <strong className="text-slate-700">{unknown}개</strong>를 복습·퀴즈로 익혀요.
+          {tt(lang, "모르는 ", "わからない ")}<strong className="text-slate-700">{tt(lang, `${unknown}개`, `${unknown}個`)}</strong>{tt(lang, "를 복습·퀴즈로 익혀요.", "を復習・クイズで覚えましょう。")}
         </p>
         <div className="mt-2 grid w-full max-w-xs gap-2.5">
           <Button variant="brand" size="free" onClick={onReview} className="py-3.5">
-            🔁 복습 카드 시작
+            {tt(lang, "🔁 복습 카드 시작", "🔁 復習カード開始")}
           </Button>
           <Button variant="surface" size="free" onClick={onQuiz} className="py-3.5">
-            📝 퀴즈로 점검
+            {tt(lang, "📝 퀴즈로 점검", "📝 クイズで確認")}
           </Button>
           <button
             onClick={() => {
@@ -83,11 +86,11 @@ export default function VocabStudy({
             }}
             className="rounded-2xl py-2 text-sm font-semibold text-slate-400"
           >
-            다시 스키밍
+            {tt(lang, "다시 스키밍", "もう一度スキミング")}
           </button>
         </div>
         <button onClick={onExit} className="text-sm font-semibold text-slate-400">
-          홈으로
+          {tt(lang, "홈으로", "ホームへ")}
         </button>
       </div>
     );
@@ -99,7 +102,7 @@ export default function VocabStudy({
       <div className="relative flex items-center px-4 pb-2 pt-2">
         <button
           onClick={onExit}
-          aria-label="뒤로"
+          aria-label={tt(lang, "뒤로", "戻る")}
           className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100"
         >
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
@@ -120,7 +123,7 @@ export default function VocabStudy({
 
         <button
           onClick={() => setMenuOpen((o) => !o)}
-          aria-label="설정"
+          aria-label={tt(lang, "설정", "設定")}
           className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100"
         >
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
@@ -131,19 +134,19 @@ export default function VocabStudy({
             <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
             <div className="absolute right-4 top-12 z-30 w-44 overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/5">
               <div className="flex w-full items-center justify-between px-4 py-3 text-sm text-slate-700">
-                후리가나
+                {tt(lang, "후리가나", "ふりがな")}
                 <Switch
                   checked={showFurigana}
                   onCheckedChange={() => onToggleFurigana()}
-                  aria-label="후리가나 표시"
+                  aria-label={tt(lang, "후리가나 표시", "ふりがな表示")}
                 />
               </div>
               <div className="flex w-full items-center justify-between border-t border-slate-100 px-4 py-3 text-sm text-slate-700">
-                뜻 숨기기
+                {tt(lang, "뜻 숨기기", "意味を隠す")}
                 <Switch
                   checked={hideMeaning}
                   onCheckedChange={setHideMeaning}
-                  aria-label="뜻 숨기기"
+                  aria-label={tt(lang, "뜻 숨기기", "意味を隠す")}
                 />
               </div>
             </div>
@@ -171,7 +174,7 @@ export default function VocabStudy({
           </SwipeCard>
         )}
         <p className="mt-3 text-center text-xs text-slate-400">
-          ← 알고 있어요 · 학습할게요 → · 카드를 좌우로 밀어보세요
+          {tt(lang, "← 알고 있어요 · 학습할게요 → · 카드를 좌우로 밀어보세요", "← 知っている · 学習する → · カードを左右にスワイプ")}
         </p>
       </div>
 
@@ -179,11 +182,11 @@ export default function VocabStudy({
       <div className="sticky bottom-16 z-10 flex gap-3 bg-gradient-to-t from-[#f5f6f8] via-[#f5f6f8] to-transparent px-4 pb-4 pt-6">
         <Button variant="success" size="free" onClick={() => next(true)} className="flex-1 py-4">
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
-          알고 있어요
+          {tt(lang, "알고 있어요", "知っている")}
         </Button>
         <Button variant="dark" size="free" onClick={() => next(false)} className="flex-1 py-4">
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-          학습할게요
+          {tt(lang, "학습할게요", "学習する")}
         </Button>
       </div>
     </div>

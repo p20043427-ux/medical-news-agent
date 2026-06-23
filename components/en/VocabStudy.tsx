@@ -6,6 +6,7 @@ import type { EnProgress } from "@/lib/en/progress";
 import { speakEn } from "@/lib/en/speech";
 import { isLearned } from "@/lib/en/progress";
 import { Button, Progress } from "@/components/ui";
+import { useUiLang, tt } from "@/lib/i18n";
 
 const CEFR_COLORS: Record<string, string> = {
   A1: "#10B981", A2: "#3B82F6", B1: "#8B5CF6", B2: "#EC4899", C1: "#F59E0B", C2: "#EF4444",
@@ -22,6 +23,8 @@ export default function EnVocabStudy({
   onQuiz: () => void;
   progress: EnProgress;
 }) {
+  const lang = useUiLang();
+  const catLabel = lang === "ja" ? (category.labelJa ?? category.label) : category.label;
   const [idx, setIdx] = useState(0);
   const [showMeaning, setShowMeaning] = useState(false);
   const [showExtra, setShowExtra] = useState(false);
@@ -39,22 +42,22 @@ export default function EnVocabStudy({
     return (
       <div className="flex flex-col items-center justify-center gap-5 px-6 py-20 text-center">
         <div className="text-6xl">🎉</div>
-        <h2 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>단어 학습 완료!</h2>
+        <h2 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{tt(lang, "단어 학습 완료!", "単語学習完了！")}</h2>
         <p style={{ color: "var(--text-3)" }}>
-          <strong style={{ color: "var(--text-1)" }}>{done}</strong>개 단어를 학습했어요.
+          <strong style={{ color: "var(--text-1)" }}>{done}</strong>{tt(lang, "개 단어를 학습했어요.", "個の単語を学習しました。")}
         </p>
         <div className="grid w-full max-w-xs gap-2.5">
           <Button variant="accent" size="free" onClick={onReview}
             className="py-3.5">
-            🔁 SM-2 복습하기
+            {tt(lang, "🔁 SM-2 복습하기", "🔁 SM-2 復習")}
           </Button>
           <Button variant="accent" size="free" onClick={onQuiz}
             className="py-3.5">
-            📝 퀴즈 도전
+            {tt(lang, "📝 퀴즈 도전", "📝 クイズに挑戦")}
           </Button>
           <Button variant="surface" size="free" onClick={onExit}
             className="py-3.5">
-            홈으로
+            {tt(lang, "홈으로", "ホームへ")}
           </Button>
         </div>
       </div>
@@ -93,7 +96,7 @@ export default function EnVocabStudy({
         </button>
         <div className="mx-auto flex items-center gap-2">
           <span className="text-xs font-bold" style={{ color: "var(--text-2)" }}>
-            {category.emoji} {category.label}
+            {category.emoji} {catLabel}
           </span>
           <span className="rounded-full px-2 py-0.5 text-xs font-bold text-white"
             style={{ background: CEFR_COLORS[word.cefrLevel] ?? "#4361EE" }}>
@@ -147,7 +150,7 @@ export default function EnVocabStudy({
                 <p className="mt-1.5 text-sm" style={{ color: "var(--text-3)" }}>{word.example.ko}</p>
                 <button onClick={() => speakEn(word.example.en)} className="mt-2 text-xs font-semibold"
                   style={{ color: "#4361EE" }}>
-                  🔊 예문 듣기
+                  {tt(lang, "🔊 예문 듣기", "🔊 例文を聞く")}
                 </button>
               </div>
 
@@ -155,14 +158,14 @@ export default function EnVocabStudy({
               <button onClick={() => setShowExtra((s) => !s)}
                 className="text-sm font-semibold"
                 style={{ color: "#4361EE" }}>
-                {showExtra ? "▲ 접기" : "▼ 더 보기 (파생어·동의어·콜로케이션)"}
+                {showExtra ? tt(lang, "▲ 접기", "▲ 閉じる") : tt(lang, "▼ 더 보기 (파생어·동의어·콜로케이션)", "▼ もっと見る（派生語・類義語・コロケーション）")}
               </button>
 
               {showExtra && (
                 <div className="space-y-2.5">
                   {word.synonyms && (
                     <div>
-                      <p className="text-xs font-bold mb-1" style={{ color: "var(--text-3)" }}>동의어</p>
+                      <p className="text-xs font-bold mb-1" style={{ color: "var(--text-3)" }}>{tt(lang, "동의어", "類義語")}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {word.synonyms.map((s) => (
                           <span key={s} className="rounded-full px-2.5 py-1 text-xs font-semibold"
@@ -175,7 +178,7 @@ export default function EnVocabStudy({
                   )}
                   {word.antonyms && (
                     <div>
-                      <p className="text-xs font-bold mb-1" style={{ color: "var(--text-3)" }}>반의어</p>
+                      <p className="text-xs font-bold mb-1" style={{ color: "var(--text-3)" }}>{tt(lang, "반의어", "対義語")}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {word.antonyms.map((a) => (
                           <span key={a} className="rounded-full px-2.5 py-1 text-xs font-semibold"
@@ -188,7 +191,7 @@ export default function EnVocabStudy({
                   )}
                   {word.wordFamily && (
                     <div>
-                      <p className="text-xs font-bold mb-1" style={{ color: "var(--text-3)" }}>파생어</p>
+                      <p className="text-xs font-bold mb-1" style={{ color: "var(--text-3)" }}>{tt(lang, "파생어", "派生語")}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {word.wordFamily.map((w) => (
                           <span key={w} className="rounded-full px-2.5 py-1 text-xs font-semibold"
@@ -201,7 +204,7 @@ export default function EnVocabStudy({
                   )}
                   {word.collocations && (
                     <div>
-                      <p className="text-xs font-bold mb-1" style={{ color: "var(--text-3)" }}>자주 쓰이는 표현</p>
+                      <p className="text-xs font-bold mb-1" style={{ color: "var(--text-3)" }}>{tt(lang, "자주 쓰이는 표현", "よく使う表現")}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {word.collocations.map((c) => (
                           <span key={c} className="rounded-full px-2.5 py-1 text-xs font-semibold"
@@ -224,7 +227,7 @@ export default function EnVocabStudy({
             <button onClick={() => setShowMeaning(true)}
               className="mt-5 rounded-xl px-4 py-2 text-sm"
               style={{ background: "var(--surface)", color: "var(--text-3)" }}>
-              👆 탭하면 뜻이 보여요
+              {tt(lang, "👆 탭하면 뜻이 보여요", "👆 タップで意味を表示")}
             </button>
           )}
         </div>
@@ -232,7 +235,7 @@ export default function EnVocabStudy({
         {/* 이미 학습한 단어 표시 */}
         {isLearned(progress, word.id) && (
           <div className="mt-2 flex items-center justify-center gap-1.5">
-            <span className="text-xs" style={{ color: "#10B981" }}>✓ 이미 학습한 단어</span>
+            <span className="text-xs" style={{ color: "#10B981" }}>{tt(lang, "✓ 이미 학습한 단어", "✓ 学習済みの単語")}</span>
           </div>
         )}
       </div>
@@ -244,17 +247,17 @@ export default function EnVocabStudy({
           <div className="grid grid-cols-2 gap-3">
             <Button variant="surface" size="free" onClick={next}
               className="py-4">
-              다음 →
+              {tt(lang, "다음 →", "次へ →")}
             </Button>
             <Button variant="success" size="free" onClick={handleKnow}
               className="py-4">
-              ✓ 알고 있어요
+              {tt(lang, "✓ 알고 있어요", "✓ 知っている")}
             </Button>
           </div>
         ) : (
           <Button variant="accent" size="free" onClick={() => setShowMeaning(true)}
             className="w-full py-4">
-            뜻 확인하기
+            {tt(lang, "뜻 확인하기", "意味を確認")}
           </Button>
         )}
       </div>

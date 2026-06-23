@@ -7,12 +7,13 @@ import { dueIds } from "@/lib/en/progress";
 import { speakEn } from "@/lib/en/speech";
 import PronounceButton from "@/components/PronounceButton";
 import { Button, Progress } from "@/components/ui";
+import { useUiLang, tt } from "@/lib/i18n";
 
-const GRADE_CONFIG: Record<EnGrade, { label: string; sub: string; bg: string; xp: string }> = {
-  again: { label: "다시",   sub: "1일",    bg: "#EF4444", xp: "+2" },
-  hard:  { label: "어려움", sub: "짧게",   bg: "#F97316", xp: "+10" },
-  good:  { label: "좋음",   sub: "며칠 뒤", bg: "#3B82F6", xp: "+15" },
-  easy:  { label: "쉬움",   sub: "길게",   bg: "#10B981", xp: "+20" },
+const GRADE_CONFIG: Record<EnGrade, { label: [string, string]; sub: [string, string]; bg: string; xp: string }> = {
+  again: { label: ["다시", "もう一度"],   sub: ["1일", "1日"],    bg: "#EF4444", xp: "+2" },
+  hard:  { label: ["어려움", "難しい"], sub: ["짧게", "短め"],   bg: "#F97316", xp: "+10" },
+  good:  { label: ["좋음", "普通"],   sub: ["며칠 뒤", "数日後"], bg: "#3B82F6", xp: "+15" },
+  easy:  { label: ["쉬움", "簡単"],   sub: ["길게", "長め"],   bg: "#10B981", xp: "+20" },
 };
 
 export default function EnReviewMode({
@@ -25,6 +26,7 @@ export default function EnReviewMode({
   onQuiz: () => void;
   progress: EnProgress;
 }) {
+  const lang = useUiLang();
   const dueList = useMemo(() => dueIds(progress, words.map((w) => w.id)), [progress, words]);
   const byId = useMemo(() => new Map(words.map((w) => [w.id, w])), [words]);
 
@@ -44,16 +46,16 @@ export default function EnReviewMode({
     return (
       <div className="flex flex-col items-center justify-center gap-5 px-6 py-20 text-center">
         <div className="text-6xl">✅</div>
-        <h2 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>복습 완료!</h2>
-        <p style={{ color: "var(--text-3)" }}>총 <strong style={{ color: "var(--text-1)" }}>{reviewed}개</strong> 복습했어요.</p>
+        <h2 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{tt(lang, "복습 완료!", "復習完了！")}</h2>
+        <p style={{ color: "var(--text-3)" }}>{tt(lang, "총 ", "計 ")}<strong style={{ color: "var(--text-1)" }}>{tt(lang, `${reviewed}개`, `${reviewed}個`)}</strong> {tt(lang, "복습했어요.", "復習しました。")}</p>
         <div className="grid w-full max-w-xs gap-2.5">
           <Button variant="accent" size="free" onClick={onQuiz}
             className="py-3.5">
-            📝 퀴즈 도전
+            {tt(lang, "📝 퀴즈 도전", "📝 クイズに挑戦")}
           </Button>
           <Button variant="surface" size="free" onClick={onExit}
             className="py-3.5">
-            홈으로
+            {tt(lang, "홈으로", "ホームへ")}
           </Button>
         </div>
       </div>
@@ -86,11 +88,11 @@ export default function EnReviewMode({
         <div className="mx-auto flex items-center gap-2">
           <span className="rounded-full px-3 py-1 text-xs font-bold text-white"
             style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
-            🔁 SM-2 복습
+            {tt(lang, "🔁 SM-2 복습", "🔁 SM-2 復習")}
           </span>
           <span className="rounded-full px-2.5 py-1 text-sm font-bold"
             style={{ background: "var(--card)", color: "var(--text-3)" }}>
-            남은 {remaining}장
+            {tt(lang, `남은 ${remaining}장`, `残り${remaining}枚`)}
           </span>
         </div>
         <span className="h-9 w-9" />
@@ -105,7 +107,7 @@ export default function EnReviewMode({
         <div
           role="button"
           tabIndex={0}
-          aria-label={revealed ? undefined : "탭하면 답 보기"}
+          aria-label={revealed ? undefined : tt(lang, "탭하면 답 보기", "タップで答えを見る")}
           onClick={() => !revealed && setRevealed(true)}
           onKeyDown={(e) => { if (!revealed && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); setRevealed(true); } }}
           className="flex min-h-[340px] w-full cursor-pointer flex-col items-center justify-center gap-4 rounded-3xl p-8 text-center shadow-xl"
@@ -136,7 +138,7 @@ export default function EnReviewMode({
               <div className="rounded-2xl p-4 text-left" style={{ background: "var(--surface)" }}>
                 <div className="flex items-start gap-2">
                   <p className="flex-1 leading-relaxed" style={{ color: "var(--text-2)" }}>&quot;{word.example.en}&quot;</p>
-                  <button onClick={(e) => { e.stopPropagation(); speakEn(word.example.en); }} aria-label="예문 듣기"
+                  <button onClick={(e) => { e.stopPropagation(); speakEn(word.example.en); }} aria-label={tt(lang, "예문 듣기", "例文を聞く")}
                     className="grid h-8 w-8 shrink-0 place-items-center rounded-full" style={{ background: "var(--card)", color: "#4361EE" }}>🔊</button>
                 </div>
                 <p className="mt-1.5 text-sm" style={{ color: "var(--text-3)" }}>{word.example.ko}</p>
@@ -155,7 +157,7 @@ export default function EnReviewMode({
           ) : (
             <p className="mt-4 rounded-full px-4 py-2 text-sm"
               style={{ background: "var(--surface)", color: "var(--text-3)" }}>
-              👆 탭하면 답이 보여요
+              {tt(lang, "👆 탭하면 답이 보여요", "👆 タップで答えを表示")}
             </p>
           )}
         </div>
@@ -181,8 +183,8 @@ export default function EnReviewMode({
                 <button key={g} onClick={() => handleGrade(g)}
                   className="rounded-2xl py-3.5 font-bold text-white shadow-sm active:scale-95 transition"
                   style={{ background: cfg.bg }}>
-                  <span className="block text-sm">{cfg.label}</span>
-                  <span className="block text-[10px] font-medium text-white/70">{cfg.sub}</span>
+                  <span className="block text-sm">{tt(lang, cfg.label[0], cfg.label[1])}</span>
+                  <span className="block text-[10px] font-medium text-white/70">{tt(lang, cfg.sub[0], cfg.sub[1])}</span>
                 </button>
               );
             })}
@@ -190,7 +192,7 @@ export default function EnReviewMode({
         ) : (
           <Button variant="accent" size="free" onClick={() => setRevealed(true)}
             className="w-full py-4">
-            답 확인
+            {tt(lang, "답 확인", "答えを確認")}
           </Button>
         )}
       </div>

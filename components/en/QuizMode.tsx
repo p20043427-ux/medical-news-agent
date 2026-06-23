@@ -7,6 +7,7 @@ import { speakEn } from "@/lib/en/speech";
 import { Button, Progress } from "@/components/ui";
 import { shuffle } from "@/lib/learn/shuffle";
 import { track } from "@/lib/analytics";
+import { useUiLang, tt } from "@/lib/i18n";
 
 export default function EnQuizMode({
   words, onGrade, onExit, onReview,
@@ -16,6 +17,7 @@ export default function EnQuizMode({
   onExit: () => void;
   onReview: () => void;
 }) {
+  const lang = useUiLang();
   const pool = useMemo(() => shuffle(words).slice(0, 20), [words]);
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -29,21 +31,21 @@ export default function EnQuizMode({
     return (
       <div className="flex flex-col items-center justify-center gap-5 px-6 py-20 text-center">
         <div className="text-6xl">{pct >= 80 ? "🏆" : pct >= 60 ? "👍" : "📚"}</div>
-        <h2 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>퀴즈 완료!</h2>
+        <h2 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{tt(lang, "퀴즈 완료!", "クイズ完了！")}</h2>
         <div className="rounded-3xl p-6 w-full max-w-xs" style={{ background: "var(--card)" }}>
           <p className="text-5xl font-extrabold" style={{ color: "#4361EE" }}>{score}<span className="text-2xl text-slate-400">/{total}</span></p>
-          <p className="mt-1 text-lg font-semibold" style={{ color: "var(--text-2)" }}>{pct}% 정답</p>
-          {pct >= 80 && <p className="mt-2 text-sm text-emerald-500">완벽해요! 🎉</p>}
-          {pct < 80 && <p className="mt-2 text-sm" style={{ color: "var(--text-3)" }}>복습을 통해 더 완벽하게!</p>}
+          <p className="mt-1 text-lg font-semibold" style={{ color: "var(--text-2)" }}>{tt(lang, `${pct}% 정답`, `正答率 ${pct}%`)}</p>
+          {pct >= 80 && <p className="mt-2 text-sm text-emerald-500">{tt(lang, "완벽해요! 🎉", "完璧です！🎉")}</p>}
+          {pct < 80 && <p className="mt-2 text-sm" style={{ color: "var(--text-3)" }}>{tt(lang, "복습을 통해 더 완벽하게!", "復習でさらに完璧に！")}</p>}
         </div>
         <div className="grid w-full max-w-xs gap-2.5">
           <Button variant="accent" size="free" onClick={onReview}
             className="py-3.5">
-            🔁 복습하기
+            {tt(lang, "🔁 복습하기", "🔁 復習する")}
           </Button>
           <Button variant="surface" size="free" onClick={onExit}
             className="py-3.5">
-            홈으로
+            {tt(lang, "홈으로", "ホームへ")}
           </Button>
         </div>
       </div>
@@ -82,7 +84,7 @@ export default function EnQuizMode({
         <div className="mx-auto flex items-center gap-2">
           <span className="rounded-full px-3 py-1 text-xs font-bold text-white"
             style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
-            📝 퀴즈
+            {tt(lang, "📝 퀴즈", "📝 クイズ")}
           </span>
           <span className="text-xs font-semibold" style={{ color: "var(--text-3)" }}>
             {idx + 1}/{pool.length}
@@ -100,7 +102,7 @@ export default function EnQuizMode({
       {/* 문제 */}
       <div className="flex flex-1 flex-col px-4 gap-4">
         <div className="rounded-3xl p-6 text-center shadow-xl" style={{ background: "var(--card)" }}>
-          <p className="text-xs mb-3" style={{ color: "var(--text-3)" }}>다음 단어의 한국어 뜻은?</p>
+          <p className="text-xs mb-3" style={{ color: "var(--text-3)" }}>{tt(lang, "다음 단어의 한국어 뜻은?", "次の単語の意味は？")}</p>
           <div className="flex items-center justify-center gap-3 mb-2">
             <h2 className="text-4xl font-extrabold" style={{ color: "#4361EE" }}>{word.word}</h2>
             <button onClick={() => speakEn(word.word)}

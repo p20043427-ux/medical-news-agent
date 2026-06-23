@@ -7,12 +7,13 @@ import Furigana from "./Furigana";
 import SpeakerButton from "./SpeakerButton";
 import PronounceButton from "@/components/PronounceButton";
 import { Button, Progress } from "@/components/ui";
+import { useUiLang, tt } from "@/lib/i18n";
 
-const GRADE_CONFIG: Record<Grade, { label: string; sub: string; grad: [string, string]; xp: string; icon: string }> = {
-  again: { label: "다시",   sub: "1일",   grad: ["#ff7675", "#d63031"], xp: "+2",  icon: "↺" },
-  hard:  { label: "어려움", sub: "짧게",  grad: ["#fdcb6e", "#e17055"], xp: "+10", icon: "△" },
-  good:  { label: "좋음",   sub: "며칠",  grad: ["#74b9ff", "#0984e3"], xp: "+15", icon: "○" },
-  easy:  { label: "쉬움",   sub: "길게",  grad: ["#55efc4", "#00b894"], xp: "+20", icon: "✦" },
+const GRADE_CONFIG: Record<Grade, { label: [string, string]; sub: [string, string]; grad: [string, string]; xp: string; icon: string }> = {
+  again: { label: ["다시", "もう一度"],   sub: ["1일", "1日"],     grad: ["#ff7675", "#d63031"], xp: "+2",  icon: "↺" },
+  hard:  { label: ["어려움", "難しい"], sub: ["짧게", "短め"],  grad: ["#fdcb6e", "#e17055"], xp: "+10", icon: "△" },
+  good:  { label: ["좋음", "普通"],   sub: ["며칠", "数日"],  grad: ["#74b9ff", "#0984e3"], xp: "+15", icon: "○" },
+  easy:  { label: ["쉬움", "簡単"],   sub: ["길게", "長め"],  grad: ["#55efc4", "#00b894"], xp: "+20", icon: "✦" },
 };
 
 export default function ReviewMode({
@@ -25,6 +26,8 @@ export default function ReviewMode({
   onExit: () => void;
   onQuiz: () => void;
 }) {
+  const lang = useUiLang();
+  const catLabel = lang === "ja" ? (category.labelJa ?? category.label) : category.label;
   const initial = useMemo(() => words.map((w) => w.id), [words]);
   const byId = useMemo(() => new Map(words.map((w) => [w.id, w])), [words]);
 
@@ -44,19 +47,19 @@ export default function ReviewMode({
         <div className="grid h-20 w-20 place-items-center rounded-full" style={{ background: "linear-gradient(135deg,#55efc4,#00b894)" }}>
           <svg viewBox="0 0 24 24" className="h-10 w-10" fill="none" stroke="white" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
         </div>
-        <h2 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>복습 완료!</h2>
+        <h2 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{tt(lang, "복습 완료!", "復習完了！")}</h2>
         <p style={{ color: "var(--text-3)" }}>
-          {category.label} 카드 <strong style={{ color: "var(--text-1)" }}>{reviewed}회</strong> 복습했어요.
+          {catLabel} {tt(lang, "카드 ", "カード ")}<strong style={{ color: "var(--text-1)" }}>{tt(lang, `${reviewed}회`, `${reviewed}回`)}</strong> {tt(lang, "복습했어요.", "復習しました。")}
         </p>
         <div className="mt-2 grid w-full max-w-xs gap-2.5">
           <button onClick={onQuiz}
             className="flex items-center justify-center gap-2 rounded-2xl py-3.5 font-bold text-white shadow-md"
             style={{ background: "linear-gradient(135deg,#E63946,#F4A261)" }}>
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-            퀴즈로 점검
+            {tt(lang, "퀴즈로 점검", "クイズで確認")}
           </button>
           <Button variant="surface" size="free" onClick={onExit} className="py-3.5">
-            홈으로
+            {tt(lang, "홈으로", "ホームへ")}
           </Button>
         </div>
       </div>
@@ -81,7 +84,7 @@ export default function ReviewMode({
     <div className="flex min-h-[calc(100vh-4rem)] flex-col" style={{ background: "var(--bg)" }}>
       {/* 헤더 */}
       <div className="flex items-center px-4 pb-2 pt-3">
-        <button onClick={onExit} aria-label="뒤로"
+        <button onClick={onExit} aria-label={tt(lang, "뒤로", "戻る")}
           className="flex h-9 w-9 items-center justify-center rounded-full"
           style={{ background: "var(--surface)", color: "var(--text-2)" }}>
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2}
@@ -90,11 +93,11 @@ export default function ReviewMode({
         <div className="mx-auto flex items-center gap-2">
           <span className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold text-white" style={{ background: "linear-gradient(135deg,#E63946,#c0392b)" }}>
             <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-            SM-2 복습
+            {tt(lang, "SM-2 복습", "SM-2 復習")}
           </span>
           <span className="rounded-full px-2.5 py-1 text-sm font-bold"
             style={{ background: "var(--card)", color: "var(--text-3)", boxShadow: "0 1px 3px rgba(0,0,0,.1)" }}>
-            남은 {remaining}장
+            {tt(lang, `남은 ${remaining}장`, `残り${remaining}枚`)}
           </span>
         </div>
         <span className="h-9 w-9" />
@@ -110,14 +113,14 @@ export default function ReviewMode({
         <div
           role="button"
           tabIndex={0}
-          aria-label={revealed ? undefined : "탭하면 답 보기"}
+          aria-label={revealed ? undefined : tt(lang, "탭하면 답 보기", "タップで答えを見る")}
           onClick={() => !revealed && setRevealed(true)}
           onKeyDown={(e) => { if (!revealed && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); setRevealed(true); } }}
           className="flex min-h-[340px] w-full cursor-pointer flex-col items-center justify-center gap-4 rounded-3xl p-8 text-center shadow-xl transition"
           style={{ background: "var(--card)" }}
         >
           <span className="text-xs font-semibold" style={{ color: "var(--text-3)" }}>
-            {revealed ? "뜻 · 예문" : "이 단어의 뜻은?"}
+            {revealed ? tt(lang, "뜻 · 예문", "意味 · 例文") : tt(lang, "이 단어의 뜻은?", "この単語の意味は？")}
           </span>
           <div className="flex items-center gap-2">
             <h2 className="text-4xl font-extrabold" style={{ color: "#E63946" }}>{word.word}</h2>
@@ -146,7 +149,7 @@ export default function ReviewMode({
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: "#E63946" }} />
               </span>
-              <span className="text-sm">탭하면 답이 보여요</span>
+              <span className="text-sm">{tt(lang, "탭하면 답이 보여요", "タップで答えを表示")}</span>
             </div>
           )}
         </div>
@@ -177,8 +180,8 @@ export default function ReviewMode({
                     {cfg.xp}
                   </span>
                   <span className="mb-0.5 text-base font-black text-white/90">{cfg.icon}</span>
-                  <span className="text-sm font-bold leading-tight text-white">{cfg.label}</span>
-                  <span className="mt-0.5 text-[10px] text-white/70">{cfg.sub}</span>
+                  <span className="text-sm font-bold leading-tight text-white">{tt(lang, cfg.label[0], cfg.label[1])}</span>
+                  <span className="mt-0.5 text-[10px] text-white/70">{tt(lang, cfg.sub[0], cfg.sub[1])}</span>
                 </button>
               );
             })}
@@ -190,7 +193,7 @@ export default function ReviewMode({
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
             </svg>
-            답 확인
+            {tt(lang, "답 확인", "答えを確認")}
           </button>
         )}
       </div>
