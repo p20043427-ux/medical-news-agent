@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { JP_GRAMMAR } from "@/lib/jp/grammar";
 import { speakJa } from "@/lib/jp/speech";
+import { AccordionItem } from "@/components/ui/accordion";
 
 function SpeakBtn({ text }: { text: string }) {
   return (
@@ -28,44 +29,39 @@ export default function GrammarView() {
         {JP_GRAMMAR.map((g) => {
           const isOpen = open === g.id;
           return (
-            <div key={g.id} className="overflow-hidden rounded-2xl" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
-              <button onClick={() => setOpen(isOpen ? null : g.id)} className="flex w-full items-center gap-3 p-4 text-left">
-                <span className="shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-extrabold text-white" style={{ background: g.level === "N4" ? "#7209B7" : "#E63946" }}>{g.level}</span>
-                <span className="min-w-0 flex-1">
-                  <span className="block font-bold" style={{ color: "var(--text-1)" }}>{g.title}</span>
-                  <span className="block truncate text-xs" style={{ color: "var(--text-3)" }}>{g.brief}</span>
-                </span>
-                <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 transition-transform" style={{ color: "var(--text-3)", transform: isOpen ? "rotate(180deg)" : "none" }}
-                  fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
-              </button>
-
-              {isOpen && (
-                <div className="px-4 pb-4">
-                  <div className="mb-3 rounded-xl p-3 text-sm leading-relaxed" style={{ background: "var(--surface)", color: "var(--text-2)" }}>
-                    📘 {g.rule}
-                  </div>
-                  <div className="space-y-2">
-                    {g.examples.map((ex, i) => (
-                      <div key={i} className="flex items-start gap-2 rounded-xl p-3" style={{ background: "var(--surface)" }}>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-base font-bold leading-snug" style={{ color: "var(--text-1)" }}>{ex.jp}</p>
-                          <p className="mt-0.5 text-xs" style={{ color: "var(--text-3)" }}>{ex.reading}</p>
-                          <p className="mt-1 text-sm" style={{ color: "var(--text-2)" }}>{ex.ko}</p>
-                          {ex.note && <p className="mt-1 text-[11px]" style={{ color: "#E63946" }}>→ {ex.note}</p>}
-                        </div>
-                        <SpeakBtn text={ex.reading || ex.jp} />
-                      </div>
-                    ))}
-                  </div>
-                  {g.commonMistake && (
-                    <p className="mt-3 rounded-xl p-2.5 text-xs leading-relaxed" style={{ background: "#E6394610", color: "var(--text-2)" }}>⚠️ 흔한 실수: {g.commonMistake}</p>
-                  )}
-                  {g.tip && (
-                    <p className="mt-2 rounded-xl p-2.5 text-xs leading-relaxed" style={{ background: "#00b89412", color: "var(--text-2)" }}>💡 {g.tip}</p>
-                  )}
+            <AccordionItem key={g.id} open={isOpen} onToggle={() => setOpen(isOpen ? null : g.id)}
+              header={
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <span className="shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-extrabold text-white" style={{ background: g.level === "N4" ? "#7209B7" : "#E63946" }}>{g.level}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-bold" style={{ color: "var(--text-1)" }}>{g.title}</span>
+                    <span className="block truncate text-xs" style={{ color: "var(--text-3)" }}>{g.brief}</span>
+                  </span>
                 </div>
+              }>
+              <div className="mb-3 rounded-xl p-3 text-sm leading-relaxed" style={{ background: "var(--surface)", color: "var(--text-2)" }}>
+                📘 {g.rule}
+              </div>
+              <div className="space-y-2">
+                {g.examples.map((ex, i) => (
+                  <div key={i} className="flex items-start gap-2 rounded-xl p-3" style={{ background: "var(--surface)" }}>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-base font-bold leading-snug" style={{ color: "var(--text-1)" }}>{ex.jp}</p>
+                      <p className="mt-0.5 text-xs" style={{ color: "var(--text-3)" }}>{ex.reading}</p>
+                      <p className="mt-1 text-sm" style={{ color: "var(--text-2)" }}>{ex.ko}</p>
+                      {ex.note && <p className="mt-1 text-[11px]" style={{ color: "#E63946" }}>→ {ex.note}</p>}
+                    </div>
+                    <SpeakBtn text={ex.reading || ex.jp} />
+                  </div>
+                ))}
+              </div>
+              {g.commonMistake && (
+                <p className="mt-3 rounded-xl p-2.5 text-xs leading-relaxed" style={{ background: "#E6394610", color: "var(--text-2)" }}>⚠️ 흔한 실수: {g.commonMistake}</p>
               )}
-            </div>
+              {g.tip && (
+                <p className="mt-2 rounded-xl p-2.5 text-xs leading-relaxed" style={{ background: "#00b89412", color: "var(--text-2)" }}>💡 {g.tip}</p>
+              )}
+            </AccordionItem>
           );
         })}
       </div>

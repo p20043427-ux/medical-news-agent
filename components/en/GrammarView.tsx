@@ -5,6 +5,7 @@ import { GRAMMAR_POINTS } from "@/lib/en/grammar";
 import { PHRASAL_VERBS } from "@/lib/en/phrasal-verbs";
 import type { GrammarPoint, PhrasalVerb } from "@/lib/en/types";
 import { speakEn } from "@/lib/en/speech";
+import { AccordionItem } from "@/components/ui/accordion";
 
 type Section = "grammar" | "phrasal";
 
@@ -29,37 +30,24 @@ function SpeakBtn({ text }: { text: string }) {
   );
 }
 
-function Chevron({ open }: { open: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 transition-transform"
-      style={{ color: "var(--text-3)", transform: open ? "rotate(180deg)" : "none" }}
-      fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
-}
 
 function GrammarCard({ gp }: { gp: GrammarPoint }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="rounded-2xl shadow-sm overflow-hidden" style={{ background: "var(--card)" }}>
-      <button onClick={() => setOpen((s) => !s)}
-        className="flex w-full items-center justify-between p-4 text-left">
-        <div className="flex items-center gap-3">
+    <AccordionItem open={open} onToggle={() => setOpen((s) => !s)} bordered={false}
+      header={
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <span className="rounded-full px-2 py-0.5 text-xs font-bold text-white"
             style={{ background: CEFR_COLORS[gp.cefrLevel] ?? "#4361EE" }}>
             {gp.cefrLevel}
           </span>
-          <div>
+          <div className="min-w-0">
             <p className="font-bold" style={{ color: "var(--text-1)" }}>{gp.title}</p>
             <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>{gp.brief}</p>
           </div>
         </div>
-        <Chevron open={open} />
-      </button>
-
-      {open && (
-        <div className="px-4 pb-4 space-y-4">
+      }>
+        <div className="space-y-4">
           <div className="rounded-xl p-3" style={{ background: "var(--surface)" }}>
             <p className="text-xs font-bold mb-1" style={{ color: "#4361EE" }}>핵심 규칙</p>
             <p className="text-sm" style={{ color: "var(--text-2)" }}>{gp.rule}</p>
@@ -93,8 +81,7 @@ function GrammarCard({ gp }: { gp: GrammarPoint }) {
             </div>
           )}
         </div>
-      )}
-    </div>
+    </AccordionItem>
   );
 }
 

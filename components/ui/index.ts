@@ -8,3 +8,4 @@ export { Chip } from "./chip";
 export { Segmented } from "./segmented";
 export { ConfirmDialog } from "./confirm-dialog";
 export { Sheet } from "./sheet";
+export { AccordionItem } from "./accordion";
