@@ -7,6 +7,7 @@ import { type EnGrade, type EnProgress, dueIds } from "@/lib/en/progress";
 import { speakEn } from "@/lib/en/speech";
 import EnReviewMode from "./ReviewMode";
 import EnQuizMode from "./QuizMode";
+import { Chip } from "@/components/ui/chip";
 
 const ALL_CAT: EnCategory = { key: "all", label: "전체 복습", emoji: "🔁", cefrRange: "A1-C1" };
 const WEAK_CAT: EnCategory = { key: "weak", label: "오답 단어", emoji: "🩹", cefrRange: "A1-C1" };
@@ -133,14 +134,11 @@ function EnWordSearch({ onExit }: { onExit: () => void }) {
           {query && <button onClick={() => setQuery("")} className="text-sm" style={{ color: "var(--text-3)" }}>✕</button>}
         </div>
         <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-          <button onClick={() => setCat(null)} className="shrink-0 rounded-full px-3 py-1.5 text-xs font-bold"
-            style={cat === null ? { background: "#4361EE", color: "#fff" } : { background: "var(--surface)", color: "var(--text-2)" }}>전체</button>
+          <Chip active={cat === null} accent="#4361EE" onClick={() => setCat(null)}>전체</Chip>
           {EN_CATEGORIES.map((c) => (
-            <button key={c.key} onClick={() => setCat(cat === c.key ? null : c.key)}
-              className="flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold"
-              style={cat === c.key ? { background: "#4361EE", color: "#fff" } : { background: "var(--surface)", color: "var(--text-2)" }}>
+            <Chip key={c.key} active={cat === c.key} accent="#4361EE" onClick={() => setCat(cat === c.key ? null : c.key)}>
               <span>{c.emoji}</span><span>{c.label}</span>
-            </button>
+            </Chip>
           ))}
         </div>
       </div>

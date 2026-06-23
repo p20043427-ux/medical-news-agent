@@ -5,6 +5,7 @@ import { VOCAB, VOCAB_CATEGORIES } from "@/lib/jp/vocab";
 import type { Word } from "@/lib/jp/types";
 import Flashcard from "./Flashcard";
 import { Button } from "@/components/ui";
+import { Chip } from "@/components/ui/chip";
 
 const EMOJI: Record<string, string> = Object.fromEntries(
   VOCAB_CATEGORIES.map((c) => [c.key, c.emoji])
@@ -63,17 +64,11 @@ export default function Wordbook({
           )}
         </div>
         <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-          <button onClick={() => setCat(null)}
-            className="shrink-0 rounded-full px-3 py-1.5 text-xs font-bold transition"
-            style={cat === null ? { background: "#E63946", color: "#fff" } : { background: "var(--surface)", color: "var(--text-2)" }}>
-            전체
-          </button>
+          <Chip active={cat === null} accent="#E63946" onClick={() => setCat(null)}>전체</Chip>
           {VOCAB_CATEGORIES.map((c) => (
-            <button key={c.key} onClick={() => setCat(cat === c.key ? null : c.key)}
-              className="flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition"
-              style={cat === c.key ? { background: "#E63946", color: "#fff" } : { background: "var(--surface)", color: "var(--text-2)" }}>
+            <Chip key={c.key} active={cat === c.key} accent="#E63946" onClick={() => setCat(cat === c.key ? null : c.key)}>
               <span>{c.emoji}</span><span>{c.label}</span>
-            </button>
+            </Chip>
           ))}
         </div>
       </div>

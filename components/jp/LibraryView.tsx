@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Wordbook from "./Wordbook";
 import MistakesView from "./MistakesView";
+import { Segmented } from "@/components/ui/segmented";
 
 export default function LibraryView({
   bookmarks,
@@ -27,18 +28,15 @@ export default function LibraryView({
     <div>
       {/* 서브 탭 */}
       <div className="px-4 pt-3">
-        <div className="flex rounded-2xl p-1 gap-1" style={{ background: "var(--surface)" }}>
-          {([["wordbook", `📚 단어장 (${bookmarks.length})`], ["mistakes", `🎯 오답노트 (${mistakes.length})`]] as ["wordbook" | "mistakes", string][]).map(([s, label]) => (
-            <button
-              key={s}
-              onClick={() => setSub(s)}
-              className="flex-1 rounded-xl py-2.5 text-sm font-bold transition"
-              style={sub === s ? { background: "#E63946", color: "#fff" } : { color: "var(--text-3)" }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <Segmented
+          value={sub}
+          onChange={setSub}
+          accent="#E63946"
+          options={[
+            { value: "wordbook", label: `📚 단어장 (${bookmarks.length})` },
+            { value: "mistakes", label: `🎯 오답노트 (${mistakes.length})` },
+          ]}
+        />
       </div>
 
       {sub === "wordbook" ? (
