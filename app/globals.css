@@ -38,6 +38,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-variant-numeric: tabular-nums; /* 숫자 폭 고정 → 카운터·점수·진도 정렬 */
   word-break: keep-all;        /* 한국어 단어 중간에서 줄바꿈되지 않도록 */
   overflow-wrap: anywhere;     /* 단, 너무 긴 라틴 단어는 넘치지 않게 분리 */
 }

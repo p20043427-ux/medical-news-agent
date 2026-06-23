@@ -7,6 +7,7 @@ import Flashcard from "./Flashcard";
 import { Button } from "@/components/ui";
 import { Chip } from "@/components/ui/chip";
 import { Sheet } from "@/components/ui/sheet";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const EMOJI: Record<string, string> = Object.fromEntries(
   VOCAB_CATEGORIES.map((c) => [c.key, c.emoji])
@@ -98,13 +99,9 @@ export default function Wordbook({
       <div style={{ height: 1, background: "var(--border)" }} className="mx-4" />
 
       {words.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
-          <span className="text-5xl">{searching ? "🔍" : "📚"}</span>
-          <p className="text-base font-semibold" style={{ color: "var(--text-2)" }}>{searching ? "검색 결과가 없어요" : "단어장이 비어있어요"}</p>
-          {!searching && (
-            <p className="text-sm" style={{ color: "var(--text-3)" }}>위에서 검색하거나, 카드의 ★로 단어를 저장하세요.</p>
-          )}
-        </div>
+        searching
+          ? <EmptyState emoji="🔍" title="검색 결과가 없어요" description="다른 검색어나 카테고리를 시도해 보세요." />
+          : <EmptyState emoji="📚" title="단어장이 비어있어요" description="위에서 검색하거나, 카드의 ★로 단어를 저장하세요." />
       ) : (
         <ul className="mt-1">
           {words.map((w) => {

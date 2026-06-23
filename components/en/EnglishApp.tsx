@@ -19,6 +19,7 @@ import EnBottomNav, { type EnTab } from "./BottomNav";
 import EnLearnHub, { type EnLearnView } from "./LearnHub";
 import { EN_VOCAB, EN_CATEGORIES } from "@/lib/en/vocab";
 import { useReminderScheduler } from "@/lib/reminder";
+import { AppSkeleton } from "@/components/ui";
 
 export default function EnglishApp({ onBack }: { onBack?: () => void }) {
   const { progress, ready, markNew, grade, setGoalDate, reset, exportJson, importJson } = useEnProgress();
@@ -28,16 +29,7 @@ export default function EnglishApp({ onBack }: { onBack?: () => void }) {
   const [studyCategory, setStudyCategory] = useState<string | null>(null);
   const [studyMode, setStudyMode] = useState<"learn" | "review" | "quiz">("learn");
 
-  if (!ready) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ background: "var(--bg)" }}>
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200" style={{ borderTopColor: "#4361EE" }} />
-          <p className="text-sm" style={{ color: "var(--text-3)" }}>불러오는 중…</p>
-        </div>
-      </div>
-    );
-  }
+  if (!ready) return <AppSkeleton />;
 
   function startStudy(key: string, mode: "learn" | "review" | "quiz" = "learn") {
     setStudyCategory(key);

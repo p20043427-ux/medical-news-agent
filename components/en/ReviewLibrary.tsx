@@ -8,6 +8,7 @@ import { speakEn } from "@/lib/en/speech";
 import EnReviewMode from "./ReviewMode";
 import EnQuizMode from "./QuizMode";
 import { Chip } from "@/components/ui/chip";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const ALL_CAT: EnCategory = { key: "all", label: "전체 복습", emoji: "🔁", cefrRange: "A1-C1" };
 const WEAK_CAT: EnCategory = { key: "weak", label: "오답 단어", emoji: "🩹", cefrRange: "A1-C1" };
@@ -144,7 +145,7 @@ function EnWordSearch({ onExit }: { onExit: () => void }) {
       </div>
 
       {results.length === 0 ? (
-        <p className="px-6 py-16 text-center text-sm" style={{ color: "var(--text-3)" }}>🔍 검색 결과가 없어요.</p>
+        <EmptyState emoji="🔍" title="검색 결과가 없어요" description="다른 검색어나 카테고리를 시도해 보세요." />
       ) : (
         <ul className="mt-2">
           {results.map((w) => (

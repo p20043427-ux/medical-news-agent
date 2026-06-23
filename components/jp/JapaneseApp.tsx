@@ -21,6 +21,7 @@ import DictationView from "./DictationView";
 import LearnHub, { type LearnView } from "./LearnHub";
 import LibraryView from "./LibraryView";
 import { useReminderScheduler } from "@/lib/reminder";
+import { AppSkeleton } from "@/components/ui";
 
 const FURIGANA_KEY = "jp-app-furigana";
 
@@ -47,16 +48,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
       return next;
     });
 
-  if (!ready) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ background: "var(--bg)" }}>
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200" style={{ borderTopColor: "#E63946" }} />
-          <p className="text-sm" style={{ color: "var(--text-3)" }}>불러오는 중…</p>
-        </div>
-      </div>
-    );
-  }
+  if (!ready) return <AppSkeleton />;
 
   if (session) {
     const SPECIAL: Record<string, { key: string; label: string; emoji: string }> = {

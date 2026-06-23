@@ -5,6 +5,7 @@ import { EN_TRAVEL_PHRASEBOOK } from "@/lib/en/phrasebook";
 import { speakEn } from "@/lib/en/speech";
 import { useFavorites } from "@/lib/favorites";
 import { Chip } from "@/components/ui/chip";
+import { EmptyState } from "@/components/ui/empty-state";
 import PhraseQuiz from "@/components/PhraseQuiz";
 
 const ALL_EN_KO = EN_TRAVEL_PHRASEBOOK.flatMap((s) => s.phrases).map((p) => p.ko);
@@ -58,7 +59,7 @@ export default function EnPhrasebookView() {
       )}
 
       {isFavTab && phrases.length === 0 ? (
-        <p className="px-6 py-12 text-center text-sm" style={{ color: "var(--text-3)" }}>⭐ 별을 눌러 자주 쓰는 표현을 모아 보세요.</p>
+        <EmptyState emoji="⭐" title="즐겨찾기가 비어있어요" description="별(☆)을 눌러 자주 쓰는 표현을 모아 보세요." />
       ) : (
         <div className="space-y-2.5 px-4">
           {phrases.map((p, i) => {
