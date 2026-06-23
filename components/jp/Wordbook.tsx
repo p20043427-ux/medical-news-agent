@@ -6,6 +6,7 @@ import type { Word } from "@/lib/jp/types";
 import Flashcard from "./Flashcard";
 import { Button } from "@/components/ui";
 import { Chip } from "@/components/ui/chip";
+import { Sheet } from "@/components/ui/sheet";
 
 const EMOJI: Record<string, string> = Object.fromEntries(
   VOCAB_CATEGORIES.map((c) => [c.key, c.emoji])
@@ -126,26 +127,21 @@ export default function Wordbook({
         </ul>
       )}
 
-      {/* 단어 카드 모달 */}
-      {selected && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm" onClick={() => setSelected(null)}>
-          <div className="w-full max-w-md animate-[slideUp_0.25s_ease-out]" style={{ paddingBottom: "env(safe-area-inset-bottom)" }} onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-center py-2">
-              <div className="h-1 w-10 rounded-full bg-white/40" />
-            </div>
-            <div className="px-3 pb-3">
-              <Flashcard
-                word={selected}
-                showFurigana={showFurigana}
-                emoji={EMOJI[selected.category] ?? "📖"}
-                hideMeaningDefault={false}
-                bookmarked={bookmarks.includes(selected.id)}
-                onToggleBookmark={() => onToggleBookmark(selected.id)}
-              />
-            </div>
+      {/* 단어 카드 시트 */}
+      <Sheet open={!!selected} onClose={() => setSelected(null)}>
+        {selected && (
+          <div className="px-3 pb-3">
+            <Flashcard
+              word={selected}
+              showFurigana={showFurigana}
+              emoji={EMOJI[selected.category] ?? "📖"}
+              hideMeaningDefault={false}
+              bookmarked={bookmarks.includes(selected.id)}
+              onToggleBookmark={() => onToggleBookmark(selected.id)}
+            />
           </div>
-        </div>
-      )}
+        )}
+      </Sheet>
     </div>
   );
 }

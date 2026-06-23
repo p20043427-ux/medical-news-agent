@@ -4,6 +4,7 @@ import { useState } from "react";
 import { EN_TRAVEL_PHRASEBOOK } from "@/lib/en/phrasebook";
 import { speakEn } from "@/lib/en/speech";
 import { useFavorites } from "@/lib/favorites";
+import { Chip } from "@/components/ui/chip";
 import PhraseQuiz from "@/components/PhraseQuiz";
 
 const ALL_EN_KO = EN_TRAVEL_PHRASEBOOK.flatMap((s) => s.phrases).map((p) => p.ko);
@@ -34,26 +35,16 @@ export default function EnPhrasebookView() {
       </div>
 
       <div className="flex gap-2 overflow-x-auto px-4 pb-3" style={{ scrollbarWidth: "none" }}>
-        <button onClick={() => setActive("__fav")}
-          className="flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-bold transition active:scale-[0.97]"
-          style={isFavTab
-            ? { background: "linear-gradient(135deg,#f6c453,#f0932b)", color: "#fff", boxShadow: "0 3px 10px rgba(240,147,43,.35)" }
-            : { background: "var(--surface)", color: "var(--text-2)" }}>
+        <Chip active={isFavTab} size="md" onClick={() => setActive("__fav")}
+          activeGradient="linear-gradient(135deg,#f6c453,#f0932b)" activeShadow="0 3px 10px rgba(240,147,43,.35)">
           <span>⭐</span><span>즐겨찾기{favs.length ? ` ${favs.length}` : ""}</span>
-        </button>
-        {EN_TRAVEL_PHRASEBOOK.map((s) => {
-          const on = s.key === active;
-          return (
-            <button key={s.key} onClick={() => setActive(s.key)}
-              className="flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-bold transition active:scale-[0.97]"
-              style={on
-                ? { background: "linear-gradient(135deg,#4361EE,#7209B7)", color: "#fff", boxShadow: "0 3px 10px rgba(67,97,238,.35)" }
-                : { background: "var(--surface)", color: "var(--text-2)" }}>
-              <span>{s.emoji}</span>
-              <span>{s.title}</span>
-            </button>
-          );
-        })}
+        </Chip>
+        {EN_TRAVEL_PHRASEBOOK.map((s) => (
+          <Chip key={s.key} active={s.key === active} size="md" onClick={() => setActive(s.key)}
+            activeGradient="linear-gradient(135deg,#4361EE,#7209B7)" activeShadow="0 3px 10px rgba(67,97,238,.35)">
+            <span>{s.emoji}</span><span>{s.title}</span>
+          </Chip>
+        ))}
       </div>
 
       {isFavTab && favPhrases.length > 0 && (
