@@ -6,23 +6,26 @@ import { speakEn } from "@/lib/en/speech";
 import { getExamHistory, pushExamHistory } from "@/lib/exam-history";
 import { bumpActivity } from "@/lib/daily-activity";
 import { Button } from "@/components/ui";
+import { useUiLang, tt, type UiLang } from "@/lib/i18n";
 
 const SECTIONS: EnSection[] = ["어휘", "구동사", "독해", "청해"];
+const SECTION_JA: Record<string, string> = { "어휘": "語彙", "구동사": "句動詞", "독해": "読解", "청해": "聴解" };
+const secLabel = (s: string, lang: UiLang) => (lang === "ja" ? (SECTION_JA[s] ?? s) : s);
 const LIMIT_SEC = 15 * 60;
 const GRAD = "linear-gradient(135deg,#4361EE,#7209B7)";
 
-type Round = { id: string; label: string; seed?: number };
+type Round = { id: string; label: string; labelJa: string; seed?: number };
 const ROUNDS: Round[] = [
-  { id: "e1", label: "모의 1회", seed: 2001 },
-  { id: "e2", label: "모의 2회", seed: 2002 },
-  { id: "e3", label: "모의 3회", seed: 2003 },
-  { id: "random", label: "랜덤 모의", seed: undefined },
+  { id: "e1", label: "모의 1회", labelJa: "模擬 1回", seed: 2001 },
+  { id: "e2", label: "모의 2회", labelJa: "模擬 2回", seed: 2002 },
+  { id: "e3", label: "모의 3회", labelJa: "模擬 3回", seed: 2003 },
+  { id: "random", label: "랜덤 모의", labelJa: "ランダム模擬", seed: undefined },
 ];
 
-const DIFFS: { key: EnDifficulty; label: string; desc: string }[] = [
-  { key: "easy", label: "입문", desc: "12문항 · A1–A2" },
-  { key: "normal", label: "표준", desc: "20문항 · 전 레벨" },
-  { key: "hard", label: "도전", desc: "25문항 · B1+" },
+const DIFFS: { key: EnDifficulty; label: [string, string]; desc: [string, string] }[] = [
+  { key: "easy", label: ["입문", "入門"], desc: ["12문항 · A1–A2", "12問 · A1–A2"] },
+  { key: "normal", label: ["표준", "標準"], desc: ["20문항 · 전 레벨", "20問 · 全レベル"] },
+  { key: "hard", label: ["도전", "挑戦"], desc: ["25문항 · B1+", "25問 · B1+"] },
 ];
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
@@ -31,6 +34,8 @@ function saveBest(id: string, pct: number) { try { const b = getBest(); if (!b[i
 const getHistory = () => getExamHistory("en");
 
 export default function EnMockExam({ onExit }: { onExit: () => void }) {
+  const lang = useUiLang();
+  const roundLabel = (r: Round | null) => (r ? tt(lang, r.label, r.labelJa) : "");
   const [round, setRound] = useState<Round | null>(null);
   const [difficulty, setDifficulty] = useState<EnDifficulty>("normal");
   const [attempt, setAttempt] = useState(0);
@@ -73,7 +78,7 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
     return (
       <div className="px-5 pb-28 pt-4">
         <h1 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>English Mock Test (CEFR)</h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--text-3)" }}>난이도와 회차를 골라 풀어보세요 · 어휘/구동사/독해/청해</p>
+        <p className="mt-1 text-sm" style={{ color: "var(--text-3)" }}>{tt(lang, "난이도와 회차를 골라 풀어보세요 · 어휘/구동사/독해/청해", "難易度と回を選んで挑戦しましょう · 語彙/句動詞/読解/聴解")}</p>
 
         {/* 난이도 선택 */}
         <div className="mt-4 grid grid-cols-3 gap-1.5 rounded-2xl p-1.5" style={{ background: "var(--surface)" }}>
@@ -83,8 +88,8 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
               <button key={d.key} onClick={() => setDifficulty(d.key)}
                 className="rounded-xl px-2 py-2 text-center transition"
                 style={{ background: on ? "var(--card)" : "transparent", boxShadow: on ? "0 1px 4px rgba(0,0,0,.12)" : "none" }}>
-                <span className="block text-sm font-extrabold" style={{ color: on ? "#4361EE" : "var(--text-2)" }}>{d.label}</span>
-                <span className="block text-[10px]" style={{ color: "var(--text-3)" }}>{d.desc}</span>
+                <span className="block text-sm font-extrabold" style={{ color: on ? "#4361EE" : "var(--text-2)" }}>{tt(lang, d.label[0], d.label[1])}</span>
+                <span className="block text-[10px]" style={{ color: "var(--text-3)" }}>{tt(lang, d.desc[0], d.desc[1])}</span>
               </button>
             );
           })}
@@ -95,15 +100,15 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
             <button key={r.id} onClick={() => start(r)} className="flex w-full items-center gap-4 rounded-2xl p-4 text-left transition active:scale-[0.98]" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-lg font-extrabold text-white" style={{ background: GRAD }}>T</span>
               <span className="min-w-0 flex-1">
-                <span className="block font-bold" style={{ color: "var(--text-1)" }}>{r.label}</span>
-                <span className="block text-xs" style={{ color: "var(--text-3)" }}>{best[`${r.id}-${difficulty}`] !== undefined ? `최고 ${best[`${r.id}-${difficulty}`]}점` : "미응시"}</span>
+                <span className="block font-bold" style={{ color: "var(--text-1)" }}>{tt(lang, r.label, r.labelJa)}</span>
+                <span className="block text-xs" style={{ color: "var(--text-3)" }}>{best[`${r.id}-${difficulty}`] !== undefined ? tt(lang, `최고 ${best[`${r.id}-${difficulty}`]}점`, `最高 ${best[`${r.id}-${difficulty}`]}点`) : tt(lang, "미응시", "未受験")}</span>
               </span>
               <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" style={{ color: "var(--text-3)" }} fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
             </button>
           ))}
         </div>
-        <p className="mt-4 rounded-xl p-3 text-xs leading-relaxed" style={{ background: "#4361EE12", color: "var(--text-2)" }}>※ 공식 시험 문제는 저작권상 수록할 수 없어, 앱 콘텐츠로 만든 <b>원본 모의문항</b>입니다.</p>
-        <Button variant="surface" size="free" onClick={onExit} className="mt-3 w-full py-3.5">학습 메뉴로</Button>
+        <p className="mt-4 rounded-xl p-3 text-xs leading-relaxed" style={{ background: "#4361EE12", color: "var(--text-2)" }}>{tt(lang, "※ 공식 시험 문제는 저작권상 수록할 수 없어, 앱 콘텐츠로 만든 ", "※ 公式試験の問題は著作権上収録できないため、アプリ内コンテンツで作成した")}<b>{tt(lang, "원본 모의문항", "オリジナル模擬問題")}</b>{tt(lang, "입니다.", "です。")}</p>
+        <Button variant="surface" size="free" onClick={onExit} className="mt-3 w-full py-3.5">{tt(lang, "학습 메뉴로", "学習メニューへ")}</Button>
       </div>
     );
   }
@@ -119,13 +124,13 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
         <div className="flex flex-col items-center text-center">
           <div className="animate-reward text-6xl">{passed ? "🎊" : "💪"}</div>
           <h2 className="mt-2 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{passed ? "Great job!" : "Keep going!"}</h2>
-          <p className="mt-1 text-5xl font-extrabold" style={{ color: passed ? "#10B981" : "#4361EE" }}>{pct}<span className="text-2xl" style={{ color: "var(--text-3)" }}>점</span></p>
-          <p className="mt-1 text-sm" style={{ color: "var(--text-3)" }}>{round?.label} · {correct}/{questions.length} · 소요 {fmt(elapsed)} · 합격선 {Math.round(EN_PASS_RATIO * 100)}%</p>
+          <p className="mt-1 text-5xl font-extrabold" style={{ color: passed ? "#10B981" : "#4361EE" }}>{pct}<span className="text-2xl" style={{ color: "var(--text-3)" }}>{tt(lang, "점", "点")}</span></p>
+          <p className="mt-1 text-sm" style={{ color: "var(--text-3)" }}>{roundLabel(round)} · {correct}/{questions.length} · {tt(lang, `소요 ${fmt(elapsed)}`, `所要 ${fmt(elapsed)}`)} · {tt(lang, `합격선 ${Math.round(EN_PASS_RATIO * 100)}%`, `合格ライン ${Math.round(EN_PASS_RATIO * 100)}%`)}</p>
         </div>
         <div className="mt-6 space-y-2.5">
           {bySection.map((b) => (
             <div key={b.s} className="rounded-2xl p-4" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
-              <div className="mb-1.5 flex items-center justify-between"><span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>{b.s}</span><span className="text-sm font-bold" style={{ color: "var(--text-2)" }}>{b.c}/{b.t}</span></div>
+              <div className="mb-1.5 flex items-center justify-between"><span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>{secLabel(b.s, lang)}</span><span className="text-sm font-bold" style={{ color: "var(--text-2)" }}>{b.c}/{b.t}</span></div>
               <div className="h-1.5 overflow-hidden rounded-full" style={{ background: "var(--surface)" }}><div className="h-full rounded-full" style={{ width: `${b.t ? (b.c / b.t) * 100 : 0}%`, background: GRAD }} /></div>
             </div>
           ))}
@@ -136,8 +141,8 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
           return (
             <div className="mt-4 rounded-2xl p-4" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>점수 추이</span>
-                <span className="text-xs" style={{ color: "var(--text-3)" }}>{round?.label} · 최근 {hist.length}회</span>
+                <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>{tt(lang, "점수 추이", "スコア推移")}</span>
+                <span className="text-xs" style={{ color: "var(--text-3)" }}>{roundLabel(round)} · {tt(lang, `최근 ${hist.length}회`, `直近 ${hist.length}回`)}</span>
               </div>
               <div className="flex h-20 items-end justify-between gap-1.5">
                 {hist.map((h, i) => (
@@ -152,17 +157,17 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
         })()}
         {wrong.length > 0 && (
           <div className="mt-5">
-            <p className="mb-2 px-1 text-sm font-extrabold" style={{ color: "var(--text-1)" }}>오답 해설 ({wrong.length})</p>
+            <p className="mb-2 px-1 text-sm font-extrabold" style={{ color: "var(--text-1)" }}>{tt(lang, `오답 해설 (${wrong.length})`, `間違い解説 (${wrong.length})`)}</p>
             <div className="space-y-2">
               {wrong.map((qq) => (
                 <div key={qq.key} className="rounded-2xl p-3.5" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
-                  <p className="text-[11px]" style={{ color: "var(--text-3)" }}>{qq.section} · {qq.question}</p>
+                  <p className="text-[11px]" style={{ color: "var(--text-3)" }}>{secLabel(qq.section, lang)} · {qq.question}</p>
                   {qq.passage && <p className="mt-1 text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>{qq.passage}</p>}
                   {qq.prompt && qq.prompt !== "🔊" && <p className="mt-1 text-base font-bold" style={{ color: "var(--text-1)" }}>{qq.prompt}</p>}
                   {qq.audio && <p className="mt-1 text-sm" style={{ color: "var(--text-2)" }}>🔊 {qq.audio}</p>}
                   <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-0.5 text-sm font-semibold">
-                    <span style={{ color: "#10B981" }}>정답: {qq.answer}</span>
-                    <span style={{ color: "#E63946" }}>내 답: {answers[qq.key] ?? "미응답"}</span>
+                    <span style={{ color: "#10B981" }}>{tt(lang, "정답: ", "正解: ")}{qq.answer}</span>
+                    <span style={{ color: "#E63946" }}>{tt(lang, "내 답: ", "あなたの答え: ")}{answers[qq.key] ?? tt(lang, "미응답", "未回答")}</span>
                   </div>
                 </div>
               ))}
@@ -170,9 +175,9 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
           </div>
         )}
         <div className="mt-5 grid gap-2.5">
-          <Button variant="accent" size="free" onClick={retry} className="py-3.5">다시 풀기</Button>
-          <Button variant="surface" size="free" onClick={toSelect} className="py-3.5">다른 회차</Button>
-          <Button variant="surface" size="free" onClick={onExit} className="py-3.5">학습 메뉴로</Button>
+          <Button variant="accent" size="free" onClick={retry} className="py-3.5">{tt(lang, "다시 풀기", "もう一度")}</Button>
+          <Button variant="surface" size="free" onClick={toSelect} className="py-3.5">{tt(lang, "다른 회차", "別の回")}</Button>
+          <Button variant="surface" size="free" onClick={onExit} className="py-3.5">{tt(lang, "학습 메뉴로", "学習メニューへ")}</Button>
         </div>
       </div>
     );
@@ -182,7 +187,7 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
   return (
     <div className="flex min-h-[calc(100vh-4rem)] flex-col px-4 pb-28 pt-3">
       <div className="mb-3 flex items-center justify-between">
-        <span className="rounded-full px-2.5 py-1 text-xs font-bold text-white" style={{ background: "#4361EE" }}>{q.section}</span>
+        <span className="rounded-full px-2.5 py-1 text-xs font-bold text-white" style={{ background: "#4361EE" }}>{secLabel(q.section, lang)}</span>
         <span className="text-sm font-bold" style={{ color: "var(--text-2)" }}>{idx + 1} / {questions.length}</span>
         {(() => { const rem = Math.max(0, LIMIT_SEC - elapsed); const low = rem <= 60; return (<span className="rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: low ? "#E63946" : "var(--surface)", color: low ? "#fff" : "var(--text-2)" }}>⏱ {fmt(rem)}</span>); })()}
       </div>
@@ -192,7 +197,7 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
         {q.passage && <p className="mb-4 rounded-2xl p-4 text-base leading-loose" style={{ background: "var(--surface)", color: "var(--text-1)" }}>{q.passage}</p>}
         <p className="text-center text-xs" style={{ color: "var(--text-3)" }}>{q.question}</p>
         {q.audio ? (
-          <button onClick={() => speakEn(q.audio!)} aria-label="다시 듣기" className="mx-auto mt-3 grid h-20 w-20 place-items-center rounded-full text-3xl text-white" style={{ background: GRAD }}>🔊</button>
+          <button onClick={() => speakEn(q.audio!)} aria-label={tt(lang, "다시 듣기", "もう一度聞く")} className="mx-auto mt-3 grid h-20 w-20 place-items-center rounded-full text-3xl text-white" style={{ background: GRAD }}>🔊</button>
         ) : q.prompt ? (
           <>
             <p className="mt-3 text-center text-3xl font-extrabold" style={{ color: "var(--text-1)" }}>{q.prompt}</p>
@@ -211,7 +216,7 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
       </div>
 
       <div className="mt-auto pt-6">
-        <Button variant="accent" size="free" onClick={next} disabled={!selected} className="w-full py-4">{idx + 1 >= questions.length ? "제출하고 결과 보기" : "다음"}</Button>
+        <Button variant="accent" size="free" onClick={next} disabled={!selected} className="w-full py-4">{idx + 1 >= questions.length ? tt(lang, "제출하고 결과 보기", "提出して結果を見る") : tt(lang, "다음", "次へ")}</Button>
       </div>
     </div>
   );

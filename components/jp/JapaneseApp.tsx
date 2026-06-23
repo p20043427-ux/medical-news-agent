@@ -22,6 +22,7 @@ import LearnHub, { type LearnView } from "./LearnHub";
 import LibraryView from "./LibraryView";
 import { useReminderScheduler } from "@/lib/reminder";
 import { AppSkeleton } from "@/components/ui";
+import { useUiLang, tt } from "@/lib/i18n";
 
 const FURIGANA_KEY = "jp-app-furigana";
 
@@ -31,6 +32,7 @@ interface Session { category: string; mode: Mode; wordIds?: string[] }
 export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
   const { progress, ready, markNew, grade, setGoalDate, setDailyGoal, reset, exportJson, importJson, toggleBookmark, addMistakes } = useProgress();
   useReminderScheduler();
+  const lang = useUiLang();
   const [tab, setTab] = useState<Tab>("home");
   const [session, setSession] = useState<Session | null>(null);
   const [learnView, setLearnView] = useState<LearnView | null>(null);
@@ -51,10 +53,10 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
   if (!ready) return <AppSkeleton />;
 
   if (session) {
-    const SPECIAL: Record<string, { key: string; label: string; emoji: string }> = {
-      _wordbook: { key: "_wordbook", label: "단어장", emoji: "📚" },
-      _mistakes: { key: "_mistakes", label: "오답노트", emoji: "🎯" },
-      _due: { key: "_due", label: "오늘 복습", emoji: "🔁" },
+    const SPECIAL: Record<string, { key: string; label: string; labelJa: string; emoji: string }> = {
+      _wordbook: { key: "_wordbook", label: "단어장", labelJa: "単語帳", emoji: "📚" },
+      _mistakes: { key: "_mistakes", label: "오답노트", labelJa: "間違いノート", emoji: "🎯" },
+      _due: { key: "_due", label: "오늘 복습", labelJa: "今日の復習", emoji: "🔁" },
     };
     const category = SPECIAL[session.category]
       ?? VOCAB_CATEGORIES.find((c) => c.key === session.category)!;
@@ -93,7 +95,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
   const totalWords = VOCAB.length;
   const knownPct = totalWords ? Math.round((knownCount(progress) / totalWords) * 100) : 0;
   const dday = daysUntilGoal(progress);
-  const WD = ["일", "월", "화", "수", "목", "금", "토"];
+  const WD = lang === "ja" ? ["日", "月", "火", "水", "木", "金", "土"] : ["일", "월", "화", "수", "목", "금", "토"];
   const now = new Date();
   const week = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(now);
@@ -109,7 +111,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
       <header className="sticky top-0 z-30" style={{ background: "var(--bg)", paddingTop: "env(safe-area-inset-top)" }}>
         <div className="flex items-center gap-2 px-4 pb-2 pt-3">
           {onBack && (
-            <button onClick={onBack} aria-label="뒤로" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+            <button onClick={onBack} aria-label={tt(lang, "뒤로", "戻る")} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
               style={{ background: "var(--surface)", color: "var(--text-2)" }}>
               <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
             </button>
@@ -182,7 +184,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
                 style={{ background: "var(--surface)", color: "var(--text-2)" }}
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
-                학습 메뉴
+                {tt(lang, "학습 메뉴", "学習メニュー")}
               </button>
             </div>
             {learnView === "conversation" && <ConversationView showFurigana={showFurigana} onToggleFurigana={toggleFurigana} />}
