@@ -130,9 +130,12 @@ export default function ReviewMode({
             <div className="mt-2 w-full space-y-4">
               <p className="text-2xl font-bold" style={{ color: "var(--text-1)" }}>{word.meaning}</p>
               <div className="rounded-2xl p-4 text-left" style={{ background: "var(--surface)" }}>
-                <p className="text-lg leading-relaxed" style={{ color: "var(--text-2)" }}>
-                  <Furigana tokens={word.example.tokens} showFurigana={showFurigana} />
-                </p>
+                <div className="flex items-start gap-2">
+                  <p className="flex-1 text-lg leading-relaxed" style={{ color: "var(--text-2)" }}>
+                    <Furigana tokens={word.example.tokens} showFurigana={showFurigana} />
+                  </p>
+                  <SpeakerButton text={word.example.tokens.map((t) => t.r || t.t).join("")} size={36} />
+                </div>
                 <p className="mt-2 text-sm" style={{ color: "var(--text-3)" }}>{word.example.ko}</p>
               </div>
             </div>

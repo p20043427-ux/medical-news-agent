@@ -158,7 +158,7 @@ export default function EnglishApp({ onBack }: { onBack?: () => void }) {
       </header>
 
       {tab === "home" && (
-        <EnHome progress={progress} onStudyCategory={startStudy} onGrammar={() => { setTab("learn"); setLearnSub("grammar"); }} />
+        <EnHome progress={progress} onStudyCategory={startStudy} onGrammar={() => { setTab("learn"); setLearnSub("grammar"); }} onReviewDue={() => setTab("review")} />
       )}
       {tab === "learn" && (
         learnSub === "exam" ? (

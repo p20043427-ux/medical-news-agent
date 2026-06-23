@@ -1,7 +1,7 @@
 "use client";
 
 import { VOCAB, VOCAB_CATEGORIES } from "@/lib/jp/vocab";
-import { type Progress as JpProgress, isKnown, todayKey } from "@/lib/jp/progress";
+import { type Progress as JpProgress, isKnown, todayKey, dueIds } from "@/lib/jp/progress";
 import { TRAVEL_PHRASEBOOK } from "@/lib/jp/phrasebook";
 import { CONVERSATIONS } from "@/lib/jp/conversations";
 import { speakJa } from "@/lib/jp/speech";
@@ -18,10 +18,12 @@ function dailyIndex(key: string, mod: number): number {
   return mod > 0 ? h % mod : 0;
 }
 
-export default function Home({ progress, onStudyCategory }: {
+export default function Home({ progress, onStudyCategory, onReviewDue }: {
   progress: JpProgress;
   onStudyCategory: (key: string) => void;
+  onReviewDue?: () => void;
 }) {
+  const dueCount = dueIds(progress).length;
   const { has, toggle } = useFavorites("jp-phrase");
   const { data: rpData } = useRoleplay("jp-roleplay");
   const rpDone = Object.keys(rpData).length;
@@ -50,6 +52,23 @@ export default function Home({ progress, onStudyCategory }: {
 
   return (
     <div className="pb-28">
+      {/* 오늘 복습할 단어 */}
+      {dueCount > 0 && onReviewDue && (
+        <div className="px-5 pb-2 pt-2">
+          <button onClick={onReviewDue}
+            className="flex w-full items-center gap-3 rounded-2xl p-4 text-left shadow-sm transition active:scale-[0.98]"
+            style={{ background: "linear-gradient(135deg,#0984e3,#6c5ce7)" }}>
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-2xl" style={{ background: "rgba(255,255,255,.2)" }}>🔁</span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-xs font-bold text-white/80">오늘 복습</span>
+              <span className="block font-extrabold text-white">복습할 단어 {dueCount}개</span>
+              <span className="block text-xs text-white/85">간격 반복으로 지금 복습하기</span>
+            </span>
+            <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+          </button>
+        </div>
+      )}
+
       {/* 이어서 학습 */}
       {resume && (
         <div className="px-5 pb-2 pt-2">

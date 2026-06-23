@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { VOCAB, VOCAB_CATEGORIES } from "@/lib/jp/vocab";
-import { useProgress, isKnown, knownCount, daysUntilGoal } from "@/lib/jp/progress";
+import { useProgress, isKnown, knownCount, daysUntilGoal, dueIds } from "@/lib/jp/progress";
 import AccountButton from "@/components/auth/AccountButton";
 import Home from "./Home";
 import VocabStudy from "./VocabStudy";
@@ -61,6 +61,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
     const SPECIAL: Record<string, { key: string; label: string; emoji: string }> = {
       _wordbook: { key: "_wordbook", label: "단어장", emoji: "📚" },
       _mistakes: { key: "_mistakes", label: "오답노트", emoji: "🎯" },
+      _due: { key: "_due", label: "오늘 복습", emoji: "🔁" },
     };
     const category = SPECIAL[session.category]
       ?? VOCAB_CATEGORIES.find((c) => c.key === session.category)!;
@@ -171,7 +172,11 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
       </header>
 
       {tab === "home" && (
-        <Home progress={progress} onStudyCategory={(key) => setSession({ category: key, mode: "skim" })} />
+        <Home
+          progress={progress}
+          onStudyCategory={(key) => setSession({ category: key, mode: "skim" })}
+          onReviewDue={() => setSession({ category: "_due", mode: "review", wordIds: dueIds(progress) })}
+        />
       )}
 
       {tab === "learn" && (

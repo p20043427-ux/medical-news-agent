@@ -1,7 +1,7 @@
 "use client";
 
 import { EN_VOCAB, EN_CATEGORIES } from "@/lib/en/vocab";
-import { type EnProgress, isLearned, todayKey } from "@/lib/en/progress";
+import { type EnProgress, isLearned, todayKey, dueIds } from "@/lib/en/progress";
 import { EN_TRAVEL_PHRASEBOOK } from "@/lib/en/phrasebook";
 import { EN_CONVERSATIONS } from "@/lib/en/conversations";
 import { speakEn } from "@/lib/en/speech";
@@ -26,11 +26,13 @@ const LEVEL_GRAD: Record<string, [string, string]> = {
   C2: ["#4361EE", "#7209B7"],
 };
 
-export default function EnHome({ progress, onStudyCategory, onGrammar }: {
+export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewDue }: {
   progress: EnProgress;
   onStudyCategory: (key: string) => void;
   onGrammar?: () => void;
+  onReviewDue?: () => void;
 }) {
+  const dueCount = dueIds(progress).length;
   const start = new Date(progress.startedAt);
   const dayN = Math.floor((Date.now() - start.getTime()) / 86400000) + 1;
   const { has, toggle } = useFavorites("en-phrase");
@@ -54,6 +56,23 @@ export default function EnHome({ progress, onStudyCategory, onGrammar }: {
 
   return (
     <div className="pb-28">
+      {/* 오늘 복습할 단어 */}
+      {dueCount > 0 && onReviewDue && (
+        <div className="px-5 pb-2 pt-2">
+          <button onClick={onReviewDue}
+            className="flex w-full items-center gap-3 rounded-2xl p-4 text-left shadow-sm transition active:scale-[0.98]"
+            style={{ background: "linear-gradient(135deg,#0984e3,#7209B7)" }}>
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-2xl" style={{ background: "rgba(255,255,255,.2)" }}>🔁</span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-xs font-bold text-white/80">오늘 복습</span>
+              <span className="block font-extrabold text-white">복습할 단어 {dueCount}개</span>
+              <span className="block text-xs text-white/85">간격 반복으로 지금 복습하기</span>
+            </span>
+            <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+          </button>
+        </div>
+      )}
+
       {/* 이어서 학습 */}
       {resume && (
         <div className="px-5 pb-2 pt-2">

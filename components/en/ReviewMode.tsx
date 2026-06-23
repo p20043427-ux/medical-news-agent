@@ -134,7 +134,11 @@ export default function EnReviewMode({
             <div className="mt-2 w-full space-y-3">
               <p className="text-2xl font-bold" style={{ color: "var(--text-1)" }}>{word.meaning}</p>
               <div className="rounded-2xl p-4 text-left" style={{ background: "var(--surface)" }}>
-                <p className="leading-relaxed" style={{ color: "var(--text-2)" }}>"{word.example.en}"</p>
+                <div className="flex items-start gap-2">
+                  <p className="flex-1 leading-relaxed" style={{ color: "var(--text-2)" }}>&quot;{word.example.en}&quot;</p>
+                  <button onClick={(e) => { e.stopPropagation(); speakEn(word.example.en); }} aria-label="예문 듣기"
+                    className="grid h-8 w-8 shrink-0 place-items-center rounded-full" style={{ background: "var(--card)", color: "#4361EE" }}>🔊</button>
+                </div>
                 <p className="mt-1.5 text-sm" style={{ color: "var(--text-3)" }}>{word.example.ko}</p>
               </div>
               {word.synonyms && (
