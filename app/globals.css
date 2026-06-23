@@ -4,32 +4,27 @@
 
 :root {
   color-scheme: light;
-  --bg: #F8F9FB;
-  --card: #FFFFFF;
-  --surface: #F1F3F7;
-  --text-1: #1A1A2E;
-  --text-2: #4A5568;
-  --text-3: #94A3B8;
-  --border: #E2E8F0;
+  /* 단일 소스: 색 값은 --ds-* (HSL)에서 정의하고, 레거시 토큰은 그 위에 alias 한다. */
+  --bg: hsl(var(--ds-background));
+  --card: hsl(var(--ds-card));
+  --surface: hsl(var(--ds-muted));
+  --text-1: hsl(var(--ds-foreground));
+  --text-2: hsl(var(--ds-muted-foreground));
+  --text-3: hsl(var(--ds-subtle));
+  --border: hsl(var(--ds-border));
   --jp-from: #E63946;
   --jp-to: #F4A261;
   --en-from: #4361EE;
   --en-to: #7209B7;
   --xp: #F59E0B;
-  --success: #10B981;
+  --success: hsl(var(--ds-success));
   --danger: #EF4444;
   --hard: #F97316;
 }
 
 html.dark {
   color-scheme: dark;
-  --bg: #0F0F1A;
-  --card: #1A1B2E;
-  --surface: #242540;
-  --text-1: #F0F0F7;
-  --text-2: #A0A8C0;
-  --text-3: #5A6480;
-  --border: #2A2D4A;
+  /* 다크 값은 --ds-* html.dark 블록에서 단일 정의 → 레거시 alias 가 자동 반영 */
 }
 
 body {
@@ -221,23 +216,24 @@ html.dark .via-\[\#F8F9FB\] {
    tailwind.config 의 colors 와 연결 → bg-primary / text-muted-foreground 등 사용 가능.
    ============================================================ */
 :root {
-  --ds-background: 220 22% 98%;
-  --ds-foreground: 240 25% 14%;
-  --ds-card: 0 0% 100%;
-  --ds-card-foreground: 240 25% 14%;
-  --ds-muted: 220 16% 95%;
-  --ds-muted-foreground: 215 20% 40%;
+  --ds-background: 220 27.3% 97.8%;       /* = 레거시 --bg #F8F9FB */
+  --ds-foreground: 240 27.8% 14.1%;       /* = --text-1 #1A1A2E */
+  --ds-card: 0 0% 100%;                    /* = --card #FFFFFF */
+  --ds-card-foreground: 240 27.8% 14.1%;
+  --ds-muted: 220 27.3% 95.7%;            /* = --surface #F1F3F7 */
+  --ds-muted-foreground: 218 16.9% 34.9%; /* = --text-2 #4A5568 */
+  --ds-subtle: 215 20.2% 65.1%;           /* = --text-3 #94A3B8 */
   --ds-primary: 353 78% 52%;          /* 일본어 브랜드 (#E63946) */
   --ds-primary-foreground: 0 0% 100%;
   --ds-secondary: 28 87% 62%;         /* 주황 (#F4A261) */
   --ds-secondary-foreground: 240 25% 14%;
   --ds-accent: 243 75% 59%;           /* 영어 브랜드 (#4361EE) */
   --ds-accent-foreground: 0 0% 100%;
-  --ds-success: 160 84% 33%;
+  --ds-success: 160.1 84.1% 39.4%;        /* = --success #10B981 */
   --ds-warning: 25 95% 48%;
   --ds-destructive: 0 78% 54%;
-  --ds-border: 220 16% 90%;
-  --ds-input: 220 16% 90%;
+  --ds-border: 214.3 31.8% 91.4%;         /* = --border #E2E8F0 */
+  --ds-input: 214.3 31.8% 91.4%;
   --ds-ring: 353 78% 52%;
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
@@ -247,14 +243,15 @@ html.dark .via-\[\#F8F9FB\] {
   --shadow-md: 0 8px 24px -12px hsl(240 25% 14% / 0.25);
 }
 html.dark {
-  --ds-background: 240 30% 8%;
-  --ds-foreground: 240 20% 96%;
-  --ds-card: 240 33% 14%;
-  --ds-card-foreground: 240 20% 96%;
-  --ds-muted: 240 25% 18%;
-  --ds-muted-foreground: 220 14% 66%;
-  --ds-border: 240 20% 24%;
-  --ds-input: 240 20% 24%;
+  --ds-background: 240 26.8% 8%;           /* = 레거시 --bg #0F0F1A */
+  --ds-foreground: 240 30.4% 95.5%;        /* = --text-1 #F0F0F7 */
+  --ds-card: 237 27.8% 14.1%;              /* = --card #1A1B2E */
+  --ds-card-foreground: 240 30.4% 95.5%;
+  --ds-muted: 237.9 28% 19.6%;            /* = --surface #242540 */
+  --ds-muted-foreground: 225 20.3% 69%;   /* = --text-2 #A0A8C0 */
+  --ds-subtle: 224.2 17.4% 42.7%;         /* = --text-3 #5A6480 */
+  --ds-border: 234.4 27.6% 22.7%;         /* = --border #2A2D4A */
+  --ds-input: 234.4 27.6% 22.7%;
   --ds-ring: 353 78% 62%;
 }
 
