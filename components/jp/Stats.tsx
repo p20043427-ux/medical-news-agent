@@ -8,6 +8,7 @@ import {
 import { useTheme, type Theme } from "@/lib/jp/theme";
 import { getRate, setRate as saveRate, speakJa } from "@/lib/jp/speech";
 import { getExamHistory, type ExamAttempt } from "@/lib/exam-history";
+import { buildBackup, restoreBackup } from "@/lib/backup";
 import ReminderSetting from "@/components/ReminderSetting";
 import { Button, Progress } from "@/components/ui";
 
@@ -70,7 +71,7 @@ export default function Stats({
   function changeRate(v: number) { setRateState(v); saveRate(v); }
 
   function exportFile() {
-    const blob = new Blob([onExport()], { type: "application/json" });
+    const blob = new Blob([buildBackup("jp", onExport())], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url; a.download = `일본어-진도-${todayKey()}.json`; a.click();
@@ -80,7 +81,11 @@ export default function Stats({
   function importFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]; if (!f) return;
     const reader = new FileReader();
-    reader.onload = () => { alert(onImport(String(reader.result)) ? "진도를 가져왔어요!" : "파일을 읽을 수 없어요."); };
+    reader.onload = () => {
+      if (restoreBackup("jp", String(reader.result), onImport)) {
+        alert("진도와 학습 데이터를 가져왔어요! 새로고침하면 모두 반영돼요.");
+      } else { alert("파일을 읽을 수 없어요."); }
+    };
     reader.readAsText(f); e.target.value = "";
   }
 

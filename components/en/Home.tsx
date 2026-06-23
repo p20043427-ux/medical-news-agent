@@ -7,6 +7,7 @@ import { EN_CONVERSATIONS } from "@/lib/en/conversations";
 import { speakEn } from "@/lib/en/speech";
 import { useFavorites } from "@/lib/favorites";
 import { useRoleplay } from "@/lib/roleplay-progress";
+import { useEffect, useState } from "react";
 import { Button, Progress } from "@/components/ui";
 
 const EN_ALL_PHRASES = EN_TRAVEL_PHRASEBOOK.flatMap((s) => s.phrases);
@@ -36,6 +37,8 @@ export default function EnHome({ progress, onStudyCategory, onGrammar }: {
   const { data: rpData } = useRoleplay("en-roleplay");
   const rpDone = Object.keys(rpData).length;
   const rpTotal = EN_CONVERSATIONS.length;
+  const [convRead, setConvRead] = useState(0);
+  useEffect(() => { try { setConvRead((JSON.parse(localStorage.getItem("en-conv-read") || "[]") as string[]).length); } catch { /* ignore */ } }, []);
   const todayPhrase = EN_ALL_PHRASES[enDailyIndex(todayKey(), EN_ALL_PHRASES.length)];
 
   const ordered = [...EN_CATEGORIES].sort((a, b) => {
@@ -74,15 +77,24 @@ export default function EnHome({ progress, onStudyCategory, onGrammar }: {
         </h1>
       </div>
 
-      {/* 회화 롤플레이 진행 */}
-      {rpDone > 0 && (
+      {/* 회화 진행 (읽음 · 롤플레이) */}
+      {(convRead > 0 || rpDone > 0) && (
         <div className="px-5 pb-3">
-          <div className="rounded-2xl p-4" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>🗣️ 회화 롤플레이</span>
-              <span className="text-sm font-bold" style={{ color: "var(--text-2)" }}>{rpDone} / {rpTotal} 완료</span>
+          <div className="space-y-3 rounded-2xl p-4" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+            <div>
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>📖 회화 읽음</span>
+                <span className="text-sm font-bold" style={{ color: "var(--text-2)" }}>{convRead} / {rpTotal}</span>
+              </div>
+              <Progress value={rpTotal ? (convRead / rpTotal) * 100 : 0} indicatorStyle={{ background: "linear-gradient(90deg,#10B981,#55efc4)" }} />
             </div>
-            <Progress value={rpTotal ? (rpDone / rpTotal) * 100 : 0} indicatorStyle={{ background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
+            <div>
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>🗣️ 롤플레이</span>
+                <span className="text-sm font-bold" style={{ color: "var(--text-2)" }}>{rpDone} / {rpTotal}</span>
+              </div>
+              <Progress value={rpTotal ? (rpDone / rpTotal) * 100 : 0} indicatorStyle={{ background: "linear-gradient(90deg,#4361EE,#7209B7)" }} />
+            </div>
           </div>
         </div>
       )}
