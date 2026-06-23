@@ -30,7 +30,10 @@ export default function BottomNav({
       className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md border-t backdrop-blur"
       style={{ background: "var(--card)", borderColor: "var(--border)" }}
     >
-      <div className="flex items-stretch justify-around gap-1 px-2 pb-[env(safe-area-inset-bottom)] pt-1.5">
+      <div
+        className="flex items-stretch justify-around gap-1 px-2 pt-1.5"
+        style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.5rem)" }}
+      >
         {(Object.keys(LABEL) as Tab[]).map((t) => {
           const on = tab === t;
           return (

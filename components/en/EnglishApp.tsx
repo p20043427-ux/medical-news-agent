@@ -100,7 +100,7 @@ export default function EnglishApp({ onBack }: { onBack?: () => void }) {
   return (
     <div className="mx-auto min-h-screen max-w-md" style={{ background: "var(--bg)" }}>
       {/* 헤더 — 레벨 · 진도칩 · 아바타 · 주간 스트립 */}
-      <header className="sticky top-0 z-30" style={{ background: "var(--bg)" }}>
+      <header className="sticky top-0 z-30" style={{ background: "var(--bg)", paddingTop: "env(safe-area-inset-top)" }}>
         <div className="flex items-center gap-2 px-4 pb-2 pt-3">
           {onBack && (
             <button onClick={onBack} aria-label="뒤로" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"

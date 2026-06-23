@@ -57,7 +57,7 @@ function LandingPage({ onSelect }: { onSelect: (l: Lang) => void }) {
       className="relative flex min-h-screen flex-col items-center justify-center px-5 py-12"
       style={{ background: "var(--bg)" }}
     >
-      <div className="absolute right-5 top-5">
+      <div className="absolute right-5" style={{ top: "max(env(safe-area-inset-top), 1.25rem)" }}>
         <AccountButton />
       </div>
 

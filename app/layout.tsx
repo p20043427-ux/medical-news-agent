@@ -18,6 +18,7 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  viewportFit: "cover" as const,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#F8F9FB" },
     { media: "(prefers-color-scheme: dark)", color: "#0F0F1A" },
