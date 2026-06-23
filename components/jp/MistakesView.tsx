@@ -5,6 +5,7 @@ import { VOCAB } from "@/lib/jp/vocab";
 import Furigana from "./Furigana";
 import SpeakerButton from "./SpeakerButton";
 import { Button } from "@/components/ui";
+import { useUiLang, tt } from "@/lib/i18n";
 
 export default function MistakesView({
   mistakes,
@@ -19,6 +20,7 @@ export default function MistakesView({
   onQuiz: (ids: string[]) => void;
   onBack?: () => void;
 }) {
+  const lang = useUiLang();
   const words = useMemo(
     () => VOCAB.filter((w) => mistakes.includes(w.id)),
     [mistakes],
@@ -31,7 +33,7 @@ export default function MistakesView({
         {onBack && (
           <button
             onClick={onBack}
-            aria-label="뒤로"
+            aria-label={tt(lang, "뒤로", "戻る")}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
             style={{ background: "var(--surface)", color: "var(--text-2)" }}
           >
@@ -39,27 +41,27 @@ export default function MistakesView({
           </button>
         )}
         <div className="flex-1">
-          <h1 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>오답노트</h1>
-          <p className="text-xs" style={{ color: "var(--text-3)" }}>틀린 단어를 모아 집중 복습해요 · {words.length}개</p>
+          <h1 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{tt(lang, "오답노트", "間違いノート")}</h1>
+          <p className="text-xs" style={{ color: "var(--text-3)" }}>{tt(lang, `틀린 단어를 모아 집중 복습해요 · ${words.length}개`, `間違えた単語を集めて集中復習 · ${words.length}個`)}</p>
         </div>
       </div>
 
       {words.length === 0 ? (
         <div className="mt-16 flex flex-col items-center gap-3 text-center">
           <div className="text-5xl">🎯</div>
-          <p className="font-bold" style={{ color: "var(--text-1)" }}>아직 오답이 없어요</p>
+          <p className="font-bold" style={{ color: "var(--text-1)" }}>{tt(lang, "아직 오답이 없어요", "まだ間違いがありません")}</p>
           <p className="text-sm" style={{ color: "var(--text-3)" }}>
-            복습·퀴즈에서 틀린 단어가 여기에 모여요.
+            {tt(lang, "복습·퀴즈에서 틀린 단어가 여기에 모여요.", "復習・クイズで間違えた単語がここに集まります。")}
           </p>
         </div>
       ) : (
         <>
           <div className="mb-4 grid grid-cols-2 gap-2.5">
             <Button variant="brand" size="free" onClick={() => onReview(ids)} className="py-3.5">
-              🔁 오답 복습
+              {tt(lang, "🔁 오답 복습", "🔁 間違い復習")}
             </Button>
             <Button variant="surface" size="free" onClick={() => onQuiz(ids)} className="py-3.5">
-              📝 오답 퀴즈
+              {tt(lang, "📝 오답 퀴즈", "📝 間違いクイズ")}
             </Button>
           </div>
 

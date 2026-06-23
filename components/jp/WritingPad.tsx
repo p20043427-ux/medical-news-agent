@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useCallback, useState, useMemo } from "react";
+import { useUiLang, tt } from "@/lib/i18n";
 
 const SIZE = 300;
 type Pt = [number, number];
@@ -12,6 +13,7 @@ export default function WritingPad({
   character: string;
   reading: string;
 }) {
+  const lang = useUiLang();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isDown = useRef(false);
   const strokes = useRef<Pt[][]>([]); // 획 히스토리(undo용)
@@ -179,7 +181,7 @@ export default function WritingPad({
           <button
             onClick={() => setIdx((i) => Math.max(0, i - 1))}
             disabled={idx === 0}
-            aria-label="이전 글자"
+            aria-label={tt(lang, "이전 글자", "前の文字")}
             className="grid h-8 w-8 place-items-center rounded-full disabled:opacity-30"
             style={{ background: "var(--surface)", color: "var(--text-2)" }}
           >‹</button>
@@ -189,14 +191,14 @@ export default function WritingPad({
           <button
             onClick={() => setIdx((i) => Math.min(chars.length - 1, i + 1))}
             disabled={idx === chars.length - 1}
-            aria-label="다음 글자"
+            aria-label={tt(lang, "다음 글자", "次の文字")}
             className="grid h-8 w-8 place-items-center rounded-full disabled:opacity-30"
             style={{ background: "var(--surface)", color: "var(--text-2)" }}
           >›</button>
         </div>
       )}
 
-      <p className="text-xs" style={{ color: "var(--text-3)" }}>가이드를 따라 써보세요</p>
+      <p className="text-xs" style={{ color: "var(--text-3)" }}>{tt(lang, "가이드를 따라 써보세요", "ガイドに沿って書いてみましょう")}</p>
       <div
         className="overflow-hidden rounded-2xl shadow-inner"
         style={{ width: "100%", maxWidth: SIZE, aspectRatio: "1 / 1", background: "var(--surface)", border: "1px solid var(--border)" }}
@@ -204,7 +206,7 @@ export default function WritingPad({
         <canvas
           ref={canvasRef}
           role="img"
-          aria-label={`${cur} 쓰기 연습`}
+          aria-label={tt(lang, `${cur} 쓰기 연습`, `${cur} 書き取り練習`)}
           className="block h-full w-full"
           style={{ touchAction: "none" }}
           onPointerDown={down}
@@ -224,7 +226,7 @@ export default function WritingPad({
           style={{ background: "var(--surface)", color: "var(--text-2)" }}
         >
           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="M9 14 4 9l5-5" /><path d="M4 9h11a5 5 0 0 1 0 10h-1" /></svg>
-          되돌리기
+          {tt(lang, "되돌리기", "元に戻す")}
         </button>
         <button
           onClick={clear}
@@ -233,7 +235,7 @@ export default function WritingPad({
           style={{ background: "linear-gradient(135deg,#ffeaa7,#fdcb6e)", color: "#7f5800" }}
         >
           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
-          전체 지우기
+          {tt(lang, "전체 지우기", "すべて消す")}
         </button>
       </div>
     </div>

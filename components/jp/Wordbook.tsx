@@ -8,6 +8,7 @@ import { Button } from "@/components/ui";
 import { Chip } from "@/components/ui/chip";
 import { Sheet } from "@/components/ui/sheet";
 import { EmptyState } from "@/components/ui/empty-state";
+import { useUiLang, tt } from "@/lib/i18n";
 
 const EMOJI: Record<string, string> = Object.fromEntries(
   VOCAB_CATEGORIES.map((c) => [c.key, c.emoji])
@@ -24,6 +25,7 @@ export default function Wordbook({
   onToggleBookmark: (id: string) => void;
   onStudy: (ids: string[]) => void;
 }) {
+  const lang = useUiLang();
   const [selected, setSelected] = useState<Word | null>(null);
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<string | null>(null);
@@ -57,19 +59,19 @@ export default function Wordbook({
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="단어·뜻·읽기·로마자 검색 (전체 단어)"
+            placeholder={tt(lang, "단어·뜻·읽기·로마자 검색 (전체 단어)", "単語・意味・読み・ローマ字で検索（全単語）")}
             className="w-full bg-transparent text-sm outline-none"
             style={{ color: "var(--text-1)" }}
           />
           {query && (
-            <button onClick={() => setQuery("")} aria-label="지우기" className="shrink-0 text-sm" style={{ color: "var(--text-3)" }}>✕</button>
+            <button onClick={() => setQuery("")} aria-label={tt(lang, "지우기", "クリア")} className="shrink-0 text-sm" style={{ color: "var(--text-3)" }}>✕</button>
           )}
         </div>
         <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-          <Chip active={cat === null} accent="#E63946" onClick={() => setCat(null)}>전체</Chip>
+          <Chip active={cat === null} accent="#E63946" onClick={() => setCat(null)}>{tt(lang, "전체", "すべて")}</Chip>
           {VOCAB_CATEGORIES.map((c) => (
             <Chip key={c.key} active={cat === c.key} accent="#E63946" onClick={() => setCat(cat === c.key ? null : c.key)}>
-              <span>{c.emoji}</span><span>{c.label}</span>
+              <span>{c.emoji}</span><span>{lang === "ja" ? (c.labelJa ?? c.label) : c.label}</span>
             </Chip>
           ))}
         </div>
@@ -78,11 +80,11 @@ export default function Wordbook({
       {/* 헤더 */}
       <div className="flex items-center justify-between px-4 py-3">
         <p className="text-sm font-bold" style={{ color: "var(--text-1)" }}>
-          {searching ? "검색 결과" : "저장된 단어"} <span className="text-base font-bold" style={{ color: "var(--text-3)" }}>{words.length}개</span>
+          {searching ? tt(lang, "검색 결과", "検索結果") : tt(lang, "저장된 단어", "保存した単語")} <span className="text-base font-bold" style={{ color: "var(--text-3)" }}>{tt(lang, `${words.length}개`, `${words.length}個`)}</span>
         </p>
         <div className="flex items-center gap-2">
           <div className="flex rounded-lg p-0.5" style={{ background: "var(--surface)" }}>
-            {([["default", "기본"], ["reading", "가나"], ["meaning", "뜻"]] as ["default" | "reading" | "meaning", string][]).map(([s, label]) => (
+            {([["default", tt(lang, "기본", "標準")], ["reading", tt(lang, "가나", "かな")], ["meaning", tt(lang, "뜻", "意味")]] as ["default" | "reading" | "meaning", string][]).map(([s, label]) => (
               <button key={s} onClick={() => setSort(s)}
                 className="rounded-md px-2 py-1 text-xs font-bold transition"
                 style={sort === s ? { background: "var(--card)", color: "var(--text-1)" } : { color: "var(--text-3)" }}>
@@ -91,7 +93,7 @@ export default function Wordbook({
             ))}
           </div>
           {!searching && bookmarks.length > 0 && (
-            <Button variant="brand" size="free" onClick={() => onStudy(bookmarks)} className="px-3 py-2 text-sm">복습</Button>
+            <Button variant="brand" size="free" onClick={() => onStudy(bookmarks)} className="px-3 py-2 text-sm">{tt(lang, "복습", "復習")}</Button>
           )}
         </div>
       </div>
@@ -100,8 +102,8 @@ export default function Wordbook({
 
       {words.length === 0 ? (
         searching
-          ? <EmptyState emoji="🔍" title="검색 결과가 없어요" description="다른 검색어나 카테고리를 시도해 보세요." />
-          : <EmptyState emoji="📚" title="단어장이 비어있어요" description="위에서 검색하거나, 카드의 ★로 단어를 저장하세요." />
+          ? <EmptyState emoji="🔍" title={tt(lang, "검색 결과가 없어요", "検索結果がありません")} description={tt(lang, "다른 검색어나 카테고리를 시도해 보세요.", "別のキーワードやカテゴリーを試してください。")} />
+          : <EmptyState emoji="📚" title={tt(lang, "단어장이 비어있어요", "単語帳が空です")} description={tt(lang, "위에서 검색하거나, 카드의 ★로 단어를 저장하세요.", "上で検索するか、カードの★で単語を保存しましょう。")} />
       ) : (
         <ul className="mt-1">
           {words.map((w) => {
@@ -115,7 +117,7 @@ export default function Wordbook({
                     <p className="truncate text-xs" style={{ color: "var(--text-3)" }}>[{w.reading}]　{w.meaning}</p>
                   </div>
                 </button>
-                <button onClick={() => onToggleBookmark(w.id)} aria-label="단어장 저장"
+                <button onClick={() => onToggleBookmark(w.id)} aria-label={tt(lang, "단어장 저장", "単語帳に保存")}
                   className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-lg"
                   style={{ color: saved ? "#f0932b" : "var(--text-3)" }}>{saved ? "★" : "☆"}</button>
               </li>

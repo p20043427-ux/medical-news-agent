@@ -4,6 +4,7 @@ import { useState } from "react";
 import Wordbook from "./Wordbook";
 import MistakesView from "./MistakesView";
 import { Segmented } from "@/components/ui/segmented";
+import { useUiLang, tt } from "@/lib/i18n";
 
 export default function LibraryView({
   bookmarks,
@@ -22,6 +23,7 @@ export default function LibraryView({
   onReviewMistakes: (ids: string[]) => void;
   onQuizMistakes: (ids: string[]) => void;
 }) {
+  const lang = useUiLang();
   const [sub, setSub] = useState<"wordbook" | "mistakes">("wordbook");
 
   return (
@@ -33,8 +35,8 @@ export default function LibraryView({
           onChange={setSub}
           accent="#E63946"
           options={[
-            { value: "wordbook", label: `📚 단어장 (${bookmarks.length})` },
-            { value: "mistakes", label: `🎯 오답노트 (${mistakes.length})` },
+            { value: "wordbook", label: tt(lang, `📚 단어장 (${bookmarks.length})`, `📚 単語帳 (${bookmarks.length})`) },
+            { value: "mistakes", label: tt(lang, `🎯 오답노트 (${mistakes.length})`, `🎯 間違いノート (${mistakes.length})`) },
           ]}
         />
       </div>

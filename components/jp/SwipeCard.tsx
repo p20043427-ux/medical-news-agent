@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useUiLang, tt } from "@/lib/i18n";
 
 /**
  * 드래그(스와이프)로 카드를 분류하는 래퍼.
@@ -16,6 +17,7 @@ export default function SwipeCard({
   /** 카드가 바뀔 때마다 달라지는 key (위치 리셋용) */
   swipeKey: string;
 }) {
+  const lang = useUiLang();
   const [dx, setDx] = useState(0);
   const [leaving, setLeaving] = useState<null | "left" | "right">(null);
   const start = useRef<number | null>(null);
@@ -83,13 +85,13 @@ export default function SwipeCard({
         className="pointer-events-none absolute left-4 top-6 z-10 rotate-[-12deg] rounded-xl border-4 border-emerald-500 px-3 py-1 text-xl font-extrabold text-emerald-500"
         style={{ opacity: knownOpacity }}
       >
-        알고 있어요
+        {tt(lang, "알고 있어요", "知っている")}
       </div>
       <div
         className="pointer-events-none absolute right-4 top-6 z-10 rotate-[12deg] rounded-xl border-4 border-slate-800 px-3 py-1 text-xl font-extrabold text-slate-800"
         style={{ opacity: studyOpacity }}
       >
-        학습할게요
+        {tt(lang, "학습할게요", "学習する")}
       </div>
       {children}
     </div>

@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { useUiLang, tt } from "@/lib/i18n";
 
 type Mode = "login" | "signup";
 
 export default function AuthModal({ onClose }: { onClose: () => void }) {
   const { signIn, signUp } = useAuth();
+  const lang = useUiLang();
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,7 +25,7 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
     try {
       if (mode === "signup") {
         if (name.trim().length < 1) {
-          setError("이름을 입력해 주세요.");
+          setError(tt(lang, "이름을 입력해 주세요.", "名前を入力してください。"));
           return;
         }
         const r = await signUp(email.trim(), password, name.trim());
@@ -32,7 +34,7 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
           return;
         }
         if (r.needsConfirm) {
-          setInfo("확인 이메일을 보냈어요. 메일의 링크를 누른 뒤 로그인해 주세요.");
+          setInfo(tt(lang, "확인 이메일을 보냈어요. 메일의 링크를 누른 뒤 로그인해 주세요.", "確認メールを送信しました。メール内のリンクを押してからログインしてください。"));
           setMode("login");
           return;
         }
@@ -63,34 +65,34 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
       >
         <div className="mb-1 flex items-center justify-between">
           <h2 className="text-xl font-extrabold" style={{ color: "var(--text-1)" }}>
-            {mode === "login" ? "로그인" : "회원가입"}
+            {mode === "login" ? tt(lang, "로그인", "ログイン") : tt(lang, "회원가입", "新規登録")}
           </h2>
           <button
             onClick={onClose}
             className="flex h-8 w-8 items-center justify-center rounded-full text-lg"
             style={{ background: "var(--surface)", color: "var(--text-3)" }}
-            aria-label="닫기"
+            aria-label={tt(lang, "닫기", "閉じる")}
           >
             ✕
           </button>
         </div>
         <p className="mb-5 text-sm" style={{ color: "var(--text-3)" }}>
-          진도가 계정에 저장되어 어느 기기에서나 이어서 학습할 수 있어요.
+          {tt(lang, "진도가 계정에 저장되어 어느 기기에서나 이어서 학습할 수 있어요.", "進捗がアカウントに保存され、どの端末でも続けて学習できます。")}
         </p>
 
         <form onSubmit={submit} className="flex flex-col gap-3">
           {mode === "signup" && (
             <Field
-              label="이름"
+              label={tt(lang, "이름", "名前")}
               value={name}
               onChange={setName}
               type="text"
-              placeholder="홍길동"
+              placeholder={tt(lang, "홍길동", "山田太郎")}
               autoComplete="name"
             />
           )}
           <Field
-            label="이메일"
+            label={tt(lang, "이메일", "メールアドレス")}
             value={email}
             onChange={setEmail}
             type="email"
@@ -98,11 +100,11 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
             autoComplete="email"
           />
           <Field
-            label="비밀번호"
+            label={tt(lang, "비밀번호", "パスワード")}
             value={password}
             onChange={setPassword}
             type="password"
-            placeholder="6자 이상"
+            placeholder={tt(lang, "6자 이상", "6文字以上")}
             autoComplete={mode === "login" ? "current-password" : "new-password"}
           />
 
@@ -123,23 +125,23 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
             className="mt-1 rounded-2xl py-3 text-sm font-bold text-white transition active:scale-[0.98] disabled:opacity-60"
             style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}
           >
-            {busy ? "처리 중…" : mode === "login" ? "로그인" : "가입하고 시작하기"}
+            {busy ? tt(lang, "처리 중…", "処理中…") : mode === "login" ? tt(lang, "로그인", "ログイン") : tt(lang, "가입하고 시작하기", "登録して始める")}
           </button>
         </form>
 
         <div className="mt-4 text-center text-sm" style={{ color: "var(--text-3)" }}>
           {mode === "login" ? (
             <>
-              계정이 없으신가요?{" "}
+              {tt(lang, "계정이 없으신가요? ", "アカウントをお持ちでないですか？ ")}
               <button onClick={() => { setMode("signup"); setError(null); setInfo(null); }} className="font-bold" style={{ color: "#4361EE" }}>
-                회원가입
+                {tt(lang, "회원가입", "新規登録")}
               </button>
             </>
           ) : (
             <>
-              이미 계정이 있으신가요?{" "}
+              {tt(lang, "이미 계정이 있으신가요? ", "すでにアカウントをお持ちですか？ ")}
               <button onClick={() => { setMode("login"); setError(null); setInfo(null); }} className="font-bold" style={{ color: "#4361EE" }}>
-                로그인
+                {tt(lang, "로그인", "ログイン")}
               </button>
             </>
           )}

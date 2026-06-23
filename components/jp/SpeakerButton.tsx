@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { speakJa, isSpeechSupported } from "@/lib/jp/speech";
 import { toast } from "@/lib/ui/toast";
+import { useUiLang, tt } from "@/lib/i18n";
 
 /** 일본어 텍스트를 음성으로 들려주는 스피커 버튼 */
 export default function SpeakerButton({
@@ -14,11 +15,12 @@ export default function SpeakerButton({
   size?: number;
   className?: string;
 }) {
+  const lang = useUiLang();
   const [active, setActive] = useState(false);
 
   function trigger() {
     if (!isSpeechSupported()) {
-      toast("이 브라우저는 음성 재생을 지원하지 않아요. Chrome/Safari를 권장해요.");
+      toast(tt(lang, "이 브라우저는 음성 재생을 지원하지 않아요. Chrome/Safari를 권장해요.", "このブラウザは音声再生に対応していません。Chrome/Safari を推奨します。"));
       return;
     }
     speakJa(text);
@@ -46,7 +48,7 @@ export default function SpeakerButton({
       tabIndex={0}
       onClick={handleClick}
       onKeyDown={handleKey}
-      aria-label="발음 듣기"
+      aria-label={tt(lang, "발음 듣기", "発音を聞く")}
       style={{ width: size, height: size }}
       className={`flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition active:scale-90 ${
         active ? "bg-slate-900 text-white" : "hover:bg-slate-50"

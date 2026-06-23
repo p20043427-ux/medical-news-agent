@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { GOJUON, DAKUON, YOON, ALL_KANA, type Kana } from "@/lib/jp/kana";
 import { speakJa } from "@/lib/jp/speech";
 import { track } from "@/lib/analytics";
+import { useUiLang, tt, type UiLang } from "@/lib/i18n";
 
 type Script = "h" | "k";
 
@@ -17,6 +18,7 @@ function shuffle<T>(a: T[]): T[] {
 }
 
 export default function KanaView({ onBack }: { onBack?: () => void }) {
+  const lang = useUiLang();
   const [script, setScript] = useState<Script>("h");
   const [showRomaji, setShowRomaji] = useState(true);
   const [mode, setMode] = useState<"chart" | "quiz">("chart");
@@ -69,7 +71,7 @@ export default function KanaView({ onBack }: { onBack?: () => void }) {
         {onBack && (
           <button
             onClick={onBack}
-            aria-label="뒤로"
+            aria-label={tt(lang, "뒤로", "戻る")}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
             style={{ background: "var(--surface)", color: "var(--text-2)" }}
           >
@@ -77,15 +79,15 @@ export default function KanaView({ onBack }: { onBack?: () => void }) {
           </button>
         )}
         <div className="flex-1">
-          <h1 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>가나 (かな)</h1>
-          <p className="text-xs" style={{ color: "var(--text-3)" }}>탭하면 발음이 들려요</p>
+          <h1 className="text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{tt(lang, "가나 (かな)", "かな")}</h1>
+          <p className="text-xs" style={{ color: "var(--text-3)" }}>{tt(lang, "탭하면 발음이 들려요", "タップで発音が聞けます")}</p>
         </div>
       </div>
 
       {/* 컨트롤 */}
       <div className="mb-4 flex items-center gap-2">
         <div className="flex rounded-xl p-1" style={{ background: "var(--surface)" }}>
-          {([["h", "히라가나"], ["k", "가타카나"]] as [Script, string][]).map(([s, label]) => (
+          {([["h", tt(lang, "히라가나", "ひらがな")], ["k", tt(lang, "가타카나", "カタカナ")]] as [Script, string][]).map(([s, label]) => (
             <button
               key={s}
               onClick={() => setScript(s)}
@@ -112,24 +114,24 @@ export default function KanaView({ onBack }: { onBack?: () => void }) {
           className="ml-auto rounded-full px-3 py-1.5 text-xs font-bold"
           style={{ background: "var(--surface)", color: "var(--text-2)" }}
         >
-          {mode === "chart" ? "📝 퀴즈" : "📋 표 보기"}
+          {mode === "chart" ? tt(lang, "📝 퀴즈", "📝 クイズ") : tt(lang, "📋 표 보기", "📋 表を見る")}
         </button>
       </div>
 
       {mode === "chart" ? (
         <>
-          <Section title="청음 (五十音)" rows={GOJUON} cols={5} />
-          <Section title="탁음 · 반탁음" rows={DAKUON} cols={5} />
-          <Section title="요음 (拗音)" rows={YOON} cols={3} />
+          <Section title={tt(lang, "청음 (五十音)", "清音（五十音）")} rows={GOJUON} cols={5} />
+          <Section title={tt(lang, "탁음 · 반탁음", "濁音・半濁音")} rows={DAKUON} cols={5} />
+          <Section title={tt(lang, "요음 (拗音)", "拗音")} rows={YOON} cols={3} />
         </>
       ) : (
-        <KanaQuiz script={script} />
+        <KanaQuiz script={script} lang={lang} />
       )}
     </div>
   );
 }
 
-function KanaQuiz({ script }: { script: Script }) {
+function KanaQuiz({ script, lang }: { script: Script; lang: UiLang }) {
   const [round, setRound] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [score, setScore] = useState({ ok: 0, total: 0 });
@@ -153,7 +155,7 @@ function KanaQuiz({ script }: { script: Script }) {
 
   return (
     <div className="flex flex-col items-center gap-5 pt-4">
-      <p className="text-sm" style={{ color: "var(--text-3)" }}>정답 {score.ok} / {score.total}</p>
+      <p className="text-sm" style={{ color: "var(--text-3)" }}>{tt(lang, `정답 ${score.ok} / ${score.total}`, `正解 ${score.ok} / ${score.total}`)}</p>
       <button
         onClick={() => speakJa(q.answer.h)}
         className="flex h-32 w-32 items-center justify-center rounded-3xl text-6xl font-bold shadow-lg"
@@ -161,7 +163,7 @@ function KanaQuiz({ script }: { script: Script }) {
       >
         {script === "h" ? q.answer.h : q.answer.k}
       </button>
-      <p className="text-xs" style={{ color: "var(--text-3)" }}>이 글자의 로마자는?</p>
+      <p className="text-xs" style={{ color: "var(--text-3)" }}>{tt(lang, "이 글자의 로마자는?", "この文字のローマ字は？")}</p>
       <div className="grid w-full max-w-xs grid-cols-2 gap-3">
         {q.options.map((o) => {
           const isAns = o.r === q.answer.r;
