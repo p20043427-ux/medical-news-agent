@@ -6,6 +6,7 @@ import { PHRASAL_VERBS } from "@/lib/en/phrasal-verbs";
 import type { GrammarPoint, PhrasalVerb } from "@/lib/en/types";
 import { speakEn } from "@/lib/en/speech";
 import { AccordionItem } from "@/components/ui/accordion";
+import GrammarQuiz from "@/components/GrammarQuiz";
 
 type Section = "grammar" | "phrasal";
 
@@ -115,10 +116,19 @@ function PhrasalVerbCard({ pv }: { pv: PhrasalVerb }) {
 export default function EnGrammarView() {
   const [section, setSection] = useState<Section>("grammar");
   const [selectedBase, setSelectedBase] = useState<string>("break");
+  const [quiz, setQuiz] = useState(false);
 
   const filteredPV = PHRASAL_VERBS.filter((pv) =>
     pv.phrase.startsWith(selectedBase)
   );
+
+  if (quiz) {
+    return (
+      <GrammarQuiz accent="#4361EE" speak={speakEn} onExit={() => setQuiz(false)}
+        points={GRAMMAR_POINTS.map((g) => ({ title: g.title, brief: g.brief, examples: g.examples.map((e) => ({ text: e.en, audio: e.en, ko: e.ko })) }))}
+      />
+    );
+  }
 
   return (
     <div className="pb-28 pt-2">
@@ -140,7 +150,11 @@ export default function EnGrammarView() {
 
       {section === "grammar" && (
         <div className="px-4 space-y-3">
-          <p className="text-xs mb-2 px-1" style={{ color: "var(--text-3)" }}>
+          <button onClick={() => setQuiz(true)} className="w-full rounded-2xl py-3 text-sm font-bold text-white"
+            style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)", boxShadow: "0 4px 12px rgba(67,97,238,.3)" }}>
+            📝 문법 퀴즈 풀기
+          </button>
+          <p className="text-xs px-1" style={{ color: "var(--text-3)" }}>
             탭하면 펼쳐집니다 — {GRAMMAR_POINTS.length}개 문법 포인트
           </p>
           {GRAMMAR_POINTS.map((gp) => (

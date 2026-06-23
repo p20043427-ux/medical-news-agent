@@ -4,6 +4,7 @@ import { useState } from "react";
 import { JP_GRAMMAR } from "@/lib/jp/grammar";
 import { speakJa } from "@/lib/jp/speech";
 import { AccordionItem } from "@/components/ui/accordion";
+import GrammarQuiz from "@/components/GrammarQuiz";
 
 function SpeakBtn({ text }: { text: string }) {
   return (
@@ -19,11 +20,24 @@ function SpeakBtn({ text }: { text: string }) {
 
 export default function GrammarView() {
   const [open, setOpen] = useState<string | null>(JP_GRAMMAR[0]?.id ?? null);
+  const [quiz, setQuiz] = useState(false);
+
+  if (quiz) {
+    return (
+      <GrammarQuiz accent="#E63946" speak={speakJa} onExit={() => setQuiz(false)}
+        points={JP_GRAMMAR.map((g) => ({ title: g.title, brief: g.brief, examples: g.examples.map((e) => ({ text: e.jp, audio: e.reading || e.jp, ko: e.ko })) }))}
+      />
+    );
+  }
 
   return (
     <div className="px-4 pb-28 pt-3">
       <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>N5 문법</h1>
-      <p className="mb-4 text-sm" style={{ color: "var(--text-3)" }}>조사·활용·표현을 예문과 함께 익혀요. ({JP_GRAMMAR.length}개)</p>
+      <p className="mb-3 text-sm" style={{ color: "var(--text-3)" }}>조사·활용·표현을 예문과 함께 익혀요. ({JP_GRAMMAR.length}개)</p>
+      <button onClick={() => setQuiz(true)} className="mb-4 w-full rounded-2xl py-3 text-sm font-bold text-white"
+        style={{ background: "linear-gradient(135deg,#fdcb6e,#e17055)", boxShadow: "0 4px 12px rgba(225,112,85,.3)" }}>
+        📝 문법 퀴즈 풀기
+      </button>
 
       <div className="space-y-2.5">
         {JP_GRAMMAR.map((g) => {
