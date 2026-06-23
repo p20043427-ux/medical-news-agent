@@ -9,6 +9,8 @@ import { useTheme, type Theme } from "@/lib/jp/theme";
 import { getRate, setRate as saveRate, speakJa } from "@/lib/jp/speech";
 import { getExamHistory, type ExamAttempt } from "@/lib/exam-history";
 import { buildBackup, restoreBackup } from "@/lib/backup";
+import { getRoleplay } from "@/lib/roleplay-progress";
+import Achievements, { type Badge } from "@/components/Achievements";
 import ReminderSetting from "@/components/ReminderSetting";
 import { Button, Progress } from "@/components/ui";
 
@@ -28,7 +30,13 @@ export default function Stats({
   const [rate, setRateState] = useState(getRate());
   const [textScale, setTextScale] = useState<"sm" | "md" | "lg">("md");
   const [examHist, setExamHist] = useState<ExamAttempt[]>([]);
-  useEffect(() => { setExamHist(getExamHistory("jp")); }, []);
+  const [rpDone, setRpDone] = useState(0);
+  const [examBest, setExamBest] = useState(0);
+  useEffect(() => {
+    setExamHist(getExamHistory("jp"));
+    setRpDone(Object.keys(getRoleplay("jp-roleplay")).length);
+    try { const b = JSON.parse(localStorage.getItem("jp-exam-best") || "{}"); const vals = Object.values(b).map(Number); setExamBest(vals.length ? Math.max(...vals) : 0); } catch { /* ignore */ }
+  }, []);
   const fileRef = useRef<HTMLInputElement>(null);
   const dailyGoal = progress.dailyGoal ?? 20;
 
@@ -138,6 +146,22 @@ export default function Stats({
         </div>
         <Progress value={total ? (known / total) * 100 : 0} indicatorStyle={{ background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
       </div>
+
+      {/* 업적 */}
+      <Achievements accent="#E63946" badges={[
+        { emoji: "🌱", title: "첫걸음", desc: "단어 1개 학습", earned: known >= 1 },
+        { emoji: "📗", title: "단어 50", desc: "50개 익힘", earned: known >= 50 },
+        { emoji: "📚", title: "단어 200", desc: "200개 익힘", earned: known >= 200 },
+        { emoji: "🏆", title: "단어 500", desc: "500개 익힘", earned: known >= 500 },
+        { emoji: "🔥", title: "3일 연속", desc: "스트릭 3일", earned: str >= 3 },
+        { emoji: "💥", title: "7일 연속", desc: "스트릭 7일", earned: str >= 7 },
+        { emoji: "⚡", title: "30일 연속", desc: "스트릭 30일", earned: str >= 30 },
+        { emoji: "🗣️", title: "회화 도전", desc: "롤플레이 1회", earned: rpDone >= 1 },
+        { emoji: "🎌", title: "회화 達人", desc: "롤플레이 10회", earned: rpDone >= 10 },
+        { emoji: "🎯", title: "모의 합격", desc: "모의시험 60점+", earned: examBest >= 60 },
+        { emoji: "💯", title: "고득점", desc: "모의시험 90점+", earned: examBest >= 90 },
+        { emoji: "🔖", title: "수집가", desc: "단어장 10개+", earned: (progress.bookmarks?.length ?? 0) >= 10 },
+      ] as Badge[]} />
 
       {/* 약점 분석 */}
       <div className="mb-4 rounded-3xl p-5 shadow-sm" style={{ background: "var(--card)" }}>
