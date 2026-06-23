@@ -3,17 +3,21 @@
 import { KO_VOCAB, KO_CATEGORIES } from "@/lib/ko/vocab";
 import { KO_CONVERSATIONS } from "@/lib/ko/conversations";
 import { KO_GRAMMAR } from "@/lib/ko/grammar";
+import { KO_TRAVEL_PHRASEBOOK } from "@/lib/ko/phrasebook";
 import { tt, type UiLang } from "@/lib/i18n";
 
-export type KoLearnView = "study" | "quiz" | "grammar" | "conversation" | "roleplay" | "dictation" | "placement";
+export type KoLearnView = "study" | "quiz" | "hangul" | "grammar" | "conversation" | "roleplay" | "dictation" | "phrasebook" | "exam" | "placement";
 
 const CARDS: { key: KoLearnView; glyph: string; title: [string, string]; desc: [string, string]; grad: string; shadow: string }[] = [
   { key: "study", glyph: "단", title: ["단어 학습", "単語学習"], desc: [`${KO_VOCAB.length}개 · ${KO_CATEGORIES.length}개 카테고리`, `${KO_VOCAB.length}語 · ${KO_CATEGORIES.length}カテゴリー`], grad: "linear-gradient(135deg,#2563EB,#7C3AED)", shadow: "rgba(37,99,235,.35)" },
   { key: "quiz", glyph: "퀴", title: ["단어 퀴즈", "単語クイズ"], desc: ["4지선다 · 뜻 맞히기", "四択 · 意味当て"], grad: "linear-gradient(135deg,#7C3AED,#a855f7)", shadow: "rgba(124,58,237,.35)" },
+  { key: "hangul", glyph: "한", title: ["한글 기초", "ハングル基礎"], desc: ["자음·모음 · 발음 · 퀴즈", "子音・母音 · 発音 · クイズ"], grad: "linear-gradient(135deg,#E63946,#F4A261)", shadow: "rgba(230,57,70,.35)" },
   { key: "grammar", glyph: "문", title: ["문법", "文法"], desc: [`${KO_GRAMMAR.length}개 · TOPIK 1~2 + 퀴즈`, `${KO_GRAMMAR.length}個 · TOPIK 1〜2 + クイズ`], grad: "linear-gradient(135deg,#fdcb6e,#e17055)", shadow: "rgba(225,112,85,.35)" },
   { key: "conversation", glyph: "회", title: ["생활 회화", "日常会話"], desc: [`${KO_CONVERSATIONS.length}개 상황 · 듣고 따라하기`, `${KO_CONVERSATIONS.length}場面 · 聞いて練習`], grad: "linear-gradient(135deg,#a29bfe,#6c5ce7)", shadow: "rgba(108,92,231,.35)" },
   { key: "roleplay", glyph: "롤", title: ["회화 롤플레이", "会話ロールプレイ"], desc: [`${KO_CONVERSATIONS.length}개 상황 · 골라서 대화 완성`, `${KO_CONVERSATIONS.length}場面 · 選んで会話完成`], grad: "linear-gradient(135deg,#6c5ce7,#0984e3)", shadow: "rgba(108,92,231,.35)" },
+  { key: "phrasebook", glyph: "여", title: ["여행 회화집", "旅行会話集"], desc: [`${KO_TRAVEL_PHRASEBOOK.length}개 상황별 즉석 표현`, `${KO_TRAVEL_PHRASEBOOK.length}場面別フレーズ`], grad: "linear-gradient(135deg,#00b894,#00cec9)", shadow: "rgba(0,184,148,.35)" },
   { key: "dictation", glyph: "듣", title: ["받아쓰기", "ディクテーション"], desc: ["문장 듣고 고르기 · 청해 훈련", "文を聞いて選ぶ · 聴解訓練"], grad: "linear-gradient(135deg,#0984e3,#74b9ff)", shadow: "rgba(9,132,227,.35)" },
+  { key: "exam", glyph: "試", title: ["TOPIK 모의시험", "TOPIK 模擬試験"], desc: ["어휘/문법/읽기/듣기 · 합격 판정", "語彙/文法/読解/聴解 · 合否判定"], grad: "linear-gradient(135deg,#0984e3,#74b9ff)", shadow: "rgba(9,132,227,.35)" },
   { key: "placement", glyph: "레", title: ["레벨 테스트", "レベル診断"], desc: ["12문항 · 추천 시작 레벨 진단", "12問 · おすすめレベル診断"], grad: "linear-gradient(135deg,#10B981,#059669)", shadow: "rgba(16,185,129,.35)" },
 ];
 

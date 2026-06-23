@@ -9,25 +9,30 @@ import { AppSkeleton, Progress } from "@/components/ui";
 import AccountButton from "@/components/auth/AccountButton";
 import KoStudyView from "./StudyView";
 import KoQuizView from "./QuizView";
+import KoHangulView from "./HangulView";
 import KoGrammarView from "./GrammarView";
 import KoConversationView from "./ConversationView";
 import KoRoleplayView from "./RoleplayView";
 import KoDictationView from "./DictationView";
+import KoPhrasebookView from "./PhrasebookView";
+import KoMockExam from "./MockExam";
 import KoPlacementView from "./PlacementView";
+import KoLibraryView from "./LibraryView";
 import KoStats from "./Stats";
 import KoLearnHub, { type KoLearnView } from "./LearnHub";
 
-type Tab = "home" | "learn" | "stats";
+type Tab = "home" | "learn" | "library" | "stats";
 const ACCENT = "#2563EB";
 
 const NAV: { key: Tab; ko: string; ja: string; icon: React.ReactNode }[] = [
   { key: "home", ko: "홈", ja: "ホーム", icon: <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" /> },
   { key: "learn", ko: "학습", ja: "学習", icon: <><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></> },
+  { key: "library", ko: "보관함", ja: "保管", icon: <><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></> },
   { key: "stats", ko: "통계", ja: "統計", icon: <><path d="M3 3v18h18" /><path d="M7 16v-5M12 16V8M17 16v-3" /></> },
 ];
 
 export default function KoreanApp({ onBack }: { onBack?: () => void }) {
-  const { progress, ready, grade, reset } = useKoProgress();
+  const { progress, ready, grade, reset, toggleBookmark, addMistakes, clearMistake } = useKoProgress();
   const lang = useUiLang();
   const [tab, setTab] = useState<Tab>("home");
   const [learnView, setLearnView] = useState<KoLearnView | null>(null);
@@ -117,15 +122,22 @@ export default function KoreanApp({ onBack }: { onBack?: () => void }) {
             </div>
             {learnView === "study" && <KoStudyView progress={progress} lang={lang} onGrade={grade} />}
             {learnView === "quiz" && <KoQuizView lang={lang} onGrade={grade} onExit={() => setLearnView(null)} />}
+            {learnView === "hangul" && <KoHangulView lang={lang} />}
             {learnView === "grammar" && <KoGrammarView lang={lang} />}
             {learnView === "conversation" && <KoConversationView lang={lang} />}
             {learnView === "roleplay" && <KoRoleplayView lang={lang} />}
             {learnView === "dictation" && <KoDictationView onExit={() => setLearnView(null)} />}
+            {learnView === "phrasebook" && <KoPhrasebookView lang={lang} />}
+            {learnView === "exam" && <KoMockExam lang={lang} onExit={() => setLearnView(null)} onMistake={addMistakes} />}
             {learnView === "placement" && <KoPlacementView lang={lang} onExit={() => setLearnView(null)} />}
           </div>
         ) : (
           <KoLearnHub lang={lang} onOpen={setLearnView} />
         )
+      )}
+
+      {tab === "library" && (
+        <KoLibraryView lang={lang} bookmarks={progress.bookmarks} mistakes={progress.mistakes} onToggleBookmark={toggleBookmark} onClearMistake={clearMistake} />
       )}
 
       {tab === "stats" && <KoStats progress={progress} lang={lang} onReset={reset} />}

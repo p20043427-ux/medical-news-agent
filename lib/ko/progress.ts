@@ -18,6 +18,8 @@ export interface KoProgress {
   daily: Record<string, number>;
   startedAt: string;
   xp: number;
+  bookmarks: string[];
+  mistakes: string[];
 }
 
 export type KoGrade = "again" | "hard" | "good" | "easy";
@@ -27,7 +29,7 @@ const GRADE_XP: Record<KoGrade, number> = { again: 2, hard: 10, good: 15, easy: 
 export function todayKey(d: Date = new Date()): string { return d.toISOString().slice(0, 10); }
 function addDays(n: number): string { const d = new Date(); d.setDate(d.getDate() + n); return todayKey(d); }
 
-const EMPTY: KoProgress = { cards: {}, daily: {}, startedAt: todayKey(), xp: 0 };
+const EMPTY: KoProgress = { cards: {}, daily: {}, startedAt: todayKey(), xp: 0, bookmarks: [], mistakes: [] };
 
 function load(): KoProgress {
   if (typeof window === "undefined") return EMPTY;
@@ -78,7 +80,31 @@ export function useKoProgress() {
     });
   }, []);
 
+  const toggleBookmark = useCallback((id: string) => {
+    setProgress((p) => {
+      const has = p.bookmarks.includes(id);
+      const next = { ...p, bookmarks: has ? p.bookmarks.filter((x) => x !== id) : [...p.bookmarks, id] };
+      save(next); return next;
+    });
+  }, []);
+
+  const addMistakes = useCallback((ids: string[]) => {
+    if (!ids.length) return;
+    setProgress((p) => {
+      const set = new Set([...p.mistakes, ...ids]);
+      const next = { ...p, mistakes: Array.from(set) };
+      save(next); return next;
+    });
+  }, []);
+
+  const clearMistake = useCallback((id: string) => {
+    setProgress((p) => {
+      const next = { ...p, mistakes: p.mistakes.filter((x) => x !== id) };
+      save(next); return next;
+    });
+  }, []);
+
   const reset = useCallback(() => persist(EMPTY), [persist]);
 
-  return { progress, ready, markNew, grade, reset };
+  return { progress, ready, markNew, grade, reset, toggleBookmark, addMistakes, clearMistake };
 }
