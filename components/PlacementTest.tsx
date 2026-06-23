@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui";
+import { useUiLang, tt } from "@/lib/i18n";
 
 export interface PlacementQ { prompt: string; sub?: string; options: string[]; answer: string }
 export interface PlacementResult { emoji: string; label: string; desc: string }
@@ -14,6 +15,7 @@ export default function PlacementTest({ questions, getResult, accent, onExit, on
   onExit: () => void;
   onDone?: (r: PlacementResult) => void;
 }) {
+  const lang = useUiLang();
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [score, setScore] = useState(0);
@@ -26,13 +28,13 @@ export default function PlacementTest({ questions, getResult, accent, onExit, on
     return (
       <div className="px-5 pb-28 pt-10 text-center">
         <div className="animate-reward text-6xl">{r.emoji}</div>
-        <p className="mt-3 text-sm" style={{ color: "var(--text-3)" }}>추천 시작 레벨</p>
+        <p className="mt-3 text-sm" style={{ color: "var(--text-3)" }}>{tt(lang, "추천 시작 레벨", "おすすめ開始レベル")}</p>
         <p className="mt-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{r.label}</p>
         <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>{r.desc}</p>
-        <p className="mt-3 text-xs" style={{ color: "var(--text-3)" }}>{score} / {questions.length} 정답</p>
+        <p className="mt-3 text-xs" style={{ color: "var(--text-3)" }}>{tt(lang, `${score} / ${questions.length} 정답`, `${score} / ${questions.length} 正解`)}</p>
         <div className="mx-auto mt-6 grid max-w-xs gap-2.5">
-          <Button variant="brand" size="free" onClick={onExit} className="py-3" style={{ background: accent }}>학습 시작하기</Button>
-          <Button variant="surface" size="free" onClick={() => { setIdx(0); setPicked(null); setScore(0); setSavedResult(null); }} className="py-3">다시 진단</Button>
+          <Button variant="brand" size="free" onClick={onExit} className="py-3" style={{ background: accent }}>{tt(lang, "학습 시작하기", "学習を始める")}</Button>
+          <Button variant="surface" size="free" onClick={() => { setIdx(0); setPicked(null); setScore(0); setSavedResult(null); }} className="py-3">{tt(lang, "다시 진단", "もう一度診断")}</Button>
         </div>
       </div>
     );
@@ -43,7 +45,7 @@ export default function PlacementTest({ questions, getResult, accent, onExit, on
   return (
     <div className="flex min-h-[calc(100vh-4rem)] flex-col px-4 pb-28 pt-3">
       <div className="mb-4 flex items-center justify-between">
-        <span className="rounded-full px-2.5 py-1 text-xs font-bold text-white" style={{ background: accent }}>레벨 진단</span>
+        <span className="rounded-full px-2.5 py-1 text-xs font-bold text-white" style={{ background: accent }}>{tt(lang, "레벨 진단", "レベル診断")}</span>
         <span className="text-sm font-bold" style={{ color: "var(--text-2)" }}>{idx + 1} / {questions.length}</span>
       </div>
       <div className="mb-5 h-1.5 overflow-hidden rounded-full" style={{ background: "var(--surface)" }}>
@@ -51,7 +53,7 @@ export default function PlacementTest({ questions, getResult, accent, onExit, on
       </div>
 
       <div className="rounded-3xl p-6 text-center shadow-sm" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
-        <p className="text-xs" style={{ color: "var(--text-3)" }}>뜻으로 알맞은 것은?</p>
+        <p className="text-xs" style={{ color: "var(--text-3)" }}>{tt(lang, "뜻으로 알맞은 것은?", "正しい意味は？")}</p>
         <p className="mt-3 text-4xl font-extrabold" style={{ color: "var(--text-1)" }}>{q.prompt}</p>
         {q.sub && <p className="mt-1 text-sm" style={{ color: "var(--text-3)" }}>{q.sub}</p>}
       </div>
@@ -74,7 +76,7 @@ export default function PlacementTest({ questions, getResult, accent, onExit, on
 
       <div className="mt-auto pt-6">
         <Button variant="brand" size="free" onClick={() => { setPicked(null); setIdx((i) => i + 1); }} disabled={picked === null} className="w-full py-4" style={{ background: accent }}>
-          {idx + 1 >= questions.length ? "결과 보기" : "다음"}
+          {idx + 1 >= questions.length ? tt(lang, "결과 보기", "結果を見る") : tt(lang, "다음", "次へ")}
         </Button>
       </div>
     </div>

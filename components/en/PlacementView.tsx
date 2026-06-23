@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { EN_VOCAB } from "@/lib/en/vocab";
 import PlacementTest, { type PlacementQ, type PlacementResult } from "@/components/PlacementTest";
+import { useUiLang, tt, type UiLang } from "@/lib/i18n";
 
 const LEVEL_ORDER: Record<string, number> = { A1: 0, A2: 1, B1: 2, B2: 3, C1: 4, C2: 5 };
 
@@ -28,15 +29,16 @@ function build(): PlacementQ[] {
   return qs;
 }
 
-function result(correct: number, total: number): PlacementResult {
+function result(correct: number, total: number, lang: UiLang): PlacementResult {
   const r = correct / total;
-  if (r < 0.4) return { emoji: "🌱", label: "A1 — 기초", desc: "기초 동사·일상 어휘부터 시작해요. 목표일을 설정하면 좋아요." };
-  if (r < 0.75) return { emoji: "📗", label: "A2–B1 — 중급", desc: "감정·여행·직장 어휘와 문법을 확장해 보세요." };
-  return { emoji: "🏆", label: "B1+ — 상급", desc: "학문·사회·고급 어휘와 모의시험(도전)으로 실력을 다져요." };
+  if (r < 0.4) return { emoji: "🌱", label: tt(lang, "A1 — 기초", "A1 — 基礎"), desc: tt(lang, "기초 동사·일상 어휘부터 시작해요. 목표일을 설정하면 좋아요.", "基礎動詞・日常語彙から始めましょう。目標日を設定するとよいでしょう。") };
+  if (r < 0.75) return { emoji: "📗", label: tt(lang, "A2–B1 — 중급", "A2–B1 — 中級"), desc: tt(lang, "감정·여행·직장 어휘와 문법을 확장해 보세요.", "感情・旅行・職場の語彙と文法を広げてみましょう。") };
+  return { emoji: "🏆", label: tt(lang, "B1+ — 상급", "B1+ — 上級"), desc: tt(lang, "학문·사회·고급 어휘와 모의시험(도전)으로 실력을 다져요.", "学術・社会・上級語彙と模擬試験で実力を固めましょう。") };
 }
 
 export default function EnPlacementView({ onExit }: { onExit: () => void }) {
+  const lang = useUiLang();
   const [qs] = useState(build);
-  return <PlacementTest questions={qs} getResult={result} accent="#4361EE" onExit={onExit}
+  return <PlacementTest questions={qs} getResult={(c, t) => result(c, t, lang)} accent="#4361EE" onExit={onExit}
     onDone={(r) => { try { localStorage.setItem("placement-en", JSON.stringify(r)); } catch { /* ignore */ } }} />;
 }
