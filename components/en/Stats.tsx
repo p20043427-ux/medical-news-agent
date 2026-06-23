@@ -13,6 +13,7 @@ import { getRoleplay } from "@/lib/roleplay-progress";
 import { getFavorites } from "@/lib/favorites";
 import Achievements, { type Badge } from "@/components/Achievements";
 import ReminderSetting from "@/components/ReminderSetting";
+import EnPlacementView from "./PlacementView";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "@/lib/ui/toast";
 import { Button, Progress } from "@/components/ui";
@@ -35,6 +36,7 @@ export default function EnStats({
   const [examBest, setExamBest] = useState(0);
   const [favCount, setFavCount] = useState(0);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [placement, setPlacement] = useState(false);
   useEffect(() => {
     setExamHist(getExamHistory("en"));
     setRpDone(Object.keys(getRoleplay("en-roleplay")).length);
@@ -97,10 +99,24 @@ export default function EnStats({
   const weekDelta = thisWeek - sumWeek(7);
   const activeDays = Array.from({ length: 7 }, (_, i) => dayAgo(i)).filter((n) => n > 0).length;
 
+  if (placement) return <EnPlacementView onExit={() => setPlacement(false)} />;
+
   return (
     <div className="px-4 pb-28 pt-3">
       <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>학습 분석</h1>
       <p className="mb-5 text-sm" style={{ color: "var(--text-3)" }}>꾸준함이 실력입니다 📈</p>
+
+      {/* 레벨 진단 */}
+      <button onClick={() => setPlacement(true)}
+        className="mb-4 flex w-full items-center gap-3 rounded-2xl p-4 text-left shadow-sm transition active:scale-[0.98]"
+        style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-2xl" style={{ background: "rgba(255,255,255,.2)" }}>🎓</span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-extrabold text-white">레벨 배치고사</span>
+          <span className="block text-xs text-white/85">12문항으로 내 CEFR 시작 레벨 진단</span>
+        </span>
+        <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+      </button>
 
       {/* 요약 카드 3개 */}
       <div className="mb-4 grid grid-cols-3 gap-3">

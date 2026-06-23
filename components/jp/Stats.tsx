@@ -12,6 +12,7 @@ import { buildBackup, restoreBackup } from "@/lib/backup";
 import { getRoleplay } from "@/lib/roleplay-progress";
 import Achievements, { type Badge } from "@/components/Achievements";
 import ReminderSetting from "@/components/ReminderSetting";
+import PlacementView from "./PlacementView";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "@/lib/ui/toast";
 import { Button, Progress } from "@/components/ui";
@@ -33,6 +34,7 @@ export default function Stats({
   const [textScale, setTextScale] = useState<"sm" | "md" | "lg">("md");
   const [examHist, setExamHist] = useState<ExamAttempt[]>([]);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [placement, setPlacement] = useState(false);
   const [rpDone, setRpDone] = useState(0);
   const [examBest, setExamBest] = useState(0);
   useEffect(() => {
@@ -100,10 +102,24 @@ export default function Stats({
     reader.readAsText(f); e.target.value = "";
   }
 
+  if (placement) return <PlacementView onExit={() => setPlacement(false)} />;
+
   return (
     <div className="px-4 pb-28 pt-3">
       <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>학습 분석</h1>
       <p className="mb-5 text-sm" style={{ color: "var(--text-3)" }}>꾸준함이 실력이 됩니다 📈</p>
+
+      {/* 레벨 진단 */}
+      <button onClick={() => setPlacement(true)}
+        className="mb-4 flex w-full items-center gap-3 rounded-2xl p-4 text-left shadow-sm transition active:scale-[0.98]"
+        style={{ background: "linear-gradient(135deg,#E63946,#F4A261)" }}>
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-2xl" style={{ background: "rgba(255,255,255,.2)" }}>🎓</span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-extrabold text-white">레벨 배치고사</span>
+          <span className="block text-xs text-white/85">12문항으로 내 시작 레벨 진단하기</span>
+        </span>
+        <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+      </button>
 
       {/* 요약 3개 */}
       <div className="mb-4 grid grid-cols-3 gap-3">
