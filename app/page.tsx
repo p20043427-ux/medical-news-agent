@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import JapaneseApp from "@/components/jp/JapaneseApp";
 import EnglishApp from "@/components/en/EnglishApp";
 import KoreanApp from "@/components/ko/KoreanApp";
+import MedicApp from "@/components/medic/MedicApp";
 import { AuthProvider } from "@/lib/auth";
 import AccountButton from "@/components/auth/AccountButton";
 import { track } from "@/lib/analytics";
 import Onboarding, { shouldOnboard } from "@/components/Onboarding";
 import { useUiLang, setUiLang, tt, type UiLang } from "@/lib/i18n";
 
-type Lang = "jp" | "en" | "ko";
+type Lang = "jp" | "en" | "ko" | "medic";
 
 export default function Root() {
   return (
@@ -28,7 +29,7 @@ function RootInner() {
   useEffect(() => {
     setMounted(true);
     const saved = window.localStorage.getItem("app-lang") as Lang | null;
-    if (saved === "jp" || saved === "en" || saved === "ko") setLang(saved);
+    if (saved === "jp" || saved === "en" || saved === "ko" || saved === "medic") setLang(saved);
     else if (shouldOnboard()) setOnboarding(true);
   }, []);
 
@@ -50,6 +51,7 @@ function RootInner() {
   if (lang === "jp") return <JapaneseApp onBack={() => setLang(null)} />;
   if (lang === "en") return <EnglishApp onBack={() => setLang(null)} />;
   if (lang === "ko") return <KoreanApp onBack={() => setLang(null)} />;
+  if (lang === "medic") return <MedicApp onBack={() => setLang(null)} />;
 
   return <LandingPage onSelect={selectLang} />;
 }
@@ -105,6 +107,30 @@ function LandingPage({ onSelect }: { onSelect: (l: Lang) => void }) {
             </div>
           </button>
         ))}
+
+        {/* 의료교류 플랫폼 */}
+        <button onClick={() => onSelect("medic")}
+          className="group relative overflow-hidden rounded-3xl p-6 text-left shadow-xl transition active:scale-[0.98]" style={{ background: "linear-gradient(135deg, #0D9488, #0EA5E9)" }}>
+          <div className="absolute -right-4 -top-4 text-8xl opacity-10 select-none">🏥</div>
+          <div className="relative">
+            <div className="mb-3 flex items-center gap-3">
+              <span className="text-4xl">🏥</span>
+              <div>
+                <p className="text-xl font-extrabold text-white">{tt(ui, "의료교류", "医療交流")}</p>
+                <p className="text-xs text-white/70">{tt(ui, "은성의료재단 ↔ 가마치그룹", "恩成医療財団 ↔ 蒲池グループ")}</p>
+              </div>
+            </div>
+            <div className="mb-4 flex flex-wrap gap-2">
+              {[tt(ui, "전문 회화", "専門会話"), tt(ui, "의료용어", "医療用語"), tt(ui, "긴급카드", "緊急カード"), tt(ui, "방문실무", "訪問実務")].map((tag) => (
+                <span key={tag} className="rounded-full bg-white/20 px-2.5 py-1 text-xs font-semibold text-white">{tag}</span>
+              ))}
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-white/80">{tt(ui, "직원 상호방문 지원 도구", "職員相互訪問サポート")}</p>
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white">→</span>
+            </div>
+          </div>
+        </button>
       </div>
 
       <p className="mt-8 text-center text-xs" style={{ color: "var(--text-3)" }}>
