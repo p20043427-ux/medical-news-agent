@@ -1,5 +1,7 @@
 "use client";
 
+import { useUiLang, tt } from "@/lib/i18n";
+
 export type EnTab = "home" | "learn" | "review" | "stats";
 
 const ICONS: Record<EnTab, React.ReactNode> = {
@@ -9,11 +11,11 @@ const ICONS: Record<EnTab, React.ReactNode> = {
   stats: <path d="M3 3v18h18M8 16V9m5 7V5m5 11v-4" />,
 };
 
-const LABEL: Record<EnTab, string> = {
-  home: "홈",
-  learn: "학습",
-  review: "복습",
-  stats: "분석",
+const LABEL: Record<EnTab, [string, string]> = {
+  home: ["홈", "ホーム"],
+  learn: ["학습", "学習"],
+  review: ["복습", "復習"],
+  stats: ["분석", "分析"],
 };
 
 export default function EnBottomNav({
@@ -25,6 +27,7 @@ export default function EnBottomNav({
   onChange: (t: EnTab) => void;
   accentColor?: string;
 }) {
+  const lang = useUiLang();
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md border-t backdrop-blur"
@@ -48,7 +51,7 @@ export default function EnBottomNav({
                 fill="none" stroke="currentColor" strokeWidth={on ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
                 {ICONS[t]}
               </svg>
-              <span className={`text-[11px] leading-none ${on ? "font-extrabold" : "font-medium"}`}>{LABEL[t]}</span>
+              <span className={`text-[11px] leading-none ${on ? "font-extrabold" : "font-medium"}`}>{tt(lang, LABEL[t][0], LABEL[t][1])}</span>
             </button>
           );
         })}
