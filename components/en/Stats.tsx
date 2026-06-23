@@ -13,6 +13,8 @@ import { getRoleplay } from "@/lib/roleplay-progress";
 import { getFavorites } from "@/lib/favorites";
 import Achievements, { type Badge } from "@/components/Achievements";
 import ReminderSetting from "@/components/ReminderSetting";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "@/lib/ui/toast";
 import { Button, Progress } from "@/components/ui";
 
 const WD = ["일", "월", "화", "수", "목", "금", "토"];
@@ -32,6 +34,7 @@ export default function EnStats({
   const [rpDone, setRpDone] = useState(0);
   const [examBest, setExamBest] = useState(0);
   const [favCount, setFavCount] = useState(0);
+  const [confirmReset, setConfirmReset] = useState(false);
   useEffect(() => {
     setExamHist(getExamHistory("en"));
     setRpDone(Object.keys(getRoleplay("en-roleplay")).length);
@@ -63,7 +66,7 @@ export default function EnStats({
   function importFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]; if (!f) return;
     const reader = new FileReader();
-    reader.onload = () => { alert(restoreBackup("en", String(reader.result), onImport) ? "학습 데이터를 가져왔어요! 새로고침하면 반영돼요." : "파일을 읽을 수 없어요."); };
+    reader.onload = () => { toast(restoreBackup("en", String(reader.result), onImport) ? "학습 데이터를 가져왔어요. 새로고침하면 반영돼요." : "파일을 읽을 수 없어요."); };
     reader.readAsText(f); e.target.value = "";
   }
 
@@ -362,11 +365,21 @@ export default function EnStats({
         </div>
       </div>
 
-      <button onClick={() => { if (confirm("영어 학습 진도를 초기화할까요?")) onReset(); }}
+      <button onClick={() => setConfirmReset(true)}
         className="w-full rounded-2xl py-3 text-sm font-semibold"
         style={{ color: "#EF4444" }}>
         학습 진도 초기화
       </button>
+
+      <ConfirmDialog
+        open={confirmReset}
+        title="학습 진도 초기화"
+        description="모든 학습 진도가 삭제되며 되돌릴 수 없어요. 정말 초기화할까요?"
+        confirmLabel="초기화"
+        destructive
+        onConfirm={() => { onReset(); setConfirmReset(false); toast("학습 진도를 초기화했어요."); }}
+        onCancel={() => setConfirmReset(false)}
+      />
     </div>
   );
 }

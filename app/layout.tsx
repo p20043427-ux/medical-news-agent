@@ -3,6 +3,7 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import ServiceWorker from "@/components/jp/ServiceWorker";
+import { Toaster } from "@/lib/ui/toast";
 
 export const metadata: Metadata = {
   title: "LinguaFlow — 일본어 · 영어 학습",
@@ -17,7 +18,6 @@ export const metadata: Metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   viewportFit: "cover" as const,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#F8F9FB" },
@@ -35,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen antialiased" style={{ background: "var(--bg)", color: "var(--text-1)" }}>
         {children}
+        <Toaster />
         <ServiceWorker />
         <Analytics />
         <SpeedInsights />

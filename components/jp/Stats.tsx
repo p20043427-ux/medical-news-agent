@@ -12,6 +12,8 @@ import { buildBackup, restoreBackup } from "@/lib/backup";
 import { getRoleplay } from "@/lib/roleplay-progress";
 import Achievements, { type Badge } from "@/components/Achievements";
 import ReminderSetting from "@/components/ReminderSetting";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "@/lib/ui/toast";
 import { Button, Progress } from "@/components/ui";
 
 const WD = ["일", "월", "화", "수", "목", "금", "토"];
@@ -30,6 +32,7 @@ export default function Stats({
   const [rate, setRateState] = useState(getRate());
   const [textScale, setTextScale] = useState<"sm" | "md" | "lg">("md");
   const [examHist, setExamHist] = useState<ExamAttempt[]>([]);
+  const [confirmReset, setConfirmReset] = useState(false);
   const [rpDone, setRpDone] = useState(0);
   const [examBest, setExamBest] = useState(0);
   useEffect(() => {
@@ -91,8 +94,8 @@ export default function Stats({
     const reader = new FileReader();
     reader.onload = () => {
       if (restoreBackup("jp", String(reader.result), onImport)) {
-        alert("진도와 학습 데이터를 가져왔어요! 새로고침하면 모두 반영돼요.");
-      } else { alert("파일을 읽을 수 없어요."); }
+        toast("진도·학습 데이터를 가져왔어요. 새로고침하면 모두 반영돼요.");
+      } else { toast("파일을 읽을 수 없어요."); }
     };
     reader.readAsText(f); e.target.value = "";
   }
@@ -380,11 +383,21 @@ export default function Stats({
         </div>
       </div>
 
-      <button onClick={() => { if (confirm("학습 진도를 모두 초기화할까요?")) onReset(); }}
+      <button onClick={() => setConfirmReset(true)}
         className="w-full rounded-2xl py-3 text-sm font-semibold"
         style={{ color: "#EF4444" }}>
         학습 진도 초기화
       </button>
+
+      <ConfirmDialog
+        open={confirmReset}
+        title="학습 진도 초기화"
+        description="모든 학습 진도가 삭제되며 되돌릴 수 없어요. 정말 초기화할까요?"
+        confirmLabel="초기화"
+        destructive
+        onConfirm={() => { onReset(); setConfirmReset(false); toast("학습 진도를 초기화했어요."); }}
+        onCancel={() => setConfirmReset(false)}
+      />
     </div>
   );
 }

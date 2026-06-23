@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { speakJa, isSpeechSupported } from "@/lib/jp/speech";
+import { toast } from "@/lib/ui/toast";
 
 /** 일본어 텍스트를 음성으로 들려주는 스피커 버튼 */
 export default function SpeakerButton({
@@ -17,7 +18,7 @@ export default function SpeakerButton({
 
   function trigger() {
     if (!isSpeechSupported()) {
-      alert("이 브라우저는 음성 재생을 지원하지 않아요. Chrome/Safari 를 권장해요.");
+      toast("이 브라우저는 음성 재생을 지원하지 않아요. Chrome/Safari를 권장해요.");
       return;
     }
     speakJa(text);
