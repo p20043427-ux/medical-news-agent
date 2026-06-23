@@ -90,7 +90,7 @@ export default function Stats({
     const blob = new Blob([buildBackup("jp", onExport())], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = `일본어-진도-${todayKey()}.json`; a.click();
+    a.href = url; a.download = `${tt(lang, "일본어-진도", "日本語-進捗")}-${todayKey()}.json`; a.click();
     URL.revokeObjectURL(url);
   }
 
@@ -249,7 +249,7 @@ export default function Stats({
             {examHist.slice(-12).map((h, i, arr) => (
               <div key={i} className="flex flex-1 flex-col items-center gap-1">
                 <div className="flex h-16 w-full items-end">
-                  <div className="w-full rounded-md" title={`${h.pct}점`}
+                  <div className="w-full rounded-md" title={tt(lang, `${h.pct}점`, `${h.pct}点`)}
                     style={{ height: `${Math.max(h.pct, 4)}%`, background: i === arr.length - 1 ? "linear-gradient(180deg,#E63946,#F4A261)" : h.pct >= 60 ? "#10B981" : "var(--surface)" }} />
                 </div>
                 <span className="text-[9px]" style={{ color: "var(--text-3)" }}>{h.diff === "easy" ? tt(lang, "입", "入") : h.diff === "hard" ? tt(lang, "도", "挑") : tt(lang, "표", "標")}</span>
@@ -274,7 +274,7 @@ export default function Stats({
                       background: today ? "#E63946" : d.count > 0 ? "#F4A261" : "var(--surface)",
                       height: `${Math.max((d.count / maxCount) * 100, d.count > 0 ? 8 : 4)}%`,
                     }}
-                    title={`${d.count}장`} />
+                    title={tt(lang, `${d.count}장`, `${d.count}枚`)} />
                 </div>
                 <span className="text-[9px]" style={{ color: "var(--text-3)" }}>{(lang === "ja" ? WD_JA : WD)[d.date.getDay()]}</span>
               </div>

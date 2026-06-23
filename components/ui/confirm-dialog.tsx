@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useUiLang, tt } from "@/lib/i18n";
 
 // 접근성 확인 다이얼로그: role=dialog, aria-modal, esc 닫기, 열릴 때 포커스 이동·닫힐 때 복귀.
 export function ConfirmDialog({
-  open, title, description, confirmLabel = "확인", cancelLabel = "취소", destructive, onConfirm, onCancel,
+  open, title, description, confirmLabel, cancelLabel, destructive, onConfirm, onCancel,
 }: {
   open: boolean;
   title: string;
@@ -15,6 +16,9 @@ export function ConfirmDialog({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const lang = useUiLang();
+  const confirmText = confirmLabel ?? tt(lang, "확인", "確認");
+  const cancelText = cancelLabel ?? tt(lang, "취소", "キャンセル");
   const confirmRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -53,9 +57,9 @@ export function ConfirmDialog({
         {description && <p className="mt-1.5 text-sm leading-relaxed" style={{ color: "var(--text-3)" }}>{description}</p>}
         <div className="mt-5 grid grid-cols-2 gap-2.5">
           <button onClick={onCancel} className="rounded-2xl py-3 text-sm font-bold transition active:scale-[0.98]"
-            style={{ background: "var(--surface)", color: "var(--text-2)" }}>{cancelLabel}</button>
+            style={{ background: "var(--surface)", color: "var(--text-2)" }}>{cancelText}</button>
           <button ref={confirmRef} onClick={onConfirm} className="rounded-2xl py-3 text-sm font-bold text-white transition active:scale-[0.98]"
-            style={{ background: destructive ? "#EF4444" : "#0984e3" }}>{confirmLabel}</button>
+            style={{ background: destructive ? "#EF4444" : "#0984e3" }}>{confirmText}</button>
         </div>
       </div>
     </div>

@@ -64,14 +64,14 @@ export default function EnStats({
     const blob = new Blob([buildBackup("en", onExport())], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = `영어-진도-${todayKey()}.json`; a.click();
+    a.href = url; a.download = `${tt(lang, "영어-진도", "英語-進捗")}-${todayKey()}.json`; a.click();
     URL.revokeObjectURL(url);
   }
 
   function importFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]; if (!f) return;
     const reader = new FileReader();
-    reader.onload = () => { toast(restoreBackup("en", String(reader.result), onImport) ? "학습 데이터를 가져왔어요. 새로고침하면 반영돼요." : "파일을 읽을 수 없어요."); };
+    reader.onload = () => { toast(restoreBackup("en", String(reader.result), onImport) ? tt(lang, "학습 데이터를 가져왔어요. 새로고침하면 반영돼요.", "学習データを取り込みました。再読み込みで反映されます。") : tt(lang, "파일을 읽을 수 없어요.", "ファイルを読み込めません。")); };
     reader.readAsText(f); e.target.value = "";
   }
 
@@ -195,7 +195,7 @@ export default function EnStats({
             {examHist.slice(-12).map((h, i, arr) => (
               <div key={i} className="flex flex-1 flex-col items-center gap-1">
                 <div className="flex h-16 w-full items-end">
-                  <div className="w-full rounded-md" title={`${h.pct}점`}
+                  <div className="w-full rounded-md" title={tt(lang, `${h.pct}점`, `${h.pct}点`)}
                     style={{ height: `${Math.max(h.pct, 4)}%`, background: i === arr.length - 1 ? "linear-gradient(180deg,#4361EE,#7209B7)" : h.pct >= 60 ? "#10B981" : "var(--surface)" }} />
                 </div>
                 <span className="text-[9px]" style={{ color: "var(--text-3)" }}>{h.diff === "easy" ? tt(lang, "입", "入") : h.diff === "hard" ? tt(lang, "도", "挑") : tt(lang, "표", "標")}</span>
@@ -292,7 +292,7 @@ export default function EnStats({
                       background: today ? "#4361EE" : d.count > 0 ? "#7209B7" : "var(--surface)",
                       height: `${Math.max((d.count / maxCount) * 100, d.count > 0 ? 8 : 4)}%`,
                     }}
-                    title={`${d.count}개`} />
+                    title={tt(lang, `${d.count}개`, `${d.count}個`)} />
                 </div>
                 <span className="text-[9px]" style={{ color: "var(--text-3)" }}>{(lang === "ja" ? WD_JA : WD)[d.date.getDay()]}</span>
               </div>
@@ -387,16 +387,17 @@ export default function EnStats({
       <button onClick={() => setConfirmReset(true)}
         className="w-full rounded-2xl py-3 text-sm font-semibold"
         style={{ color: "#EF4444" }}>
-        학습 진도 초기화
+        {tt(lang, "학습 진도 초기화", "学習進捗をリセット")}
       </button>
 
       <ConfirmDialog
         open={confirmReset}
-        title="학습 진도 초기화"
-        description="모든 학습 진도가 삭제되며 되돌릴 수 없어요. 정말 초기화할까요?"
-        confirmLabel="초기화"
+        title={tt(lang, "학습 진도 초기화", "学習進捗をリセット")}
+        description={tt(lang, "모든 학습 진도가 삭제되며 되돌릴 수 없어요. 정말 초기화할까요?", "すべての学習進捗が削除され、元に戻せません。本当にリセットしますか？")}
+        confirmLabel={tt(lang, "초기화", "リセット")}
+        cancelLabel={tt(lang, "취소", "キャンセル")}
         destructive
-        onConfirm={() => { onReset(); setConfirmReset(false); toast("학습 진도를 초기화했어요."); }}
+        onConfirm={() => { onReset(); setConfirmReset(false); toast(tt(lang, "학습 진도를 초기화했어요.", "学習進捗をリセットしました。")); }}
         onCancel={() => setConfirmReset(false)}
       />
     </div>
