@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { EN_CONVERSATIONS, type EnConversation } from "@/lib/en/conversations";
 import { speakEn } from "@/lib/en/speech";
 import { bumpActivity } from "@/lib/daily-activity";
-import { Button } from "@/components/ui";
+import { useUiLang, tt } from "@/lib/i18n";
 
 export default function EnConversationView() {
+  const lang = useUiLang();
   const [active, setActive] = useState<EnConversation | null>(null);
   const [showKo, setShowKo] = useState(true);
   const [read, setRead] = useState<string[]>([]);
@@ -29,7 +30,7 @@ export default function EnConversationView() {
     return (
       <div className="px-4 pb-28 pt-2">
         <div className="mb-3 flex items-center gap-2">
-          <button onClick={() => setActive(null)} aria-label="뒤로" className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "var(--surface)", color: "var(--text-2)" }}>
+          <button onClick={() => setActive(null)} aria-label={tt(lang, "뒤로", "戻る")} className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "var(--surface)", color: "var(--text-2)" }}>
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
           </button>
           <div className="min-w-0 flex-1">
@@ -37,12 +38,12 @@ export default function EnConversationView() {
             <p className="truncate text-xs" style={{ color: "var(--text-3)" }}>{active.situation}</p>
           </div>
           <button onClick={() => setShowKo((s) => !s)} className="shrink-0 rounded-full px-3 py-1.5 text-xs font-bold"
-            style={showKo ? { background: "#4361EE", color: "#fff" } : { background: "var(--surface)", color: "var(--text-3)" }}>한글</button>
+            style={showKo ? { background: "#4361EE", color: "#fff" } : { background: "var(--surface)", color: "var(--text-3)" }}>{tt(lang, "한글", "韓国語")}</button>
         </div>
 
         <button onClick={() => speakEn(active.lines.map((l) => l.en).join(". "))}
           className="mb-4 w-full rounded-xl py-2.5 text-sm font-bold text-white" style={{ background: "linear-gradient(135deg,#4361EE,#7209B7)" }}>
-          🔊 전체 듣기
+          {tt(lang, "🔊 전체 듣기", "🔊 全文を聞く")}
         </button>
 
         <div className="space-y-2.5">
@@ -66,11 +67,11 @@ export default function EnConversationView() {
   // ── 목록 ──
   return (
     <div className="px-4 pb-28 pt-2">
-      <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>생활 회화</h1>
-      <p className="mb-2 text-sm" style={{ color: "var(--text-3)" }}>상황별 영어 대화를 듣고 따라 말해 보세요.</p>
+      <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{tt(lang, "생활 회화", "生活会話")}</h1>
+      <p className="mb-2 text-sm" style={{ color: "var(--text-3)" }}>{tt(lang, "상황별 영어 대화를 듣고 따라 말해 보세요.", "場面別の英語会話を聞いて真似してみましょう。")}</p>
       {read.length > 0 && (
         <p className="mb-3 inline-block rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "#10B98114", color: "#10B981" }}>
-          ✓ 읽음 {read.length} / {EN_CONVERSATIONS.length}
+          {tt(lang, "✓ 읽음", "✓ 既読")} {read.length} / {EN_CONVERSATIONS.length}
         </p>
       )}
 

@@ -9,6 +9,7 @@ import { speakJa } from "@/lib/jp/speech";
 import { Button } from "@/components/ui";
 import { track } from "@/lib/analytics";
 import { bumpActivity } from "@/lib/daily-activity";
+import { useUiLang, tt } from "@/lib/i18n";
 
 const ACCENT = "linear-gradient(135deg,#E63946,#F4A261)";
 
@@ -19,6 +20,7 @@ export default function ConversationView({
   showFurigana: boolean;
   onToggleFurigana: () => void;
 }) {
+  const lang = useUiLang();
   const [active, setActive] = useState<Conversation | null>(null);
   const [showKo, setShowKo] = useState(true);
   const [cat, setCat] = useState<ConversationCategory | "all">("all");
@@ -66,7 +68,7 @@ export default function ConversationView({
         <div className="mb-4 flex items-center gap-3">
           <button
             onClick={() => setActive(null)}
-            aria-label="뒤로"
+            aria-label={tt(lang, "뒤로", "戻る")}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
             style={{ background: "var(--surface)", color: "var(--text-2)" }}
           >
@@ -78,7 +80,7 @@ export default function ConversationView({
             </h2>
             <p className="truncate text-xs" style={{ color: "var(--text-3)" }}>{active.situation}</p>
           </div>
-          <Chip on={showKo} onClick={() => setShowKo((s) => !s)}>한글</Chip>
+          <Chip on={showKo} onClick={() => setShowKo((s) => !s)}>{tt(lang, "한글", "韓国語")}</Chip>
           <Chip on={showFurigana} onClick={onToggleFurigana}>ふり</Chip>
         </div>
 
@@ -88,7 +90,7 @@ export default function ConversationView({
           onClick={() => speakJa(active.lines.map((l) => tokensToText(l.tokens)).join(" 。 "))}
           className="mb-4 w-full py-3"
         >
-          ▶ 대화 전체 듣기
+          {tt(lang, "▶ 대화 전체 듣기", "▶ 会話を通して聞く")}
         </Button>
 
         {/* 대화 */}
@@ -135,7 +137,7 @@ export default function ConversationView({
         {active.keyPhrases && active.keyPhrases.length > 0 && (
           <div className="mt-6">
             <p className="mb-2 px-1 text-sm font-extrabold" style={{ color: "var(--text-1)" }}>
-              ✏️ 오늘의 표현
+              {tt(lang, "✏️ 오늘의 표현", "✏️ 今日の表現")}
             </p>
             <div className="space-y-2">
               {active.keyPhrases.map((p, i) => (
@@ -170,19 +172,19 @@ export default function ConversationView({
   // ───── 목록 ─────
   return (
     <div className="px-4 pb-28 pt-2">
-      <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>생활 회화</h1>
+      <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{tt(lang, "생활 회화", "生活会話")}</h1>
       <p className="mb-2 text-sm" style={{ color: "var(--text-3)" }}>
-        상황별 필수 회화를 듣고 따라 말해 보세요.
+        {tt(lang, "상황별 필수 회화를 듣고 따라 말해 보세요.", "場面別の必須会話を聞いて真似してみましょう。")}
       </p>
       {read.length > 0 && (
         <p className="mb-3 inline-block rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "#10B98114", color: "#10B981" }}>
-          ✓ 읽음 {read.length} / {CONVERSATIONS.length}
+          {tt(lang, "✓ 읽음", "✓ 既読")} {read.length} / {CONVERSATIONS.length}
         </p>
       )}
 
       {/* 카테고리 필터 */}
       <div className="no-scrollbar mb-4 flex gap-2 overflow-x-auto pb-1">
-        <Chip on={cat === "all"} onClick={() => setCat("all")}>전체</Chip>
+        <Chip on={cat === "all"} onClick={() => setCat("all")}>{tt(lang, "전체", "すべて")}</Chip>
         {cats.map((c) => (
           <Chip key={c.key} on={cat === c.key} onClick={() => setCat(c.key)}>
             {c.emoji} {c.label}
