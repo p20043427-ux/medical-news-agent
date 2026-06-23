@@ -110,7 +110,9 @@ export default function ReviewMode({
         <div
           role="button"
           tabIndex={0}
+          aria-label={revealed ? undefined : "탭하면 답 보기"}
           onClick={() => !revealed && setRevealed(true)}
+          onKeyDown={(e) => { if (!revealed && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); setRevealed(true); } }}
           className="flex min-h-[340px] w-full cursor-pointer flex-col items-center justify-center gap-4 rounded-3xl p-8 text-center shadow-xl transition"
           style={{ background: "var(--card)" }}
         >
