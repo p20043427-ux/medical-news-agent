@@ -12,6 +12,7 @@ import EnMockExam from "./MockExam";
 import EnPhrasebookView from "./PhrasebookView";
 import EnRoleplayView from "./RoleplayView";
 import EnConversationView from "./ConversationView";
+import EnDictationView from "./DictationView";
 import EnReviewLibrary from "./ReviewLibrary";
 import EnStats from "./Stats";
 import EnBottomNav, { type EnTab } from "./BottomNav";
@@ -188,6 +189,7 @@ export default function EnglishApp({ onBack }: { onBack?: () => void }) {
             {learnSub === "phrasebook" && <EnPhrasebookView />}
             {learnSub === "roleplay" && <EnRoleplayView />}
             {learnSub === "conversation" && <EnConversationView />}
+            {learnSub === "dictation" && <EnDictationView onExit={() => setLearnSub(null)} />}
           </div>
         ) : (
           <EnLearnHub onOpen={setLearnSub} />

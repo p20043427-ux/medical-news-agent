@@ -5,7 +5,7 @@ import { VERBS } from "@/lib/jp/verbs";
 import { TRAVEL_PHRASEBOOK } from "@/lib/jp/phrasebook";
 import { JP_GRAMMAR } from "@/lib/jp/grammar";
 
-export type LearnView = "conversation" | "verbs" | "kana" | "exam" | "phrasebook" | "roleplay" | "grammar";
+export type LearnView = "conversation" | "verbs" | "kana" | "exam" | "phrasebook" | "roleplay" | "grammar" | "dictation";
 
 // 아이콘은 통일감을 위해 일본어 글자(흰색 볼드)로 표기 — 会(会話)·動(動詞)·あ(かな)
 const CARDS: { key: LearnView; glyph: string; title: string; desc: (n: { conv: number; verb: number; sit: number }) => string; grad: string; shadow: string }[] = [
@@ -15,6 +15,7 @@ const CARDS: { key: LearnView; glyph: string; title: string; desc: (n: { conv: n
   { key: "grammar", glyph: "文", title: "N5 문법", desc: () => `${JP_GRAMMAR.length}개 · 조사·활용·표현`, grad: "linear-gradient(135deg,#fdcb6e,#e17055)", shadow: "rgba(225,112,85,.35)" },
   { key: "verbs", glyph: "動", title: "필수 동사", desc: (n) => `${n.verb}개 · 활용형(ます·て·ない)`, grad: "linear-gradient(135deg,#fd79a8,#e84393)", shadow: "rgba(232,67,147,.35)" },
   { key: "kana", glyph: "あ", title: "가나 (히라가나·가타카나)", desc: () => "기초 문자 · 발음 · 퀴즈", grad: "linear-gradient(135deg,#E63946,#F4A261)", shadow: "rgba(230,57,70,.35)" },
+  { key: "dictation", glyph: "聴", title: "받아쓰기", desc: () => "문장 듣고 고르기 · 청해 훈련", grad: "linear-gradient(135deg,#0984e3,#74b9ff)", shadow: "rgba(9,132,227,.35)" },
   { key: "exam", glyph: "試", title: "JLPT N5 모의시험", desc: () => "문자·어휘 / 문법 / 청해 · 합격 판정", grad: "linear-gradient(135deg,#0984e3,#74b9ff)", shadow: "rgba(9,132,227,.35)" },
 ];
 
