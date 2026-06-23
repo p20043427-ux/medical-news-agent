@@ -102,10 +102,10 @@ export default function KoStudyView({ progress, lang, onGrade }: {
 
         {revealed ? (
           <div className="mt-2 w-full space-y-3">
-            <p className="text-2xl font-bold" style={{ color: "var(--text-1)" }}>{word.meaning}</p>
+            <p className="text-2xl font-bold" style={{ color: "var(--text-1)" }}>{lang === "ko" ? (word.meaningKo ?? word.meaning) : word.meaning}</p>
             <div className="rounded-2xl p-4 text-left" style={{ background: "var(--surface)" }}>
               <p className="text-lg" style={{ color: "var(--text-1)" }}>{word.example.ko}</p>
-              <p className="mt-1 font-mono text-xs" style={{ color: "var(--text-3)" }}>{word.example.ja}</p>
+              {lang === "ja" && <p className="mt-1 text-xs" style={{ color: "var(--text-3)" }}>{word.example.ja}</p>}
             </div>
           </div>
         ) : (

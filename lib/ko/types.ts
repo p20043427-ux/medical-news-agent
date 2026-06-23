@@ -17,6 +17,7 @@ export interface KoWord {
   topik: Topik;          // TOPIK 급수 (1 또는 2)
   category: string;      // 카테고리 키
   meaning: string;       // 일본어 뜻 (主 설명 언어)
+  meaningKo?: string;    // 한국어 뜻풀이 (UI=한국어일 때)
   example: KoExample;    // 예문
 }
 

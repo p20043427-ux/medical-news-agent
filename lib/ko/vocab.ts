@@ -1,6 +1,7 @@
 import type { KoWord, KoCategory } from "./types";
 import { KO_VOCAB_K1A } from "./vocab-k1a";
 import { KO_VOCAB_K2 } from "./vocab-k2";
+import { KO_MEANING_KO } from "./meaning-ko";
 
 export const KO_CATEGORIES: KoCategory[] = [
   { key: "greeting", label: "인사·표현", labelJa: "あいさつ・表現", emoji: "👋" },
@@ -21,7 +22,8 @@ export const KO_CATEGORIES: KoCategory[] = [
   { key: "adverb", label: "부사·기타", labelJa: "副詞・その他", emoji: "💬" },
 ];
 
-// 표제어 기준 중복 제거(먼저 등장 유지)
+// 표제어 기준 중복 제거(먼저 등장 유지) + 한국어 뜻풀이 병합
 const seen = new Set<string>();
 export const KO_VOCAB: KoWord[] = [...KO_VOCAB_K1A, ...KO_VOCAB_K2]
-  .filter((w) => (seen.has(w.word) ? false : (seen.add(w.word), true)));
+  .filter((w) => (seen.has(w.word) ? false : (seen.add(w.word), true)))
+  .map((w) => ({ ...w, meaningKo: KO_MEANING_KO[w.id] ?? w.meaningKo }));
