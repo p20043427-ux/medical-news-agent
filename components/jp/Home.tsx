@@ -7,6 +7,8 @@ import { CONVERSATIONS } from "@/lib/jp/conversations";
 import { speakJa } from "@/lib/jp/speech";
 import { useFavorites } from "@/lib/favorites";
 import { useRoleplay } from "@/lib/roleplay-progress";
+import { useDailyActivity } from "@/lib/daily-activity";
+import DailyMissions from "@/components/DailyMissions";
 import { useEffect, useState } from "react";
 import WordImage from "./WordImage";
 import { Button, Progress } from "@/components/ui";
@@ -24,6 +26,7 @@ export default function Home({ progress, onStudyCategory, onReviewDue }: {
   onReviewDue?: () => void;
 }) {
   const dueCount = dueIds(progress).length;
+  const activity = useDailyActivity("jp");
   const { has, toggle } = useFavorites("jp-phrase");
   const { data: rpData } = useRoleplay("jp-roleplay");
   const rpDone = Object.keys(rpData).length;
@@ -52,6 +55,15 @@ export default function Home({ progress, onStudyCategory, onReviewDue }: {
 
   return (
     <div className="pb-28">
+      {/* 오늘의 미션 */}
+      <div className="px-5 pb-2 pt-2">
+        <DailyMissions accent="#E63946" missions={[
+          { emoji: "📖", label: "단어 10개 학습", done: todayCount, goal: 10 },
+          { emoji: "🗣️", label: "회화 1개 보기", done: activity.conversation, goal: 1 },
+          { emoji: "🎯", label: "롤플레이·모의시험 1회", done: activity.roleplay + activity.exam, goal: 1 },
+        ]} />
+      </div>
+
       {/* 오늘 복습할 단어 */}
       {dueCount > 0 && onReviewDue && (
         <div className="px-5 pb-2 pt-2">

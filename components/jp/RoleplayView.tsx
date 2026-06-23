@@ -5,6 +5,7 @@ import { CONVERSATIONS, CONVERSATION_CATEGORIES } from "@/lib/jp/conversations";
 import type { Conversation, DialogueLine } from "@/lib/jp/types";
 import { speakJa } from "@/lib/jp/speech";
 import { useRoleplay } from "@/lib/roleplay-progress";
+import { bumpActivity } from "@/lib/daily-activity";
 import { Button } from "@/components/ui";
 import PronounceButton from "@/components/PronounceButton";
 
@@ -69,7 +70,7 @@ function RoleplayRunner({ convo, onExit, onComplete }: { convo: Conversation; on
   const [mistakes, setMistakes] = useState(0);
 
   const done = revealed >= lines.length;
-  useEffect(() => { if (done) onComplete(mistakes); /* eslint-disable-next-line */ }, [done]);
+  useEffect(() => { if (done) { onComplete(mistakes); bumpActivity("jp", "roleplay"); } /* eslint-disable-next-line */ }, [done]);
 
   // 현재 B 턴의 보기(정답 + 오답 2)
   const cur = lines[revealed];

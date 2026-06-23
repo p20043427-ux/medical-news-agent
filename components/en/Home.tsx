@@ -7,6 +7,8 @@ import { EN_CONVERSATIONS } from "@/lib/en/conversations";
 import { speakEn } from "@/lib/en/speech";
 import { useFavorites } from "@/lib/favorites";
 import { useRoleplay } from "@/lib/roleplay-progress";
+import { useDailyActivity } from "@/lib/daily-activity";
+import DailyMissions from "@/components/DailyMissions";
 import { useEffect, useState } from "react";
 import { Button, Progress } from "@/components/ui";
 
@@ -33,6 +35,8 @@ export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewD
   onReviewDue?: () => void;
 }) {
   const dueCount = dueIds(progress).length;
+  const todayCount = progress.daily?.[todayKey()] ?? 0;
+  const activity = useDailyActivity("en");
   const start = new Date(progress.startedAt);
   const dayN = Math.floor((Date.now() - start.getTime()) / 86400000) + 1;
   const { has, toggle } = useFavorites("en-phrase");
@@ -56,6 +60,15 @@ export default function EnHome({ progress, onStudyCategory, onGrammar, onReviewD
 
   return (
     <div className="pb-28">
+      {/* 오늘의 미션 */}
+      <div className="px-5 pb-2 pt-2">
+        <DailyMissions accent="#4361EE" missions={[
+          { emoji: "📖", label: "단어 10개 학습", done: todayCount, goal: 10 },
+          { emoji: "🗣️", label: "회화 1개 보기", done: activity.conversation, goal: 1 },
+          { emoji: "🎯", label: "롤플레이·모의시험 1회", done: activity.roleplay + activity.exam, goal: 1 },
+        ]} />
+      </div>
+
       {/* 오늘 복습할 단어 */}
       {dueCount > 0 && onReviewDue && (
         <div className="px-5 pb-2 pt-2">

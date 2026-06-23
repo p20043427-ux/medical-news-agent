@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { buildExam, PASS_RATIO, type ExamQuestion, type Section, type Difficulty } from "@/lib/jp/exam";
 import { getExamHistory, pushExamHistory } from "@/lib/exam-history";
+import { bumpActivity } from "@/lib/daily-activity";
 import { speakJa } from "@/lib/jp/speech";
 import { Button } from "@/components/ui";
 
@@ -98,6 +99,7 @@ export default function MockExam({
       saveBest(`${round.id}-${difficulty}`, pct);
       pushExamHistory("jp", { t: Date.now(), round: round.id, diff: difficulty, pct });
     }
+    bumpActivity("jp", "exam");
     setPhase("result");
   }
   function retry() { setAttempt((a) => a + 1); setIdx(0); setAnswers({}); setElapsed(0); setPhase("run"); }

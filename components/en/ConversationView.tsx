@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { EN_CONVERSATIONS, type EnConversation } from "@/lib/en/conversations";
 import { speakEn } from "@/lib/en/speech";
+import { bumpActivity } from "@/lib/daily-activity";
 import { Button } from "@/components/ui";
 
 export default function EnConversationView() {
@@ -18,6 +19,7 @@ export default function EnConversationView() {
       if (prev.includes(id)) return prev;
       const next = [...prev, id];
       try { localStorage.setItem("en-conv-read", JSON.stringify(next)); } catch { /* ignore */ }
+      bumpActivity("en", "conversation");
       return next;
     });
   }

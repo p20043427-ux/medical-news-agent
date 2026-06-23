@@ -8,6 +8,7 @@ import SpeakerButton from "./SpeakerButton";
 import { speakJa } from "@/lib/jp/speech";
 import { Button } from "@/components/ui";
 import { track } from "@/lib/analytics";
+import { bumpActivity } from "@/lib/daily-activity";
 
 const ACCENT = "linear-gradient(135deg,#E63946,#F4A261)";
 
@@ -31,6 +32,7 @@ export default function ConversationView({
       if (prev.includes(id)) return prev;
       const next = [...prev, id];
       try { localStorage.setItem("jp-conv-read", JSON.stringify(next)); } catch { /* ignore */ }
+      bumpActivity("jp", "conversation");
       return next;
     });
   }

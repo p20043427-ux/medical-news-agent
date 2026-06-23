@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { buildEnExam, EN_PASS_RATIO, type EnExamQuestion, type EnSection, type EnDifficulty } from "@/lib/en/exam";
 import { speakEn } from "@/lib/en/speech";
 import { getExamHistory, pushExamHistory } from "@/lib/exam-history";
+import { bumpActivity } from "@/lib/daily-activity";
 import { Button } from "@/components/ui";
 
 const SECTIONS: EnSection[] = ["어휘", "구동사", "독해", "청해"];
@@ -62,6 +63,7 @@ export default function EnMockExam({ onExit }: { onExit: () => void }) {
       saveBest(`${round.id}-${difficulty}`, pct);
       pushExamHistory("en", { t: Date.now(), round: round.id, diff: difficulty, pct });
     }
+    bumpActivity("en", "exam");
     setPhase("result");
   }
   function retry() { setAttempt((a) => a + 1); setIdx(0); setAnswers({}); setElapsed(0); setPhase("run"); }

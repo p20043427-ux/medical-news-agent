@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { EN_CONVERSATIONS, type EnConversation } from "@/lib/en/conversations";
 import { speakEn } from "@/lib/en/speech";
 import { useRoleplay } from "@/lib/roleplay-progress";
+import { bumpActivity } from "@/lib/daily-activity";
 import { Button } from "@/components/ui";
 import PronounceButton from "@/components/PronounceButton";
 
@@ -73,7 +74,7 @@ function Runner({ convo, onExit, onComplete }: { convo: EnConversation; onExit: 
   }, [revealed, convo.id]);
 
   const done = revealed >= lines.length;
-  useEffect(() => { if (done) onComplete(mistakes); /* eslint-disable-next-line */ }, [done]);
+  useEffect(() => { if (done) { onComplete(mistakes); bumpActivity("en", "roleplay"); } /* eslint-disable-next-line */ }, [done]);
 
   function advanceNpc() { const l = lines[revealed]; if (l) speakEn(l.en); setRevealed((r) => r + 1); }
   function pick(opt: string) {
