@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import HomeView from "./HomeView";
 import GuideView from "./GuideView";
 import EntryView from "./EntryView";
 import TransportView from "./TransportView";
@@ -7,6 +8,7 @@ import PhraseView from "./PhraseView";
 import PrepView from "./PrepView";
 
 const TABS = [
+  { key: "home", label: "홈", icon: "🏠" },
   { key: "guide", label: "도시", icon: "🗺️" },
   { key: "entry", label: "입국", icon: "✈️" },
   { key: "transport", label: "교통", icon: "🚃" },
@@ -24,11 +26,19 @@ const SOS_CONTACTS = [
 ];
 
 export default function TravelApp({ onBack }: { onBack: () => void }) {
-  const [tab, setTab] = useState<Tab>("guide");
+  const [tab, setTab] = useState<Tab>("home");
   const [sos, setSos] = useState(false);
+
+  function handleNavigate(nextTab: Tab, city?: string) {
+    setTab(nextTab);
+    // city 파라미터는 GuideView 등에서 활용 가능하도록 확장 예정
+    void city;
+  }
 
   function renderTab() {
     switch (tab) {
+      case "home":
+        return <HomeView onNavigate={handleNavigate} />;
       case "guide":
         return <GuideView />;
       case "entry":
@@ -68,7 +78,6 @@ export default function TravelApp({ onBack }: { onBack: () => void }) {
               onClick={() => setTab(t.key)}
               style={{
                 ...styles.tabBtn,
-                ...(active ? styles.tabBtnActive : {}),
               }}
               aria-current={active ? "page" : undefined}
             >
@@ -86,14 +95,16 @@ export default function TravelApp({ onBack }: { onBack: () => void }) {
         })}
       </nav>
 
-      {/* SOS 플로팅 버튼 */}
-      <button
-        onClick={() => setSos(true)}
-        style={styles.sosBtn}
-        aria-label="긴급 연락처"
-      >
-        SOS
-      </button>
+      {/* SOS 플로팅 버튼 — 홈 탭 제외 */}
+      {tab !== "home" && (
+        <button
+          onClick={() => setSos(true)}
+          style={styles.sosBtn}
+          aria-label="긴급 연락처"
+        >
+          SOS
+        </button>
+      )}
 
       {/* SOS 모달 */}
       {sos && (
@@ -197,8 +208,8 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "row",
     alignItems: "stretch",
     height: "60px",
-    backgroundColor: "var(--color-surface, #ffffff)",
-    borderTop: "1px solid var(--color-border, #e2e8f0)",
+    backgroundColor: "var(--card, #ffffff)",
+    borderTop: "1px solid var(--border, #e2e8f0)",
     flexShrink: 0,
     zIndex: 10,
     paddingBottom: "env(safe-area-inset-bottom, 0px)",
@@ -214,24 +225,20 @@ const styles: Record<string, React.CSSProperties> = {
     background: "none",
     cursor: "pointer",
     padding: "4px 0",
-    transition: "background-color 0.15s ease",
     borderRadius: 0,
-  },
-  tabBtnActive: {
-    backgroundColor: "var(--color-primary-light, #eff6ff)",
   },
   tabIcon: {
     fontSize: "20px",
     lineHeight: "1",
   },
   tabLabel: {
-    fontSize: "11px",
+    fontSize: "10px",
     fontWeight: "500",
-    color: "var(--color-muted, #94a3b8)",
+    color: "var(--text-3, #94a3b8)",
     letterSpacing: "-0.2px",
   },
   tabLabelActive: {
-    color: "var(--color-primary, #2563eb)",
+    color: "#E63946",
     fontWeight: "700",
   },
   sosBtn: {
@@ -241,13 +248,13 @@ const styles: Record<string, React.CSSProperties> = {
     width: "52px",
     height: "52px",
     borderRadius: "50%",
-    backgroundColor: "var(--color-danger, #dc2626)",
+    backgroundColor: "#E63946",
     color: "#ffffff",
     fontWeight: "800",
     fontSize: "13px",
     border: "none",
     cursor: "pointer",
-    boxShadow: "0 4px 12px rgba(220, 38, 38, 0.45)",
+    boxShadow: "0 4px 12px rgba(230, 57, 70, 0.45)",
     zIndex: 50,
     letterSpacing: "-0.5px",
     display: "flex",
@@ -324,10 +331,10 @@ const styles: Record<string, React.CSSProperties> = {
   contactNumber: {
     fontSize: "14px",
     fontWeight: "700",
-    color: "var(--color-danger, #dc2626)",
+    color: "#E63946",
     textDecoration: "none",
     padding: "6px 12px",
-    backgroundColor: "rgba(220,38,38,0.08)",
+    backgroundColor: "rgba(230,57,70,0.08)",
     borderRadius: "8px",
     letterSpacing: "0.3px",
   },

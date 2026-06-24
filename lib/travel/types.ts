@@ -8,6 +8,12 @@ export interface TravelSpot {
   hours?: string;    // 운영시간
   fee?: string;      // 입장료
   tips: string[];    // 실용 팁 2-4개
+  rating?: number;        // 예: 4.5
+  reviewCount?: number;   // 예: 2341
+  priceRange?: "무료" | "¥" | "¥¥" | "¥¥¥";
+  timeFromStation?: string; // 예: "도보 5분"
+  tags?: string[];         // 예: ["인기", "예약필수", "야경명소"]
+  rank?: number;           // 인기 순위
 }
 
 export interface TravelFood {
@@ -16,6 +22,11 @@ export interface TravelFood {
   desc: string;
   avgPrice?: string;
   area?: string;     // 추천 지역/가게
+  rating?: number;
+  reviewCount?: number;
+  priceRange?: "¥" | "¥¥" | "¥¥¥";
+  tags?: string[];
+  rank?: number;
 }
 
 export interface CityBasics {
