@@ -6,6 +6,7 @@ import EntryView from "./EntryView";
 import TransportView from "./TransportView";
 import PhraseView from "./PhraseView";
 import PrepView from "./PrepView";
+import PracticalView from "./PracticalView";
 
 const TABS = [
   { key: "home", label: "홈", icon: "🏠" },
@@ -14,6 +15,7 @@ const TABS = [
   { key: "transport", label: "교통", icon: "🚃" },
   { key: "phrase", label: "회화", icon: "💬" },
   { key: "prep", label: "준비", icon: "📋" },
+  { key: "practical", label: "실용", icon: "💡" },
 ] as const;
 type Tab = (typeof TABS)[number]["key"];
 
@@ -49,6 +51,8 @@ export default function TravelApp({ onBack }: { onBack: () => void }) {
         return <PhraseView />;
       case "prep":
         return <PrepView />;
+      case "practical":
+        return <PracticalView />;
       default:
         return null;
     }

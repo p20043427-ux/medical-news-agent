@@ -1,7 +1,7 @@
 // lib/travel/osaka.ts
 import { CityGuide } from "./types";
 
-export const OSAKA_GUIDE: CityGuide = {
+export const OSAKA: CityGuide = {
   key: "osaka",
   name: "오사카",
   nameJp: "大阪",

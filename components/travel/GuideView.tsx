@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { OSAKA } from "@/lib/travel/osaka";
 import { FUKUOKA } from "@/lib/travel/fukuoka";
+import { TOKYO } from "@/lib/travel/tokyo";
 import type { CityGuide, TravelSpot, TravelFood } from "@/lib/travel/types";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const CITIES: CityGuide[] = [OSAKA, FUKUOKA];
+const CITIES: CityGuide[] = [TOKYO, OSAKA, FUKUOKA];
 
 type SubTab = "spots" | "food" | "shopping" | "tips";
 
@@ -21,6 +22,8 @@ const SUB_TABS: { key: SubTab; label: string; icon: string }[] = [
 // ─── City gradient map ────────────────────────────────────────────────────────
 
 const CITY_GRADIENT: Record<string, string> = {
+  tokyo:
+    "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
   osaka:
     "linear-gradient(135deg, #c0392b 0%, #e67e22 50%, #f39c12 100%)",
   fukuoka:

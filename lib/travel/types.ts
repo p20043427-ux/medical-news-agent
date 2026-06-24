@@ -21,12 +21,13 @@ export interface TravelFood {
   nameJp: string;
   desc: string;
   avgPrice?: string;
-  area?: string;     // 추천 지역/가게
+  area?: string;
   rating?: number;
   reviewCount?: number;
   priceRange?: "¥" | "¥¥" | "¥¥¥";
   tags?: string[];
   rank?: number;
+  tips?: string[];
 }
 
 export interface CityBasics {
