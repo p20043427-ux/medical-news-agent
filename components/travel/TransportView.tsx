@@ -3,10 +3,11 @@
 import { useState } from "react";
 import {
   IC_CARD_GUIDE,
-  TRANSPORT_TYPES,
   OSAKA_AIRPORT_ROUTES,
   FUKUOKA_AIRPORT_ROUTES,
   CITY_TO_AIRPORT,
+  BUS_TIPS,
+  TAXI_TIPS,
 } from "@/lib/travel/transport";
 import { TransportRoute, TransportOption } from "@/lib/travel/types";
 import { Chip } from "@/components/ui/chip";
@@ -361,7 +362,7 @@ function ICCardTab() {
           style={{ background: "var(--card)", border: "1px solid var(--border)" }}
         >
           <ul className="space-y-2">
-            {IC_CARD_GUIDE.usage.map((u, i) => (
+            {IC_CARD_GUIDE.howToUse.map((u, i) => (
               <li key={i} className="flex gap-2 text-xs leading-relaxed" style={{ color: "var(--text-2)" }}>
                 <span
                   className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
@@ -430,13 +431,12 @@ function CityToAirportTab() {
   const cityLabel: Record<CityKey, string> = {
     osaka: "오사카",
     fukuoka: "후쿠오카",
-    tokyo: "도쿄",
   };
 
   return (
     <div className="space-y-6">
       {cityKeys.map((cityKey) => {
-        const airportMap = CITY_TO_AIRPORT[cityKey] as Record<string, AirportEntry>;
+        const airportMap = CITY_TO_AIRPORT[cityKey] as unknown as Record<string, AirportEntry>;
         return (
           <section key={cityKey}>
             <h3
