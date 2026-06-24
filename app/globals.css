@@ -232,7 +232,7 @@ html.dark .via-\[\#F8F9FB\] {
   --ds-card-foreground: 240 27.8% 14.1%;
   --ds-muted: 220 27.3% 95.7%;            /* = --surface #F1F3F7 */
   --ds-muted-foreground: 218 16.9% 34.9%; /* = --text-2 #4A5568 */
-  --ds-subtle: 215 20.2% 65.1%;           /* = --text-3 #94A3B8 */
+  --ds-subtle: 220 9% 46%;                /* = --text-3 #6B7280 — WCAG AA 5:1 */
   --ds-primary: 353 78% 52%;          /* 일본어 브랜드 (#E63946) */
   --ds-primary-foreground: 0 0% 100%;
   --ds-secondary: 28 87% 62%;         /* 주황 (#F4A261) */
