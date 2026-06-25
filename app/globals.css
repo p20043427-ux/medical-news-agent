@@ -12,6 +12,12 @@
   --text-2: hsl(var(--ds-muted-foreground));
   --text-3: hsl(var(--ds-subtle));
   --border: hsl(var(--ds-border));
+  /* 일본여행(travel) 레거시 토큰 alias → 공통 디자인 토큰에 매핑(다크모드 자동 대응) */
+  --color-bg: var(--bg);
+  --color-surface: var(--card);
+  --color-text: var(--text-1);
+  --color-muted: var(--text-3);
+  --color-border: var(--border);
   --jp-from: #E63946;
   --jp-to: #F4A261;
   --en-from: #4361EE;

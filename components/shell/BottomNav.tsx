@@ -7,7 +7,8 @@ export interface NavTab<K extends string = string> {
   key: K;
   ko: string;
   ja: string;
-  icon: React.ReactNode; // <path/> 들 (24x24 stroke 아이콘)
+  icon?: React.ReactNode; // <path/> 들 (24x24 stroke 아이콘)
+  emoji?: string;         // 이모지 아이콘(여행 등) — icon 대신 사용
 }
 
 /** 공통 하단 탭 바 — 일본어 카테고리 디자인 기준. tabs 구성을 props로 주입. */
@@ -29,7 +30,9 @@ export function BottomNav<K extends string>({
             <button key={n.key} onClick={() => onChange(n.key)} aria-current={on ? "page" : undefined}
               className="flex flex-1 flex-col items-center gap-1 rounded-2xl py-1.5 transition active:scale-95"
               style={{ color: on ? accent : "var(--text-3)", background: on ? `${accent}14` : "transparent" }}>
-              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={on ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">{n.icon}</svg>
+              {n.emoji
+                ? <span className="text-xl leading-none">{n.emoji}</span>
+                : <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={on ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">{n.icon}</svg>}
               <span className={`text-[11px] leading-none ${on ? "font-extrabold" : "font-medium"}`}>{lang === "ja" ? n.ja : n.ko}</span>
             </button>
           );
