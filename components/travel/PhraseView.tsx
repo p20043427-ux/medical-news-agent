@@ -46,27 +46,15 @@ export default function PhraseView() {
   const isSearching = query.trim().length > 0;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
+    <div className="flex min-h-0 flex-col">
       {/* 검색바 */}
       <div
-        style={{
-          padding: "10px 16px 0",
-          backgroundColor: "var(--bg-1)",
-          position: "sticky",
-          top: 0,
-          zIndex: 20,
-        }}
+        className="sticky top-0 z-20 px-4 pt-2.5"
+        style={{ background: "var(--bg)" }}
       >
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "8px 12px",
-            borderRadius: 10,
-            border: "1.5px solid var(--border)",
-            backgroundColor: "var(--bg-2)",
-          }}
+          className="flex items-center gap-2 rounded-[10px] px-3 py-2"
+          style={{ background: "var(--surface)", border: "1.5px solid var(--border)" }}
         >
           {/* 돋보기 아이콘 */}
           <svg
@@ -76,7 +64,7 @@ export default function PhraseView() {
             strokeWidth={1.8}
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ width: 16, height: 16, flexShrink: 0 }}
+            className="h-4 w-4 flex-shrink-0"
           >
             <circle cx="8.5" cy="8.5" r="5.5" />
             <path d="M14 14l3 3" />
@@ -86,31 +74,15 @@ export default function PhraseView() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="한국어 또는 일본어로 검색..."
-            style={{
-              flex: 1,
-              border: "none",
-              outline: "none",
-              background: "transparent",
-              fontSize: 14,
-              color: "var(--text-1)",
-              lineHeight: 1.4,
-            }}
+            className="flex-1 border-none bg-transparent text-sm leading-snug outline-none"
+            style={{ color: "var(--text-1)" }}
           />
           {query && (
             <button
               onClick={() => setQuery("")}
               aria-label="검색어 지우기"
-              style={{
-                border: "none",
-                background: "none",
-                cursor: "pointer",
-                padding: 2,
-                color: "var(--text-3)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
+              className="flex h-10 w-10 flex-shrink-0 cursor-pointer items-center justify-center border-none bg-transparent"
+              style={{ color: "var(--text-3)" }}
             >
               <svg
                 viewBox="0 0 16 16"
@@ -118,7 +90,7 @@ export default function PhraseView() {
                 stroke="currentColor"
                 strokeWidth={2}
                 strokeLinecap="round"
-                style={{ width: 14, height: 14 }}
+                className="h-3.5 w-3.5"
               >
                 <path d="M4 4l8 8M12 4l-8 8" />
               </svg>
@@ -130,18 +102,11 @@ export default function PhraseView() {
       {/* 카테고리 칩 — 검색 중이면 숨김 */}
       {!isSearching && (
         <div
+          className="sticky z-[15] flex gap-2 overflow-x-auto px-4 py-2.5 [-webkit-overflow-scrolling:touch] [scrollbar-width:none]"
           style={{
-            display: "flex",
-            overflowX: "auto",
-            gap: 8,
-            padding: "10px 16px",
-            scrollbarWidth: "none",
-            WebkitOverflowScrolling: "touch",
-            borderBottom: "1px solid var(--border)",
-            backgroundColor: "var(--bg-1)",
-            position: "sticky",
             top: 54,
-            zIndex: 15,
+            borderBottom: "1px solid var(--border)",
+            background: "var(--bg)",
           }}
         >
           {SORTED_PHRASES.map((section) => {
@@ -151,37 +116,28 @@ export default function PhraseView() {
               <button
                 key={section.key}
                 onClick={() => setCat(section.key)}
+                className="flex min-h-[40px] flex-shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-[13px] transition-all"
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 5,
-                  flexShrink: 0,
-                  padding: "6px 14px",
-                  borderRadius: 9999,
                   border: isActive
                     ? isEmergency
                       ? "1.5px solid #e53e3e"
-                      : "1.5px solid var(--accent)"
+                      : "1.5px solid #0EA5E9"
                     : isEmergency
                     ? "1.5px solid #feb2b2"
                     : "1.5px solid var(--border)",
-                  backgroundColor: isActive
+                  background: isActive
                     ? isEmergency
                       ? "#e53e3e"
-                      : "var(--accent)"
+                      : "#0EA5E9"
                     : isEmergency
                     ? "#fff5f5"
-                    : "var(--bg-2)",
+                    : "var(--surface)",
                   color: isActive
                     ? "#fff"
                     : isEmergency
                     ? "#c53030"
                     : "var(--text-2)",
-                  fontSize: 13,
                   fontWeight: isActive || isEmergency ? 600 : 400,
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  transition: "all 0.15s",
                 }}
               >
                 <span>{section.emoji}</span>
@@ -195,12 +151,8 @@ export default function PhraseView() {
       {/* 검색 결과 헤더 */}
       {isSearching && (
         <div
-          style={{
-            padding: "8px 16px 4px",
-            fontSize: 12,
-            color: "var(--text-3)",
-            borderBottom: "1px solid var(--border)",
-          }}
+          className="px-4 pb-1 pt-2 text-xs"
+          style={{ color: "var(--text-3)", borderBottom: "1px solid var(--border)" }}
         >
           {filteredPhrases.length > 0
             ? `${filteredPhrases.length}개 결과`
@@ -209,7 +161,7 @@ export default function PhraseView() {
       )}
 
       {/* Phrase 목록 */}
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      <div className="flex flex-col">
         {(filteredPhrases as (typeof SORTED_PHRASES[0]["phrases"][0] & { _sectionTitle?: string; _sectionKey?: string })[]).map((phrase, idx) => {
           const cardId = `${isSearching ? phrase._sectionKey ?? cat : cat}-${idx}`;
           const isCopied = copied === cardId;
@@ -218,36 +170,19 @@ export default function PhraseView() {
           return (
             <div
               key={cardId}
+              className="flex items-start gap-3 px-4 py-3.5 transition-colors"
               style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 12,
-                padding: "14px 16px",
-                borderBottom:
-                  idx < lastIdx ? "1px solid var(--border)" : "none",
-                backgroundColor: "var(--bg-1)",
-                transition: "background-color 0.1s",
+                borderBottom: idx < lastIdx ? "1px solid var(--border)" : "none",
+                background: "var(--bg)",
               }}
             >
               {/* 텍스트 영역 */}
-              <div
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 3,
-                }}
-              >
+              <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
                 {/* 검색 중일 때 카테고리 뱃지 */}
                 {isSearching && phrase._sectionTitle && (
                   <span
-                    style={{
-                      display: "inline-block",
-                      fontSize: 11,
-                      color: "var(--text-3)",
-                      marginBottom: 2,
-                    }}
+                    className="mb-0.5 inline-block text-[11px]"
+                    style={{ color: "var(--text-3)" }}
                   >
                     {phrase._sectionTitle}
                   </span>
@@ -255,12 +190,8 @@ export default function PhraseView() {
 
                 {/* 한국어 */}
                 <p
-                  style={{
-                    margin: 0,
-                    fontSize: 12,
-                    color: "var(--text-2)",
-                    lineHeight: 1.5,
-                  }}
+                  className="m-0 text-xs leading-normal"
+                  style={{ color: "var(--text-2)" }}
                 >
                   {phrase.ko}
                 </p>
@@ -269,25 +200,11 @@ export default function PhraseView() {
                 <button
                   onClick={() => handleCopy(phrase.jp, cardId)}
                   title="탭하여 복사"
-                  style={{
-                    all: "unset",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                    cursor: "pointer",
-                    width: "fit-content",
-                  }}
+                  className="flex w-fit min-h-[40px] cursor-pointer items-center gap-1.5 [all:unset]"
                 >
                   <p
-                    style={{
-                      margin: 0,
-                      fontSize: 19,
-                      fontWeight: 700,
-                      color: isCopied ? "var(--accent)" : "var(--text-1)",
-                      lineHeight: 1.4,
-                      wordBreak: "break-all",
-                      transition: "color 0.2s",
-                    }}
+                    className="m-0 break-all text-[19px] font-bold leading-snug transition-colors"
+                    style={{ color: isCopied ? "#0EA5E9" : "var(--text-1)" }}
                   >
                     {isCopied ? "복사됨!" : phrase.jp}
                   </p>
@@ -300,7 +217,7 @@ export default function PhraseView() {
                       strokeWidth={1.5}
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      style={{ width: 13, height: 13, flexShrink: 0, opacity: 0.6 }}
+                      className="h-[13px] w-[13px] flex-shrink-0 opacity-60"
                     >
                       <rect x="5" y="5" width="8" height="8" rx="1.5" />
                       <path d="M3 11H2.5A1.5 1.5 0 0 1 1 9.5v-7A1.5 1.5 0 0 1 2.5 1h7A1.5 1.5 0 0 1 11 2.5V3" />
@@ -310,11 +227,11 @@ export default function PhraseView() {
                     <svg
                       viewBox="0 0 16 16"
                       fill="none"
-                      stroke="var(--accent)"
+                      stroke="#0EA5E9"
                       strokeWidth={2}
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      style={{ width: 14, height: 14, flexShrink: 0 }}
+                      className="h-3.5 w-3.5 flex-shrink-0"
                     >
                       <path d="M2.5 8.5l3.5 3.5 7-8" />
                     </svg>
@@ -323,12 +240,8 @@ export default function PhraseView() {
 
                 {/* 히라가나 읽기 */}
                 <p
-                  style={{
-                    margin: 0,
-                    fontSize: 12,
-                    color: "var(--text-3)",
-                    lineHeight: 1.5,
-                  }}
+                  className="m-0 text-xs leading-normal"
+                  style={{ color: "var(--text-3)" }}
                 >
                   {phrase.reading}
                 </p>
@@ -336,28 +249,21 @@ export default function PhraseView() {
                 {/* 노트 */}
                 {phrase.note && (
                   <p
+                    className="mt-0.5 mb-0 mx-0 flex items-start gap-1 rounded-md px-2 py-[5px] text-xs leading-normal"
                     style={{
-                      margin: "2px 0 0",
-                      fontSize: 12,
                       color: "var(--text-2)",
-                      lineHeight: 1.5,
-                      display: "flex",
-                      alignItems: "flex-start",
-                      gap: 4,
-                      padding: "5px 8px",
-                      backgroundColor: "var(--bg-2)",
-                      borderRadius: 6,
-                      borderLeft: "2px solid var(--accent)",
+                      background: "var(--surface)",
+                      borderLeft: "2px solid #0EA5E9",
                     }}
                   >
-                    <span style={{ flexShrink: 0 }}>💡</span>
+                    <span className="flex-shrink-0">💡</span>
                     <span>{phrase.note}</span>
                   </p>
                 )}
               </div>
 
               {/* 스피커 버튼 */}
-              <div style={{ paddingTop: 2 }}>
+              <div className="pt-0.5">
                 <SpeakerButton text={phrase.jp} size={38} />
               </div>
             </div>
@@ -367,21 +273,14 @@ export default function PhraseView() {
         {/* 검색 결과 없음 */}
         {isSearching && filteredPhrases.length === 0 && (
           <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "48px 24px",
-              gap: 8,
-              color: "var(--text-3)",
-            }}
+            className="flex flex-col items-center justify-center gap-2 px-6 py-12"
+            style={{ color: "var(--text-3)" }}
           >
-            <span style={{ fontSize: 32 }}>🔍</span>
-            <p style={{ margin: 0, fontSize: 14 }}>
+            <span className="text-[32px]">🔍</span>
+            <p className="m-0 text-sm">
               &ldquo;{query}&rdquo;에 대한 결과가 없어요
             </p>
-            <p style={{ margin: 0, fontSize: 12 }}>
+            <p className="m-0 text-xs">
               한국어 또는 일본어로 다시 검색해 보세요
             </p>
           </div>

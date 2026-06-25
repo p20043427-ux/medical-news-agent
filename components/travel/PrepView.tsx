@@ -31,10 +31,7 @@ function TabBar({
   onChange: (key: TabKey) => void;
 }) {
   return (
-    <div
-      className="flex gap-1.5 overflow-x-auto px-4 pb-3 pt-1"
-      style={{ scrollbarWidth: "none" }}
-    >
+    <div className="no-scrollbar flex gap-1.5 overflow-x-auto px-4 pb-3 pt-1">
       {TABS.map(({ key, label, emoji }) => {
         const on = key === active;
         return (
@@ -87,7 +84,7 @@ function ChecklistTab() {
     <div className="space-y-4 px-4 pb-28">
       {/* 진행률 바 */}
       <div
-        className="rounded-2xl p-4"
+        className="rounded-2xl p-4 shadow-sm"
         style={{ background: "var(--card)", border: "1px solid var(--border)" }}
       >
         <div className="mb-2 flex items-center justify-between">
@@ -300,7 +297,7 @@ function ContactsTab() {
             !c.number.includes("보험") && !c.number.includes("확인");
           const Content = (
             <div
-              className="flex items-center gap-3 rounded-2xl p-4 transition active:scale-[0.98]"
+              className="flex items-center gap-3 rounded-2xl p-4 shadow-sm transition active:scale-[0.98]"
               style={{
                 background: "var(--card)",
                 border: "1px solid var(--border)",
@@ -385,7 +382,7 @@ function AppsTab() {
         {USEFUL_APPS.map((app, i) => (
           <div
             key={app.name}
-            className="flex items-start gap-3.5 rounded-2xl p-4"
+            className="flex items-start gap-3.5 rounded-2xl p-4 shadow-sm"
             style={{
               background: "var(--card)",
               border: "1px solid var(--border)",
@@ -457,7 +454,7 @@ function LostTab() {
           return (
             <div
               key={item.case}
-              className="overflow-hidden rounded-2xl transition-shadow"
+              className="overflow-hidden rounded-2xl shadow-sm transition-shadow"
               style={{
                 background: "var(--card)",
                 border: `1px solid ${isOpen ? ACCENT + "66" : "var(--border)"}`,

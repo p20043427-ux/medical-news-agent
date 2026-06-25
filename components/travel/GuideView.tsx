@@ -58,17 +58,8 @@ function PriceRangeBadge({ range }: { range: string }) {
 
   return (
     <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        fontSize: 11,
-        fontWeight: 700,
-        padding: "2px 7px",
-        borderRadius: 99,
-        background: bg,
-        color,
-        flexShrink: 0,
-      }}
+      className="inline-flex flex-shrink-0 items-center rounded-full px-[7px] py-0.5 text-[11px] font-bold"
+      style={{ background: bg, color }}
     >
       {range}
     </span>
@@ -80,17 +71,11 @@ function PriceRangeBadge({ range }: { range: string }) {
 function TagPill({ label }: { label: string }) {
   return (
     <span
+      className="inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-semibold"
       style={{
-        display: "inline-flex",
-        alignItems: "center",
-        fontSize: 11,
-        fontWeight: 600,
-        padding: "2px 8px",
-        borderRadius: 99,
         background: "var(--surface)",
         color: "var(--text-2)",
         border: "1px solid var(--border)",
-        whiteSpace: "nowrap",
       }}
     >
       {label}
@@ -108,20 +93,13 @@ function StarRating({
   reviewCount?: number;
 }) {
   return (
-    <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 4,
-        fontSize: 13,
-      }}
-    >
-      <span style={{ color: "#f59e0b", fontSize: 14 }}>★</span>
-      <span style={{ fontWeight: 700, color: "var(--text-1)", fontSize: 14 }}>
+    <span className="inline-flex items-center gap-1 text-[13px]">
+      <span className="text-[14px]" style={{ color: "#f59e0b" }}>★</span>
+      <span className="text-[14px] font-bold" style={{ color: "var(--text-1)" }}>
         {rating.toFixed(1)}
       </span>
       {reviewCount !== undefined && (
-        <span style={{ color: "var(--text-3)", fontSize: 12 }}>
+        <span className="text-[12px]" style={{ color: "var(--text-3)" }}>
           ({reviewCount.toLocaleString()})
         </span>
       )}
@@ -139,43 +117,23 @@ function SpotCard({ spot, index }: { spot: TravelSpot; index: number }) {
 
   return (
     <div
+      className="mb-3 overflow-hidden rounded-[14px] shadow-sm"
       style={{
         background: "var(--card)",
         border: "1px solid var(--border)",
-        borderRadius: 14,
-        overflow: "hidden",
-        marginBottom: 12,
-        boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
       }}
     >
       {/* Main row */}
-      <div style={{ padding: "14px 16px 0" }}>
+      <div className="px-4 pt-[14px]">
         {/* Top: rank + tags */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            marginBottom: 8,
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="mb-2 flex flex-wrap items-center gap-1.5">
           {/* Rank badge */}
           <span
+            className="inline-flex h-[22px] min-w-[28px] items-center justify-center rounded-md px-1.5 text-[11px] font-extrabold tracking-tight"
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              minWidth: 28,
-              height: 22,
-              borderRadius: 6,
               background: rs.bg,
               color: rs.color,
               border: `1px solid ${rs.border}`,
-              fontSize: 11,
-              fontWeight: 800,
-              padding: "0 6px",
-              letterSpacing: "-0.02em",
             }}
           >
             #{displayRank}
@@ -185,52 +143,29 @@ function SpotCard({ spot, index }: { spot: TravelSpot; index: number }) {
         </div>
 
         {/* Name row */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "baseline",
-            gap: 8,
-            marginBottom: 6,
-          }}
-        >
+        <div className="mb-1.5 flex items-baseline gap-2">
           <h3
-            style={{
-              margin: 0,
-              fontSize: 17,
-              fontWeight: 800,
-              color: "var(--text-1)",
-              lineHeight: 1.3,
-            }}
+            className="m-0 text-[17px] font-extrabold leading-[1.3]"
+            style={{ color: "var(--text-1)" }}
           >
             {spot.name}
           </h3>
           <span
-            style={{
-              fontSize: 13,
-              color: "var(--text-3)",
-              fontWeight: 400,
-            }}
+            className="text-[13px] font-normal"
+            style={{ color: "var(--text-3)" }}
           >
             {spot.nameJp}
           </span>
         </div>
 
         {/* Rating + price row */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            marginBottom: 8,
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="mb-2 flex flex-wrap items-center gap-2">
           {spot.rating !== undefined && (
             <StarRating rating={spot.rating} reviewCount={spot.reviewCount} />
           )}
           {spot.priceRange && (
             <>
-              <span style={{ color: "var(--border)", fontSize: 12 }}>·</span>
+              <span className="text-[12px]" style={{ color: "var(--border)" }}>·</span>
               <PriceRangeBadge range={spot.priceRange} />
             </>
           )}
@@ -239,14 +174,8 @@ function SpotCard({ spot, index }: { spot: TravelSpot; index: number }) {
         {/* Station distance */}
         {spot.timeFromStation && (
           <p
-            style={{
-              margin: "0 0 8px",
-              fontSize: 12,
-              color: "var(--text-3)",
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-            }}
+            className="m-0 mb-2 flex items-center gap-1 text-[12px]"
+            style={{ color: "var(--text-3)" }}
           >
             <span>📍</span>
             {spot.timeFromStation}
@@ -255,11 +184,9 @@ function SpotCard({ spot, index }: { spot: TravelSpot; index: number }) {
 
         {/* Description (2-line clamp when closed) */}
         <p
+          className="m-0 mb-2.5 overflow-hidden text-[13px] leading-[1.7]"
           style={{
-            margin: "0 0 10px",
-            fontSize: 13,
             color: "var(--text-2)",
-            lineHeight: 1.7,
             display: "-webkit-box",
             WebkitLineClamp: open ? undefined : 2,
             WebkitBoxOrient: "vertical" as React.CSSProperties["WebkitBoxOrient"],
@@ -273,13 +200,8 @@ function SpotCard({ spot, index }: { spot: TravelSpot; index: number }) {
       {/* Info chips row */}
       {(spot.access || spot.hours || spot.fee) && (
         <div
-          style={{
-            display: "flex",
-            gap: 6,
-            padding: "0 16px 10px",
-            overflowX: "auto",
-            scrollbarWidth: "none",
-          }}
+          className="flex gap-1.5 overflow-x-auto px-4 pb-2.5"
+          style={{ scrollbarWidth: "none" }}
         >
           {spot.access && (
             <InfoChip icon="🚇" text={spot.access} />
@@ -296,33 +218,22 @@ function SpotCard({ spot, index }: { spot: TravelSpot; index: number }) {
       {/* Expandable: tips */}
       {open && spot.tips.length > 0 && (
         <div
-          style={{
-            margin: "0 16px 14px",
-            background: "var(--surface)",
-            borderRadius: 10,
-            padding: "10px 12px",
-          }}
+          className="mx-4 mb-[14px] rounded-[10px] px-3 py-2.5"
+          style={{ background: "var(--surface)" }}
         >
           <p
-            style={{
-              margin: "0 0 7px",
-              fontSize: 11,
-              fontWeight: 700,
-              color: "var(--text-3)",
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
-            }}
+            className="m-0 mb-[7px] text-[11px] font-bold uppercase tracking-[0.06em]"
+            style={{ color: "var(--text-3)" }}
           >
             실용 팁
           </p>
-          <ul style={{ margin: 0, paddingLeft: 16 }}>
+          <ul className="m-0 pl-4">
             {spot.tips.map((tip, i) => (
               <li
                 key={i}
+                className="text-[12px] leading-[1.7]"
                 style={{
-                  fontSize: 12,
                   color: "var(--text-2)",
-                  lineHeight: 1.7,
                   marginBottom: i < spot.tips.length - 1 ? 4 : 0,
                 }}
               >
@@ -336,21 +247,12 @@ function SpotCard({ spot, index }: { spot: TravelSpot; index: number }) {
       {/* More toggle button */}
       <button
         onClick={() => setOpen((v) => !v)}
+        className="flex w-full cursor-pointer items-center justify-center gap-[5px] px-4 py-[9px] text-[12px] font-semibold transition-[background] duration-100"
         style={{
-          width: "100%",
-          padding: "9px 16px",
           background: "var(--surface)",
           border: "none",
           borderTop: "1px solid var(--border)",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 5,
-          fontSize: 12,
-          fontWeight: 600,
           color: "var(--text-3)",
-          transition: "background 0.1s",
         }}
       >
         {open ? "▲ 접기" : "▼ 더보기"}
@@ -364,31 +266,15 @@ function SpotCard({ spot, index }: { spot: TravelSpot; index: number }) {
 function InfoChip({ icon, text }: { icon: string; text: string }) {
   return (
     <span
+      className="inline-flex max-w-[200px] flex-shrink-0 items-center gap-1 overflow-hidden text-ellipsis whitespace-nowrap rounded-full px-2.5 py-[5px] text-[11px]"
       style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 4,
-        padding: "5px 10px",
         background: "var(--surface)",
         border: "1px solid var(--border)",
-        borderRadius: 99,
-        fontSize: 11,
         color: "var(--text-2)",
-        whiteSpace: "nowrap",
-        flexShrink: 0,
-        maxWidth: 200,
-        overflow: "hidden",
-        textOverflow: "ellipsis",
       }}
     >
-      <span style={{ flexShrink: 0 }}>{icon}</span>
-      <span
-        style={{
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        }}
-      >
+      <span className="flex-shrink-0">{icon}</span>
+      <span className="overflow-hidden text-ellipsis whitespace-nowrap">
         {text}
       </span>
     </span>
@@ -403,66 +289,36 @@ function FoodCard({ food, index }: { food: TravelFood; index: number }) {
 
   return (
     <div
+      className="mb-2.5 rounded-[14px] px-4 py-[14px] shadow-sm"
       style={{
         background: "var(--card)",
         border: "1px solid var(--border)",
-        borderRadius: 14,
-        padding: "14px 16px",
-        marginBottom: 10,
-        boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
       }}
     >
       {/* Top row: rank + name + price badge */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          gap: 10,
-          marginBottom: 7,
-        }}
-      >
+      <div className="mb-[7px] flex items-start gap-2.5">
         {/* Rank badge */}
         <span
+          className="mt-0.5 inline-flex h-[22px] min-w-[28px] flex-shrink-0 items-center justify-center rounded-md px-1.5 text-[11px] font-extrabold"
           style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            minWidth: 28,
-            height: 22,
-            borderRadius: 6,
             background: rs.bg,
             color: rs.color,
             border: `1px solid ${rs.border}`,
-            fontSize: 11,
-            fontWeight: 800,
-            padding: "0 6px",
-            flexShrink: 0,
-            marginTop: 2,
           }}
         >
           #{displayRank}
         </span>
 
         {/* Name block */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "baseline",
-              gap: 7,
-              flexWrap: "wrap",
-            }}
-          >
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-baseline gap-[7px]">
             <span
-              style={{
-                fontSize: 16,
-                fontWeight: 800,
-                color: "var(--text-1)",
-              }}
+              className="text-[16px] font-extrabold"
+              style={{ color: "var(--text-1)" }}
             >
               {food.name}
             </span>
-            <span style={{ fontSize: 13, color: "var(--text-3)" }}>
+            <span className="text-[13px]" style={{ color: "var(--text-3)" }}>
               {food.nameJp}
             </span>
           </div>
@@ -476,44 +332,26 @@ function FoodCard({ food, index }: { food: TravelFood; index: number }) {
 
       {/* Tags */}
       {food.tags && food.tags.length > 0 && (
-        <div
-          style={{
-            display: "flex",
-            gap: 5,
-            flexWrap: "wrap",
-            marginBottom: 8,
-          }}
-        >
+        <div className="mb-2 flex flex-wrap gap-[5px]">
           {food.tags.map((tag, i) => <TagPill key={i} label={tag} />)}
         </div>
       )}
 
       {/* Rating + avg price */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          marginBottom: 8,
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="mb-2 flex flex-wrap items-center gap-2">
         {food.rating !== undefined && (
           <StarRating rating={food.rating} reviewCount={food.reviewCount} />
         )}
         {food.avgPrice && (
           <>
             {food.rating !== undefined && (
-              <span style={{ color: "var(--border)", fontSize: 12 }}>·</span>
+              <span className="text-[12px]" style={{ color: "var(--border)" }}>·</span>
             )}
             <span
+              className="rounded-md px-2 py-0.5 text-[12px] font-semibold"
               style={{
-                fontSize: 12,
-                fontWeight: 600,
                 color: "var(--text-2)",
                 background: "var(--surface)",
-                borderRadius: 6,
-                padding: "2px 8px",
                 border: "1px solid var(--border)",
               }}
             >
@@ -525,12 +363,8 @@ function FoodCard({ food, index }: { food: TravelFood; index: number }) {
 
       {/* Description */}
       <p
-        style={{
-          margin: "0 0 8px",
-          fontSize: 13,
-          color: "var(--text-2)",
-          lineHeight: 1.7,
-        }}
+        className="m-0 mb-2 text-[13px] leading-[1.7]"
+        style={{ color: "var(--text-2)" }}
       >
         {food.desc}
       </p>
@@ -538,16 +372,10 @@ function FoodCard({ food, index }: { food: TravelFood; index: number }) {
       {/* Area/recommended spots */}
       {food.area && (
         <p
-          style={{
-            margin: 0,
-            fontSize: 12,
-            color: "var(--text-3)",
-            display: "flex",
-            alignItems: "flex-start",
-            gap: 4,
-          }}
+          className="m-0 flex items-start gap-1 text-[12px]"
+          style={{ color: "var(--text-3)" }}
         >
-          <span style={{ flexShrink: 0 }}>📍</span>
+          <span className="flex-shrink-0">📍</span>
           <span>{food.area}</span>
         </p>
       )}
@@ -567,68 +395,40 @@ function ShoppingList({
       {items.map((item, i) => (
         <div
           key={i}
+          className="mb-2.5 rounded-[14px] px-4 py-[14px] shadow-sm"
           style={{
             background: "var(--card)",
             border: "1px solid var(--border)",
-            borderRadius: 14,
-            padding: "14px 16px",
-            marginBottom: 10,
-            boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              marginBottom: 4,
-            }}
-          >
+          <div className="mb-1 flex items-center gap-2.5">
             <span
+              className="inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-[15px]"
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 28,
-                height: 28,
-                borderRadius: 8,
                 background: "var(--surface)",
                 border: "1px solid var(--border)",
-                fontSize: 15,
-                flexShrink: 0,
               }}
             >
               🛍️
             </span>
             <div>
               <p
-                style={{
-                  margin: 0,
-                  fontWeight: 800,
-                  fontSize: 15,
-                  color: "var(--text-1)",
-                }}
+                className="m-0 text-[15px] font-extrabold"
+                style={{ color: "var(--text-1)" }}
               >
                 {item.name}
               </p>
               <p
-                style={{
-                  margin: "1px 0 0",
-                  fontSize: 12,
-                  color: "var(--text-3)",
-                }}
+                className="m-0 mt-px text-[12px]"
+                style={{ color: "var(--text-3)" }}
               >
                 {item.nameJp}
               </p>
             </div>
           </div>
           <p
-            style={{
-              margin: "8px 0 0",
-              fontSize: 13,
-              color: "var(--text-2)",
-              lineHeight: 1.7,
-            }}
+            className="m-0 mt-2 text-[13px] leading-[1.7]"
+            style={{ color: "var(--text-2)" }}
           >
             {item.desc}
           </p>
@@ -648,35 +448,18 @@ function TipsList({ tips }: { tips: string[] }) {
       {tips.map((tip, i) => (
         <div
           key={i}
+          className="mb-2.5 flex items-start gap-3 rounded-[14px] px-4 py-[14px] shadow-sm"
           style={{
             background: "var(--card)",
             border: "1px solid var(--border)",
-            borderRadius: 14,
-            padding: "14px 16px",
-            marginBottom: 10,
-            display: "flex",
-            gap: 12,
-            alignItems: "flex-start",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
           }}
         >
-          <span
-            style={{
-              fontSize: 18,
-              lineHeight: 1,
-              flexShrink: 0,
-              marginTop: 1,
-            }}
-          >
+          <span className="mt-px flex-shrink-0 text-[18px] leading-none">
             {TIP_ICONS[i % TIP_ICONS.length]}
           </span>
           <p
-            style={{
-              margin: 0,
-              fontSize: 13,
-              color: "var(--text-2)",
-              lineHeight: 1.75,
-            }}
+            className="m-0 text-[13px] leading-[1.75]"
+            style={{ color: "var(--text-2)" }}
           >
             {tip}
           </p>
@@ -694,84 +477,40 @@ function HeaderCard({ guide }: { guide: CityGuide }) {
     CITY_GRADIENT[guide.key] ?? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
 
   return (
-    <div style={{ marginBottom: 18 }}>
+    <div className="mb-[18px]">
       {/* Gradient hero */}
       <div
-        style={{
-          background: gradient,
-          borderRadius: 16,
-          padding: "22px 20px 20px",
-          marginBottom: 12,
-          position: "relative",
-          overflow: "hidden",
-        }}
+        className="relative mb-3 overflow-hidden rounded-2xl px-5 pb-5 pt-[22px]"
+        style={{ background: gradient }}
       >
         {/* Decorative circle */}
         <div
-          style={{
-            position: "absolute",
-            top: -30,
-            right: -30,
-            width: 120,
-            height: 120,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.1)",
-            pointerEvents: "none",
-          }}
+          className="pointer-events-none absolute -right-[30px] -top-[30px] h-[120px] w-[120px] rounded-full"
+          style={{ background: "rgba(255,255,255,0.1)" }}
         />
         <div
-          style={{
-            position: "absolute",
-            bottom: -20,
-            left: 60,
-            width: 80,
-            height: 80,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.07)",
-            pointerEvents: "none",
-          }}
+          className="pointer-events-none absolute -bottom-5 left-[60px] h-20 w-20 rounded-full"
+          style={{ background: "rgba(255,255,255,0.07)" }}
         />
 
         <h2
-          style={{
-            margin: "0 0 4px",
-            fontSize: 26,
-            fontWeight: 900,
-            color: "#fff",
-            letterSpacing: "-0.02em",
-          }}
+          className="m-0 mb-1 text-[26px] font-black tracking-tight"
+          style={{ color: "#fff" }}
         >
           {guide.emoji} {guide.name}
-          <span
-            style={{
-              fontSize: 16,
-              fontWeight: 400,
-              marginLeft: 10,
-              opacity: 0.85,
-            }}
-          >
+          <span className="ml-2.5 text-[16px] font-normal opacity-85">
             {guide.nameJp}
           </span>
         </h2>
         <p
-          style={{
-            margin: "0 0 16px",
-            fontSize: 13,
-            color: "rgba(255,255,255,0.85)",
-            fontWeight: 600,
-          }}
+          className="m-0 mb-4 text-[13px] font-semibold"
+          style={{ color: "rgba(255,255,255,0.85)" }}
         >
           {guide.tagline}
         </p>
 
         {/* Basics info row */}
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 8,
-          }}
-        >
+        <div className="flex flex-wrap gap-2">
           <BasicBadge icon="✈️" text={basics.airportCode} />
           <BasicBadge icon="🕐" text={basics.timezone.split(" ")[0]} />
           <BasicBadge icon="💴" text={basics.currency.split("—")[0].trim()} />
@@ -781,21 +520,15 @@ function HeaderCard({ guide }: { guide: CityGuide }) {
 
       {/* Overview */}
       <div
+        className="mb-2.5 rounded-xl px-4 py-[14px]"
         style={{
           background: "var(--card)",
           border: "1px solid var(--border)",
-          borderRadius: 12,
-          padding: "14px 16px",
-          marginBottom: 10,
         }}
       >
         <p
-          style={{
-            margin: 0,
-            fontSize: 13,
-            color: "var(--text-2)",
-            lineHeight: 1.8,
-          }}
+          className="m-0 text-[13px] leading-[1.8]"
+          style={{ color: "var(--text-2)" }}
         >
           {guide.overview}
         </p>
@@ -804,33 +537,25 @@ function HeaderCard({ guide }: { guide: CityGuide }) {
       {/* Basics tips */}
       {basics.tips.length > 0 && (
         <div
+          className="rounded-xl px-4 py-[14px]"
           style={{
             background: "var(--card)",
             border: "1px solid var(--border)",
-            borderRadius: 12,
-            padding: "14px 16px",
           }}
         >
           <p
-            style={{
-              margin: "0 0 10px",
-              fontSize: 11,
-              fontWeight: 700,
-              color: "var(--text-3)",
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
-            }}
+            className="m-0 mb-2.5 text-[11px] font-bold uppercase tracking-[0.06em]"
+            style={{ color: "var(--text-3)" }}
           >
             필수 정보
           </p>
-          <ul style={{ margin: 0, paddingLeft: 18 }}>
+          <ul className="m-0 pl-[18px]">
             {basics.tips.map((tip, i) => (
               <li
                 key={i}
+                className="text-[12px] leading-[1.7]"
                 style={{
-                  fontSize: 12,
                   color: "var(--text-2)",
-                  lineHeight: 1.7,
                   marginBottom: i < basics.tips.length - 1 ? 5 : 0,
                 }}
               >
@@ -847,17 +572,10 @@ function HeaderCard({ guide }: { guide: CityGuide }) {
 function BasicBadge({ icon, text }: { icon: string; text: string }) {
   return (
     <span
+      className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-semibold backdrop-blur-[4px]"
       style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 4,
-        padding: "4px 10px",
         background: "rgba(255,255,255,0.18)",
-        borderRadius: 99,
-        fontSize: 12,
-        fontWeight: 600,
         color: "#fff",
-        backdropFilter: "blur(4px)",
         border: "1px solid rgba(255,255,255,0.25)",
       }}
     >
@@ -890,14 +608,8 @@ function CityContent({ guide }: { guide: CityGuide }) {
 
       {/* Sub-tabs */}
       <div
-        style={{
-          display: "flex",
-          gap: 6,
-          marginBottom: 18,
-          overflowX: "auto",
-          paddingBottom: 2,
-          scrollbarWidth: "none",
-        }}
+        className="mb-[18px] flex gap-1.5 overflow-x-auto pb-0.5"
+        style={{ scrollbarWidth: "none" }}
       >
         {SUB_TABS.map((tab) => {
           const active = subTab === tab.key;
@@ -905,10 +617,8 @@ function CityContent({ guide }: { guide: CityGuide }) {
             <button
               key={tab.key}
               onClick={() => setSubTab(tab.key)}
+              className="flex flex-shrink-0 cursor-pointer items-center gap-[5px] rounded-full px-4 py-2 text-[13px] transition-all duration-150 ease-in-out"
               style={{
-                flexShrink: 0,
-                padding: "8px 16px",
-                borderRadius: 99,
                 border: active
                   ? "1.5px solid var(--primary, #2563eb)"
                   : "1.5px solid var(--border)",
@@ -916,13 +626,7 @@ function CityContent({ guide }: { guide: CityGuide }) {
                   ? "var(--primary, #2563eb)"
                   : "var(--card)",
                 color: active ? "#fff" : "var(--text-2)",
-                fontSize: 13,
                 fontWeight: active ? 700 : 500,
-                cursor: "pointer",
-                transition: "all 0.15s ease",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
               }}
             >
               <span>{tab.icon}</span>
@@ -935,30 +639,18 @@ function CityContent({ guide }: { guide: CityGuide }) {
       {/* Section header */}
       {subTab === "spots" && (
         <>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 14,
-            }}
-          >
+          <div className="mb-[14px] flex items-center gap-2">
             <span
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: "var(--text-1)",
-              }}
+              className="text-[13px] font-bold"
+              style={{ color: "var(--text-1)" }}
             >
               🏆 인기 관광지 순위
             </span>
             <span
+              className="rounded-full px-2 py-0.5 text-[12px]"
               style={{
-                fontSize: 12,
                 color: "var(--text-3)",
                 background: "var(--surface)",
-                borderRadius: 99,
-                padding: "2px 8px",
                 border: "1px solid var(--border)",
               }}
             >
@@ -973,30 +665,18 @@ function CityContent({ guide }: { guide: CityGuide }) {
 
       {subTab === "food" && (
         <>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 14,
-            }}
-          >
+          <div className="mb-[14px] flex items-center gap-2">
             <span
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: "var(--text-1)",
-              }}
+              className="text-[13px] font-bold"
+              style={{ color: "var(--text-1)" }}
             >
               🍴 인기 맛집 순위
             </span>
             <span
+              className="rounded-full px-2 py-0.5 text-[12px]"
               style={{
-                fontSize: 12,
                 color: "var(--text-3)",
                 background: "var(--surface)",
-                borderRadius: 99,
-                padding: "2px 8px",
                 border: "1px solid var(--border)",
               }}
             >
@@ -1011,20 +691,10 @@ function CityContent({ guide }: { guide: CityGuide }) {
 
       {subTab === "shopping" && (
         <>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 14,
-            }}
-          >
+          <div className="mb-[14px] flex items-center gap-2">
             <span
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: "var(--text-1)",
-              }}
+              className="text-[13px] font-bold"
+              style={{ color: "var(--text-1)" }}
             >
               🛍️ 쇼핑 명소
             </span>
@@ -1035,30 +705,18 @@ function CityContent({ guide }: { guide: CityGuide }) {
 
       {subTab === "tips" && (
         <>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 14,
-            }}
-          >
+          <div className="mb-[14px] flex items-center gap-2">
             <span
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: "var(--text-1)",
-              }}
+              className="text-[13px] font-bold"
+              style={{ color: "var(--text-1)" }}
             >
               💡 여행 팁
             </span>
             <span
+              className="rounded-full px-2 py-0.5 text-[12px]"
               style={{
-                fontSize: 12,
                 color: "var(--text-3)",
                 background: "var(--surface)",
-                borderRadius: 99,
-                padding: "2px 8px",
                 border: "1px solid var(--border)",
               }}
             >
@@ -1081,34 +739,26 @@ export default function GuideView() {
 
   return (
     <div
-      style={{
-        background: "var(--bg)",
-        minHeight: "100dvh",
-        display: "flex",
-        flexDirection: "column",
-      }}
+      className="flex min-h-[100dvh] flex-col"
+      style={{ background: "var(--bg)" }}
     >
       {/* City selector — sticky */}
       <div
+        className="sticky top-0 z-10 px-4"
         style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
           background: "var(--bg)",
           borderBottom: "1px solid var(--border)",
-          padding: "0 16px",
         }}
       >
-        <div style={{ display: "flex" }}>
+        <div className="flex">
           {CITIES.map((city) => {
             const active = city.key === cityKey;
             return (
               <button
                 key={city.key}
                 onClick={() => setCityKey(city.key)}
+                className="-mb-px flex-1 cursor-pointer px-2 pb-3 pt-[13px] text-[14px] transition-all duration-150 ease-in-out"
                 style={{
-                  flex: 1,
-                  padding: "13px 8px 12px",
                   background: "none",
                   border: "none",
                   borderBottom: active
@@ -1117,12 +767,7 @@ export default function GuideView() {
                   color: active
                     ? "var(--primary, #2563eb)"
                     : "var(--text-3)",
-                  fontSize: 14,
                   fontWeight: active ? 800 : 500,
-                  cursor: "pointer",
-                  transition: "all 0.15s ease",
-                  marginBottom: -1,
-                  letterSpacing: active ? "0" : "0",
                 }}
               >
                 {city.emoji} {city.name}
@@ -1134,12 +779,8 @@ export default function GuideView() {
 
       {/* Scrollable content */}
       <div
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          padding: "20px 16px 60px",
-          WebkitOverflowScrolling: "touch",
-        }}
+        className="flex-1 overflow-y-auto px-4 pb-[60px] pt-5"
+        style={{ WebkitOverflowScrolling: "touch" }}
       >
         <CityContent key={activeGuide.key} guide={activeGuide} />
       </div>

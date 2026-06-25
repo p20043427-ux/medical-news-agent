@@ -7,47 +7,27 @@ import { SIM_GUIDE } from "@/lib/travel/practical";
 export default function PracticalView() {
   return (
     <div
-      style={{
-        background: "var(--bg)",
-        minHeight: "100dvh",
-        padding: "20px 16px 60px",
-      }}
+      className="min-h-[100dvh] px-4 pt-5 pb-[60px]"
+      style={{ background: "var(--bg)" }}
     >
       {/* Page header */}
-      <div style={{ marginBottom: 20 }}>
+      <div className="mb-5">
         <h2
-          style={{
-            margin: "0 0 4px",
-            fontSize: 22,
-            fontWeight: 900,
-            color: "var(--text-1)",
-            letterSpacing: "-0.02em",
-          }}
+          className="m-0 mb-1 text-[22px] font-black tracking-[-0.02em]"
+          style={{ color: "var(--text-1)" }}
         >
           💡 실용 정보
         </h2>
-        <p
-          style={{
-            margin: 0,
-            fontSize: 13,
-            color: "var(--text-3)",
-          }}
-        >
+        <p className="m-0 text-[13px]" style={{ color: "var(--text-3)" }}>
           유심·Wi-Fi 등 여행 필수 실용 정보
         </p>
       </div>
 
       {/* SIM / eSIM section */}
-      <div style={{ marginBottom: 24 }}>
+      <div className="mb-6">
         <p
-          style={{
-            margin: "0 0 12px",
-            fontSize: 11,
-            fontWeight: 700,
-            color: "var(--text-3)",
-            textTransform: "uppercase",
-            letterSpacing: "0.06em",
-          }}
+          className="m-0 mb-3 text-[11px] font-bold uppercase tracking-[0.06em]"
+          style={{ color: "var(--text-3)" }}
         >
           유심 · eSIM 가이드
         </p>
@@ -55,44 +35,25 @@ export default function PracticalView() {
         {SIM_GUIDE.options.map((opt, i) => (
           <div
             key={i}
+            className="rounded-2xl px-4 py-3.5 mb-2.5 shadow-sm"
             style={{
               background: "var(--card)",
               border: "1px solid var(--border)",
-              borderRadius: 14,
-              padding: "14px 16px",
-              marginBottom: 10,
-              boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
             }}
           >
             {/* Header row */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 6,
-                flexWrap: "wrap",
-              }}
-            >
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
               <span
-                style={{
-                  fontSize: 16,
-                  fontWeight: 800,
-                  color: "var(--text-1)",
-                }}
+                className="text-base font-extrabold"
+                style={{ color: "var(--text-1)" }}
               >
                 {opt.name}
               </span>
               <span
+                className="text-[11px] font-bold px-2 py-0.5 rounded-full"
                 style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  padding: "2px 8px",
-                  borderRadius: 99,
-                  background:
-                    opt.type === "eSIM" ? "#dbeafe" : "#dcfce7",
-                  color:
-                    opt.type === "eSIM" ? "#1e40af" : "#166534",
+                  background: opt.type === "eSIM" ? "#dbeafe" : "#dcfce7",
+                  color: opt.type === "eSIM" ? "#1e40af" : "#166534",
                 }}
               >
                 {opt.type}
@@ -101,66 +62,42 @@ export default function PracticalView() {
 
             {/* Price */}
             <p
-              style={{
-                margin: "0 0 8px",
-                fontSize: 13,
-                fontWeight: 700,
-                color: "var(--text-2)",
-              }}
+              className="m-0 mb-2 text-[13px] font-bold"
+              style={{ color: "var(--text-2)" }}
             >
               {opt.price}
             </p>
 
             {/* Recommended for */}
             <p
-              style={{
-                margin: "0 0 10px",
-                fontSize: 12,
-                color: "var(--text-3)",
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 4,
-              }}
+              className="m-0 mb-2.5 text-xs flex items-start gap-1"
+              style={{ color: "var(--text-3)" }}
             >
-              <span style={{ flexShrink: 0 }}>🎯</span>
+              <span className="shrink-0">🎯</span>
               <span>{opt.recommendedFor}</span>
             </p>
 
             {/* Pros & Cons */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 8,
-              }}
-            >
+            <div className="grid grid-cols-2 gap-2">
               <div
+                className="rounded-lg px-2.5 py-2"
                 style={{
                   background: "#f0fdf4",
-                  borderRadius: 8,
-                  padding: "8px 10px",
                   border: "1px solid #bbf7d0",
                 }}
               >
                 <p
-                  style={{
-                    margin: "0 0 4px",
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: "#166534",
-                  }}
+                  className="m-0 mb-1 text-[11px] font-bold"
+                  style={{ color: "#166534" }}
                 >
                   장점
                 </p>
-                <ul style={{ margin: 0, paddingLeft: 14 }}>
+                <ul className="m-0 pl-3.5">
                   {opt.pros.map((p, j) => (
                     <li
                       key={j}
-                      style={{
-                        fontSize: 11,
-                        color: "#15803d",
-                        lineHeight: 1.6,
-                      }}
+                      className="text-[11px] leading-relaxed"
+                      style={{ color: "#15803d" }}
                     >
                       {p}
                     </li>
@@ -168,32 +105,24 @@ export default function PracticalView() {
                 </ul>
               </div>
               <div
+                className="rounded-lg px-2.5 py-2"
                 style={{
                   background: "#fef2f2",
-                  borderRadius: 8,
-                  padding: "8px 10px",
                   border: "1px solid #fecaca",
                 }}
               >
                 <p
-                  style={{
-                    margin: "0 0 4px",
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: "#991b1b",
-                  }}
+                  className="m-0 mb-1 text-[11px] font-bold"
+                  style={{ color: "#991b1b" }}
                 >
                   단점
                 </p>
-                <ul style={{ margin: 0, paddingLeft: 14 }}>
+                <ul className="m-0 pl-3.5">
                   {opt.cons.map((c, j) => (
                     <li
                       key={j}
-                      style={{
-                        fontSize: 11,
-                        color: "#b91c1c",
-                        lineHeight: 1.6,
-                      }}
+                      className="text-[11px] leading-relaxed"
+                      style={{ color: "#b91c1c" }}
                     >
                       {c}
                     </li>

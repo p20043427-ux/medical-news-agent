@@ -51,18 +51,8 @@ function Badge({ type }: { type: keyof typeof BADGE_STYLES }) {
   const s = BADGE_STYLES[type];
   return (
     <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        background: s.bg,
-        color: "#fff",
-        borderRadius: "999px",
-        padding: "2px 9px",
-        fontSize: "10px",
-        fontWeight: 700,
-        letterSpacing: "0.02em",
-        whiteSpace: "nowrap",
-      }}
+      className="inline-flex items-center rounded-full px-[9px] py-0.5 text-[10px] font-bold tracking-[0.02em] whitespace-nowrap text-white"
+      style={{ background: s.bg }}
     >
       {s.label}
     </span>
@@ -92,45 +82,20 @@ function RouteCard({ route }: { route: TransportRoute }) {
 
   return (
     <div
-      style={{
-        background: "var(--card)",
-        border: "1px solid var(--border)",
-        borderRadius: "18px",
-        overflow: "hidden",
-        boxShadow: "0 2px 10px rgba(0,0,0,.07)",
-        marginBottom: "20px",
-      }}
+      className="mb-5 overflow-hidden rounded-[18px] shadow-sm"
+      style={{ background: "var(--card)", border: "1px solid var(--border)" }}
     >
       {/* 노선 헤더 */}
       <div
-        style={{
-          background: "var(--surface)",
-          borderBottom: "1px solid var(--border)",
-          padding: "14px 18px 12px",
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-        }}
+        className="flex items-center gap-2.5 px-[18px] pt-3.5 pb-3"
+        style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)" }}
       >
-        <span style={{ fontSize: "22px", lineHeight: 1 }}>{route.emoji}</span>
+        <span className="text-[22px] leading-none">{route.emoji}</span>
         <div>
-          <p
-            style={{
-              fontSize: "11px",
-              color: "var(--text-3)",
-              fontWeight: 500,
-              marginBottom: "2px",
-            }}
-          >
+          <p className="mb-0.5 text-[11px] font-medium" style={{ color: "var(--text-3)" }}>
             {route.from}
           </p>
-          <p
-            style={{
-              fontSize: "15px",
-              color: "var(--text-1)",
-              fontWeight: 800,
-            }}
-          >
+          <p className="text-[15px] font-extrabold" style={{ color: "var(--text-1)" }}>
             → {route.to}
           </p>
         </div>
@@ -147,28 +112,12 @@ function RouteCard({ route }: { route: TransportRoute }) {
           return (
             <div
               key={i}
-              style={{
-                padding: "14px 18px",
-                borderBottom: isLast ? "none" : "1px solid var(--border)",
-              }}
+              className="px-[18px] py-3.5"
+              style={{ borderBottom: isLast ? "none" : "1px solid var(--border)" }}
             >
               {/* 이름 + 배지 */}
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "center",
-                  gap: "6px",
-                  marginBottom: "8px",
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    color: "var(--text-1)",
-                  }}
-                >
+              <div className="mb-2 flex flex-wrap items-center gap-1.5">
+                <span className="text-[13px] font-bold" style={{ color: "var(--text-1)" }}>
                   {opt.name}
                 </span>
                 {badges.map((b) => (
@@ -178,12 +127,8 @@ function RouteCard({ route }: { route: TransportRoute }) {
 
               {/* 메타 정보 행 */}
               <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "14px",
-                  marginBottom: opt.tip ? "8px" : "0",
-                }}
+                className="flex flex-wrap gap-3.5"
+                style={{ marginBottom: opt.tip ? "8px" : "0" }}
               >
                 <MetaItem icon="⏱" value={opt.time} />
                 <MetaItem icon="💴" value={opt.fare} />
@@ -193,14 +138,8 @@ function RouteCard({ route }: { route: TransportRoute }) {
               {/* 팁 */}
               {opt.tip && (
                 <div
-                  style={{
-                    background: "var(--surface)",
-                    borderRadius: "10px",
-                    padding: "8px 12px",
-                    fontSize: "11px",
-                    color: "var(--text-2)",
-                    lineHeight: 1.65,
-                  }}
+                  className="rounded-[10px] px-3 py-2 text-[11px] leading-[1.65]"
+                  style={{ background: "var(--surface)", color: "var(--text-2)" }}
                 >
                   {opt.tip}
                 </div>
@@ -213,38 +152,26 @@ function RouteCard({ route }: { route: TransportRoute }) {
       {/* 유의사항 */}
       {route.tips.length > 0 && (
         <div
-          style={{
-            background: "var(--surface)",
-            borderTop: "1px solid var(--border)",
-            padding: "12px 18px",
-          }}
+          className="px-[18px] py-3"
+          style={{ background: "var(--surface)", borderTop: "1px solid var(--border)" }}
         >
           <p
-            style={{
-              fontSize: "10px",
-              fontWeight: 700,
-              color: "var(--text-3)",
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
-              marginBottom: "8px",
-            }}
+            className="mb-2 text-[10px] font-bold uppercase tracking-[0.06em]"
+            style={{ color: "var(--text-3)" }}
           >
             유의사항
           </p>
-          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+          <ul className="m-0 list-none p-0">
             {route.tips.map((tip, i) => (
               <li
                 key={i}
+                className="flex gap-2 text-[11px] leading-[1.6]"
                 style={{
-                  display: "flex",
-                  gap: "8px",
-                  fontSize: "11px",
                   color: "var(--text-2)",
-                  lineHeight: 1.6,
                   marginBottom: i < route.tips.length - 1 ? "4px" : 0,
                 }}
               >
-                <span style={{ color: "var(--text-3)", flexShrink: 0 }}>•</span>
+                <span className="flex-shrink-0" style={{ color: "var(--text-3)" }}>•</span>
                 <span>{tip}</span>
               </li>
             ))}
@@ -258,16 +185,11 @@ function RouteCard({ route }: { route: TransportRoute }) {
 function MetaItem({ icon, value }: { icon: string; value: string }) {
   return (
     <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "4px",
-        fontSize: "12px",
-        color: "var(--text-2)",
-      }}
+      className="inline-flex items-center gap-1 text-[12px]"
+      style={{ color: "var(--text-2)" }}
     >
-      <span style={{ fontSize: "13px" }}>{icon}</span>
-      <span style={{ fontWeight: 600, color: "var(--text-1)" }}>{value}</span>
+      <span className="text-[13px]">{icon}</span>
+      <span className="font-semibold" style={{ color: "var(--text-1)" }}>{value}</span>
     </span>
   );
 }
@@ -278,18 +200,11 @@ function MetaItem({ icon, value }: { icon: string; value: string }) {
 
 function ICCardTab() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+    <div className="flex flex-col gap-5">
       {/* 설명 */}
       <div
-        style={{
-          background: "var(--surface)",
-          border: "1px solid var(--border)",
-          borderRadius: "16px",
-          padding: "16px",
-          fontSize: "13px",
-          color: "var(--text-2)",
-          lineHeight: 1.7,
-        }}
+        className="rounded-2xl p-4 text-[13px] leading-[1.7]"
+        style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text-2)" }}
       >
         {IC_CARD_GUIDE.desc}
       </div>
@@ -297,93 +212,54 @@ function ICCardTab() {
       {/* 카드 종류 */}
       <section>
         <SectionTitle>카드 종류</SectionTitle>
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <div className="flex flex-col gap-2.5">
           {IC_CARD_GUIDE.types.map((card) => {
             const isWelcome = card.name === "Suica" && card.note?.includes("Welcome Suica");
             return (
               <div
                 key={card.name}
+                className="relative rounded-2xl px-4 py-3.5 shadow-sm"
                 style={{
                   background: "var(--card)",
                   border: isWelcome
                     ? "2px solid var(--accent, #6c5ce7)"
                     : "1px solid var(--border)",
-                  borderRadius: "16px",
-                  padding: "14px 16px",
-                  boxShadow: "0 1px 6px rgba(0,0,0,.06)",
-                  position: "relative",
                 }}
               >
                 {isWelcome && (
                   <span
-                    style={{
-                      position: "absolute",
-                      top: "10px",
-                      right: "14px",
-                      background: "var(--accent, #6c5ce7)",
-                      color: "#fff",
-                      fontSize: "9px",
-                      fontWeight: 800,
-                      borderRadius: "999px",
-                      padding: "2px 8px",
-                      letterSpacing: "0.04em",
-                    }}
+                    className="absolute right-3.5 top-2.5 rounded-full px-2 py-0.5 text-[9px] font-extrabold tracking-[0.04em] text-white"
+                    style={{ background: "var(--accent, #6c5ce7)" }}
                   >
                     외국인 전용
                   </span>
                 )}
 
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "baseline",
-                    gap: "8px",
-                    marginBottom: "8px",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "16px",
-                      fontWeight: 800,
-                      color: "var(--text-1)",
-                    }}
-                  >
+                <div className="mb-2 flex items-baseline gap-2">
+                  <span className="text-[16px] font-extrabold" style={{ color: "var(--text-1)" }}>
                     {card.name}
                   </span>
-                  <span
-                    style={{ fontSize: "12px", color: "var(--text-3)" }}
-                  >
+                  <span className="text-[12px]" style={{ color: "var(--text-3)" }}>
                     {card.nameJp}
                   </span>
                 </div>
 
                 <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "auto 1fr",
-                    gap: "4px 12px",
-                    fontSize: "12px",
-                    marginBottom: card.note ? "10px" : 0,
-                  }}
+                  className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[12px]"
+                  style={{ marginBottom: card.note ? "10px" : 0 }}
                 >
-                  <span style={{ color: "var(--text-3)", whiteSpace: "nowrap" }}>사용지역</span>
+                  <span className="whitespace-nowrap" style={{ color: "var(--text-3)" }}>사용지역</span>
                   <span style={{ color: "var(--text-1)" }}>{card.region}</span>
-                  <span style={{ color: "var(--text-3)", whiteSpace: "nowrap" }}>구매처</span>
+                  <span className="whitespace-nowrap" style={{ color: "var(--text-3)" }}>구매처</span>
                   <span style={{ color: "var(--text-1)" }}>{card.where}</span>
-                  <span style={{ color: "var(--text-3)", whiteSpace: "nowrap" }}>보증금</span>
+                  <span className="whitespace-nowrap" style={{ color: "var(--text-3)" }}>보증금</span>
                   <span style={{ color: "var(--text-1)" }}>{card.deposit}</span>
                 </div>
 
                 {card.note && (
                   <div
-                    style={{
-                      background: "var(--surface)",
-                      borderRadius: "10px",
-                      padding: "8px 12px",
-                      fontSize: "11px",
-                      color: "var(--text-2)",
-                      lineHeight: 1.65,
-                    }}
+                    className="rounded-[10px] px-3 py-2 text-[11px] leading-[1.65]"
+                    style={{ background: "var(--surface)", color: "var(--text-2)" }}
                   >
                     {card.note}
                   </div>
@@ -398,41 +274,22 @@ function ICCardTab() {
       <section>
         <SectionTitle>사용법</SectionTitle>
         <div
-          style={{
-            background: "var(--card)",
-            border: "1px solid var(--border)",
-            borderRadius: "16px",
-            padding: "16px",
-          }}
+          className="rounded-2xl p-4"
+          style={{ background: "var(--card)", border: "1px solid var(--border)" }}
         >
-          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+          <ul className="m-0 list-none p-0">
             {IC_CARD_GUIDE.howToUse.map((step, i) => (
               <li
                 key={i}
+                className="flex gap-2.5 text-[12px] leading-[1.65]"
                 style={{
-                  display: "flex",
-                  gap: "10px",
-                  fontSize: "12px",
                   color: "var(--text-2)",
-                  lineHeight: 1.65,
                   marginBottom: i < IC_CARD_GUIDE.howToUse.length - 1 ? "10px" : 0,
                 }}
               >
                 <span
-                  style={{
-                    flexShrink: 0,
-                    width: "20px",
-                    height: "20px",
-                    borderRadius: "50%",
-                    background: "var(--accent, #6c5ce7)",
-                    color: "#fff",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "10px",
-                    fontWeight: 800,
-                    marginTop: "1px",
-                  }}
+                  className="mt-px inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-extrabold text-white"
+                  style={{ background: "var(--accent, #6c5ce7)" }}
                 >
                   {i + 1}
                 </span>
@@ -447,17 +304,10 @@ function ICCardTab() {
       <section>
         <SectionTitle>환불 안내</SectionTitle>
         <div
-          style={{
-            background: "var(--card)",
-            border: "1px solid var(--border)",
-            borderRadius: "16px",
-            padding: "14px 16px",
-            fontSize: "12px",
-            color: "var(--text-2)",
-            lineHeight: 1.7,
-          }}
+          className="rounded-2xl px-4 py-3.5 text-[12px] leading-[1.7]"
+          style={{ background: "var(--card)", border: "1px solid var(--border)", color: "var(--text-2)" }}
         >
-          <span style={{ marginRight: "6px" }}>💴</span>
+          <span className="mr-1.5">💴</span>
           {IC_CARD_GUIDE.refund}
         </div>
       </section>
@@ -466,27 +316,20 @@ function ICCardTab() {
       <section>
         <SectionTitle>실용 팁</SectionTitle>
         <div
-          style={{
-            background: "var(--card)",
-            border: "1px solid var(--border)",
-            borderRadius: "16px",
-            padding: "16px",
-          }}
+          className="rounded-2xl p-4"
+          style={{ background: "var(--card)", border: "1px solid var(--border)" }}
         >
-          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+          <ul className="m-0 list-none p-0">
             {IC_CARD_GUIDE.tips.map((tip, i) => (
               <li
                 key={i}
+                className="flex gap-2 text-[12px] leading-[1.65]"
                 style={{
-                  display: "flex",
-                  gap: "8px",
-                  fontSize: "12px",
                   color: "var(--text-2)",
-                  lineHeight: 1.65,
                   marginBottom: i < IC_CARD_GUIDE.tips.length - 1 ? "8px" : 0,
                 }}
               >
-                <span style={{ color: "#fdcb6e", flexShrink: 0 }}>★</span>
+                <span className="flex-shrink-0" style={{ color: "#fdcb6e" }}>★</span>
                 <span>{tip}</span>
               </li>
             ))}
@@ -526,7 +369,7 @@ function CityToAirportTab() {
   const cityKeys = Object.keys(CITY_TO_AIRPORT) as CityKey[];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+    <div className="flex flex-col gap-6">
       {cityKeys.map((cityKey) => {
         const airportMap = CITY_TO_AIRPORT[cityKey] as Record<
           string,
@@ -535,71 +378,37 @@ function CityToAirportTab() {
 
         return (
           <section key={cityKey}>
-            <h3
-              style={{
-                fontSize: "15px",
-                fontWeight: 800,
-                color: "var(--text-1)",
-                marginBottom: "12px",
-              }}
-            >
+            <h3 className="mb-3 text-[15px] font-extrabold" style={{ color: "var(--text-1)" }}>
               {CITY_LABEL[cityKey] ?? cityKey}
             </h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div className="flex flex-col gap-2.5">
               {Object.entries(airportMap).map(([apKey, data]) => (
                 <div
                   key={apKey}
-                  style={{
-                    background: "var(--card)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "16px",
-                    overflow: "hidden",
-                    boxShadow: "0 1px 6px rgba(0,0,0,.06)",
-                  }}
+                  className="overflow-hidden rounded-2xl shadow-sm"
+                  style={{ background: "var(--card)", border: "1px solid var(--border)" }}
                 >
                   <div
-                    style={{
-                      background: "var(--surface)",
-                      borderBottom: "1px solid var(--border)",
-                      padding: "11px 16px",
-                    }}
+                    className="px-4 py-[11px]"
+                    style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)" }}
                   >
-                    <p
-                      style={{
-                        fontSize: "13px",
-                        fontWeight: 700,
-                        color: "var(--text-1)",
-                      }}
-                    >
+                    <p className="text-[13px] font-bold" style={{ color: "var(--text-1)" }}>
                       {data.title}
                     </p>
                   </div>
-                  <ul
-                    style={{
-                      listStyle: "none",
-                      padding: "14px 16px",
-                      margin: 0,
-                    }}
-                  >
+                  <ul className="m-0 list-none px-4 py-3.5">
                     {data.tips.map((tip, i) => (
                       <li
                         key={i}
+                        className="flex gap-2 text-[12px] leading-[1.65]"
                         style={{
-                          display: "flex",
-                          gap: "8px",
-                          fontSize: "12px",
                           color: "var(--text-2)",
-                          lineHeight: 1.65,
                           marginBottom: i < data.tips.length - 1 ? "8px" : 0,
                         }}
                       >
                         <span
-                          style={{
-                            color: "#74b9ff",
-                            flexShrink: 0,
-                            fontSize: "10px",
-                            marginTop: "3px",
-                          }}
+                          className="mt-[3px] flex-shrink-0 text-[10px]"
+                          style={{ color: "#74b9ff" }}
                         >
                           ▶
                         </span>
@@ -623,7 +432,7 @@ function CityToAirportTab() {
 
 function TipsTab() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+    <div className="flex flex-col gap-5">
       <TipSection title="🚌 버스 이용법" tips={BUS_TIPS} accentColor="#00cec9" />
       <TipSection title="🚕 택시 이용법" tips={TAXI_TIPS} accentColor="#fdcb6e" />
     </div>
@@ -641,25 +450,14 @@ function TipSection({
 }) {
   return (
     <section>
-      <h3
-        style={{
-          fontSize: "14px",
-          fontWeight: 800,
-          color: "var(--text-1)",
-          marginBottom: "10px",
-        }}
-      >
+      <h3 className="mb-2.5 text-[14px] font-extrabold" style={{ color: "var(--text-1)" }}>
         {title}
       </h3>
       <div
-        style={{
-          background: "var(--card)",
-          border: "1px solid var(--border)",
-          borderRadius: "16px",
-          padding: "16px",
-        }}
+        className="rounded-2xl p-4"
+        style={{ background: "var(--card)", border: "1px solid var(--border)" }}
       >
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+        <ul className="m-0 list-none p-0">
           {tips.map((tip, i) => {
             const colon = tip.indexOf(":");
             const label = colon !== -1 ? tip.slice(0, colon) : null;
@@ -668,12 +466,9 @@ function TipSection({
             return (
               <li
                 key={i}
+                className="flex gap-2.5 text-[12px] leading-[1.65]"
                 style={{
-                  display: "flex",
-                  gap: "10px",
-                  fontSize: "12px",
                   color: "var(--text-2)",
-                  lineHeight: 1.65,
                   marginBottom: i < tips.length - 1 ? "10px" : 0,
                   paddingBottom: i < tips.length - 1 ? "10px" : 0,
                   borderBottom:
@@ -681,23 +476,14 @@ function TipSection({
                 }}
               >
                 <span
-                  style={{
-                    flexShrink: 0,
-                    width: "6px",
-                    height: "6px",
-                    borderRadius: "50%",
-                    background: accentColor,
-                    marginTop: "6px",
-                  }}
+                  className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full"
+                  style={{ background: accentColor }}
                 />
                 <span>
                   {label && (
                     <span
-                      style={{
-                        fontWeight: 700,
-                        color: "var(--text-1)",
-                        marginRight: "4px",
-                      }}
+                      className="mr-1 font-bold"
+                      style={{ color: "var(--text-1)" }}
                     >
                       {label}:
                     </span>
@@ -719,14 +505,7 @@ function TipSection({
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h3
-      style={{
-        fontSize: "13px",
-        fontWeight: 700,
-        color: "var(--text-1)",
-        marginBottom: "10px",
-      }}
-    >
+    <h3 className="mb-2.5 text-[13px] font-bold" style={{ color: "var(--text-1)" }}>
       {children}
     </h3>
   );
@@ -755,13 +534,8 @@ function TabBar({
 }) {
   return (
     <div
-      style={{
-        display: "flex",
-        gap: "8px",
-        overflowX: "auto",
-        padding: "0 16px 16px",
-        scrollbarWidth: "none",
-      }}
+      className="flex gap-2 overflow-x-auto px-4 pb-4"
+      style={{ scrollbarWidth: "none" }}
     >
       {TABS.map((t) => {
         const active = tab === t.key;
@@ -769,26 +543,18 @@ function TabBar({
           <button
             key={t.key}
             onClick={() => onSelect(t.key)}
+            className={`inline-flex flex-shrink-0 cursor-pointer items-center gap-[5px] whitespace-nowrap rounded-full px-3.5 py-[7px] text-[12px] shadow-sm transition-all duration-150 ${
+              active ? "font-bold" : "font-medium"
+            }`}
             style={{
-              flexShrink: 0,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "5px",
-              padding: "7px 14px",
-              borderRadius: "999px",
               border: active ? "none" : "1px solid var(--border)",
               background: active
                 ? "linear-gradient(135deg,#6c5ce7,#a29bfe)"
                 : "var(--card)",
               color: active ? "#fff" : "var(--text-2)",
-              fontSize: "12px",
-              fontWeight: active ? 700 : 500,
-              cursor: "pointer",
               boxShadow: active
                 ? "0 3px 10px rgba(108,92,231,.35)"
                 : "0 1px 3px rgba(0,0,0,.06)",
-              transition: "all 0.15s ease",
-              whiteSpace: "nowrap",
             }}
           >
             {t.label}
@@ -807,36 +573,24 @@ export default function TransportView() {
   const [tab, setTab] = useState<TabKey>("ic");
 
   return (
-    <div
-      style={{
-        paddingTop: "12px",
-        paddingBottom: "112px",
-      }}
-    >
+    <div className="pt-3 pb-28">
       {/* 헤더 */}
-      <div style={{ padding: "0 16px", marginBottom: "4px" }}>
-        <h1
-          style={{
-            fontSize: "22px",
-            fontWeight: 900,
-            color: "var(--text-1)",
-            marginBottom: "4px",
-          }}
-        >
+      <div className="mb-1 px-4">
+        <h1 className="mb-1 text-[22px] font-black" style={{ color: "var(--text-1)" }}>
           일본 교통 안내
         </h1>
-        <p style={{ fontSize: "13px", color: "var(--text-3)" }}>
+        <p className="text-[13px]" style={{ color: "var(--text-3)" }}>
           IC카드 · 공항 교통 · 시내 이동 한눈에
         </p>
       </div>
 
       {/* 탭 바 */}
-      <div style={{ paddingTop: "14px" }}>
+      <div className="pt-3.5">
         <TabBar tab={tab} onSelect={setTab} />
       </div>
 
       {/* 탭 콘텐츠 */}
-      <div style={{ padding: "0 16px" }}>
+      <div className="px-4">
         {tab === "ic"       && <ICCardTab />}
         {tab === "osaka"    && <AirportTab routes={OSAKA_AIRPORT_ROUTES} />}
         {tab === "fukuoka"  && <AirportTab routes={FUKUOKA_AIRPORT_ROUTES} />}

@@ -8,7 +8,6 @@ import { EntrySection } from "@/lib/travel/types";
 const ACCENT = "#E63946";
 const ACCENT_LIGHT = "#E6394612";
 const OFFICER_BG = "#1d4ed8";   /* 파란색 — 심사관 */
-const TRAVELER_BG = "#ffffff";  /* 흰색 — 여행자 */
 
 /* ── 섹션 탭 ────────────────────────────────────────────── */
 function SectionTabs({
@@ -88,8 +87,8 @@ function DialogueBubble({
                 borderBottomLeftRadius: "4px",
               }
             : {
-                background: TRAVELER_BG,
-                color: "#1a1a2e",
+                background: "var(--card)",
+                color: "var(--text-1)",
                 border: "1px solid var(--border)",
                 borderBottomRightRadius: "4px",
               }
@@ -132,7 +131,7 @@ function StepCard({
 
   return (
     <div
-      className="overflow-hidden rounded-2xl transition-shadow"
+      className="overflow-hidden rounded-2xl shadow-sm transition-shadow"
       style={{ background: "var(--card)", border: "1px solid var(--border)" }}
     >
       {/* 헤더 — 번호 + 제목 + 토글 */}
@@ -276,7 +275,7 @@ function SectionView({ section }: { section: EntrySection }) {
       {/* 팁 섹션 */}
       {section.tips.length > 0 && (
         <div
-          className="rounded-2xl p-4"
+          className="rounded-2xl p-4 shadow-sm"
           style={{
             background: "var(--card)",
             border: "1px solid var(--border)",
