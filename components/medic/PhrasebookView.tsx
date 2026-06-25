@@ -27,12 +27,14 @@ const ROLES: { key: MedRole | "fav"; ko: string; ja: string; emoji: string }[] =
 
 export default function MedicPhrasebookView({ uiLang, focusRole }: { uiLang: UiLang; focusRole?: MedRole | null }) {
   const [role, setRole] = useState<MedRole | "fav">("common");
+  const [groupKey, setGroupKey] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const { has, toggle, favs } = useFavorites("medic-phrase");
 
-  useEffect(() => { if (focusRole) { setRole(focusRole); setQuery(""); } }, [focusRole]);
+  useEffect(() => { if (focusRole) { setRole(focusRole); setGroupKey(null); setQuery(""); } }, [focusRole]);
 
   const groups = role === "fav" ? [] : MED_PHRASEBOOK.filter((g) => g.role === role);
+  const openGroup = groups.find((g) => g.key === groupKey);
   const favPhrases = MED_PHRASEBOOK.flatMap((g) => g.phrases).filter((p) => favs.includes(p.ko));
 
   const q = query.trim().toLowerCase();
@@ -85,7 +87,7 @@ export default function MedicPhrasebookView({ uiLang, focusRole }: { uiLang: UiL
       <>
       <div className="mt-1 flex gap-2 overflow-x-auto px-4 pb-3" style={{ scrollbarWidth: "none" }}>
         {ROLES.map((r) => (
-          <Chip key={r.key} active={r.key === role} size="md" onClick={() => setRole(r.key)}
+          <Chip key={r.key} active={r.key === role} size="md" onClick={() => { setRole(r.key); setGroupKey(null); }}
             accent={r.key === "fav" ? "#f0932b" : MED_ACCENT}>
             <span>{r.emoji}</span><span>{uiLang === "ja" ? r.ja : r.ko}{r.key === "fav" && favs.length ? ` ${favs.length}` : ""}</span>
           </Chip>
@@ -97,41 +99,33 @@ export default function MedicPhrasebookView({ uiLang, focusRole }: { uiLang: UiL
           <EmptyState emoji="⭐" title={tt(uiLang, "즐겨찾기가 비어있어요", "お気に入りが空です")} description={tt(uiLang, "표현의 ☆를 눌러 자주 쓰는 문장을 모아 보세요.", "表現の☆を押してよく使う文を集めましょう。")} />
         ) : (
           <div className="space-y-2.5 px-4">
-            {favPhrases.map((p, i) => (
-              <div key={i} className="rounded-2xl p-4 shadow-sm" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
-                <div className="mb-1 flex justify-end">
-                  <button onClick={() => toggle(p.ko)} aria-label={tt(uiLang, "즐겨찾기", "お気に入り")} className="text-lg" style={{ color: "#f0932b" }}>★</button>
-                </div>
-                <BilingualRow {...p} uiLang={uiLang} />
-              </div>
-            ))}
+            {favPhrases.map((p, i) => <PhraseCard key={i} p={p} />)}
           </div>
         )
+      ) : openGroup ? (
+        <div className="px-4">
+          <button onClick={() => setGroupKey(null)} className="mb-2 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold" style={{ background: "var(--surface)", color: "var(--text-2)" }}>
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+            {tt(uiLang, "상황 목록", "場面一覧")}
+          </button>
+          <h2 className="mb-2 flex items-center gap-2 text-lg font-extrabold" style={{ color: "var(--text-1)" }}>
+            <span>{openGroup.emoji}</span><span>{uiLang === "ja" ? openGroup.titleJa : openGroup.titleKo}</span>
+            <span className="text-sm font-bold" style={{ color: "var(--text-3)" }}>{openGroup.phrases.length}</span>
+          </h2>
+          <div className="space-y-2.5">
+            {openGroup.phrases.map((p, i) => <PhraseCard key={i} p={p} />)}
+          </div>
+        </div>
       ) : (
-        <div className="space-y-5 px-4">
+        <div className="grid grid-cols-2 gap-2.5 px-4">
           {groups.map((g) => (
-            <section key={g.key}>
-              <h2 className="mb-2 flex items-center gap-2 text-sm font-extrabold" style={{ color: "var(--text-1)" }}>
-                <span>{g.emoji}</span><span>{uiLang === "ja" ? g.titleJa : g.titleKo}</span>
-              </h2>
-              <div className="space-y-2.5">
-                {g.phrases.map((p, i) => {
-                  const fav = has(p.ko);
-                  const note = uiLang === "ja" ? p.noteJa : p.noteKo;
-                  return (
-                    <div key={i} className="rounded-2xl p-4 shadow-sm" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
-                      <div className="mb-1 flex justify-end">
-                        <button onClick={() => toggle(p.ko)} aria-label={tt(uiLang, "즐겨찾기", "お気に入り")} className="text-lg" style={{ color: fav ? "#f0932b" : "var(--text-3)" }}>{fav ? "★" : "☆"}</button>
-                      </div>
-                      <BilingualRow {...p} uiLang={uiLang} />
-                      {note && (
-                        <p className="mt-2 rounded-lg px-2 py-1 text-[11px] leading-relaxed" style={{ background: `${MED_ACCENT}14`, color: "var(--text-2)" }}>💡 {note}</p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
+            <button key={g.key} onClick={() => setGroupKey(g.key)}
+              className="flex flex-col items-start rounded-2xl p-4 text-left shadow-sm transition active:scale-[0.97]"
+              style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+              <span className="text-2xl">{g.emoji}</span>
+              <span className="mt-1.5 text-sm font-extrabold leading-tight" style={{ color: "var(--text-1)" }}>{uiLang === "ja" ? g.titleJa : g.titleKo}</span>
+              <span className="mt-0.5 text-xs font-bold" style={{ color: MED_ACCENT }}>{tt(uiLang, `${g.phrases.length}개 표현`, `${g.phrases.length}表現`)}</span>
+            </button>
           ))}
         </div>
       )}
