@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import JapaneseApp from "@/components/jp/JapaneseApp";
-import EnglishApp from "@/components/en/EnglishApp";
 import KoreanApp from "@/components/ko/KoreanApp";
 import MedicApp from "@/components/medic/MedicApp";
 import TravelApp from "@/components/travel/TravelApp";
@@ -12,7 +11,7 @@ import { track } from "@/lib/analytics";
 import Onboarding, { shouldOnboard } from "@/components/Onboarding";
 import { useUiLang, setUiLang, tt, type UiLang } from "@/lib/i18n";
 
-type Lang = "jp" | "en" | "ko" | "medic" | "travel";
+type Lang = "jp" | "ko" | "medic" | "travel";
 
 export default function Root() {
   return (
@@ -30,7 +29,7 @@ function RootInner() {
   useEffect(() => {
     setMounted(true);
     const saved = window.localStorage.getItem("app-lang") as Lang | null;
-    if (saved === "jp" || saved === "en" || saved === "ko" || saved === "medic" || saved === "travel") setLang(saved);
+    if (saved === "jp" || saved === "ko" || saved === "medic" || saved === "travel") setLang(saved);
     else if (shouldOnboard()) setOnboarding(true);
   }, []);
 
@@ -50,7 +49,6 @@ function RootInner() {
 
   if (onboarding) return <Onboarding onDone={() => setOnboarding(false)} />;
   if (lang === "jp") return <JapaneseApp onBack={() => setLang(null)} />;
-  if (lang === "en") return <EnglishApp onBack={() => setLang(null)} />;
   if (lang === "ko") return <KoreanApp onBack={() => setLang(null)} />;
   if (lang === "medic") return <MedicApp onBack={() => setLang(null)} />;
   if (lang === "travel") return <TravelApp onBack={() => setLang(null)} />;
@@ -62,7 +60,6 @@ function LandingPage({ onSelect }: { onSelect: (l: Lang) => void }) {
   const ui = useUiLang();
   const courses: { key: Lang; title: string; sub: string; flag: string; grad: string; tags: string[]; foot: string }[] = [
     { key: "jp", title: tt(ui, "일본어", "日本語"), sub: "Japanese", flag: "🇯🇵", grad: "linear-gradient(135deg, #E63946, #F4A261)", tags: ["JLPT N5·N4", "700+", tt(ui, "회화", "会話"), "SM-2"], foot: tt(ui, "단어 · 동사 · 회화 · 문법", "単語・動詞・会話・文法") },
-    { key: "en", title: tt(ui, "영어", "英語"), sub: "English", flag: "🇺🇸", grad: "linear-gradient(135deg, #4361EE, #7209B7)", tags: ["CEFR A1→C1", "500+", tt(ui, "구동사", "句動詞"), tt(ui, "문법", "文法")], foot: tt(ui, "어휘 · 문법 · 구동사 · IPA", "語彙・文法・句動詞・IPA") },
     { key: "ko", title: tt(ui, "한국어", "韓国語"), sub: "Korean", flag: "🇰🇷", grad: "linear-gradient(135deg, #2563EB, #7C3AED)", tags: ["TOPIK 1·2", "330+", tt(ui, "회화", "会話"), tt(ui, "문법", "文法")], foot: tt(ui, "단어 · 문법 · 회화 · 발음", "単語・文法・会話・発音") },
   ];
 
