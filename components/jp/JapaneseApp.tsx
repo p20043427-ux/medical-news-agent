@@ -11,7 +11,7 @@ import QuizMode from "./QuizMode";
 import ConversationView from "./ConversationView";
 import VerbView from "./VerbView";
 import Stats from "./Stats";
-import BottomNav, { type Tab } from "./BottomNav";
+import { AppShell, AppHeader, ProgressChip, WeekStrip, BottomNav, type NavTab } from "@/components/shell";
 import KanaView from "./KanaView";
 import MockExam from "./MockExam";
 import PhrasebookView from "./PhrasebookView";
@@ -25,6 +25,15 @@ import { AppSkeleton } from "@/components/ui";
 import { useUiLang, tt } from "@/lib/i18n";
 
 const FURIGANA_KEY = "jp-app-furigana";
+const JP_ACCENT = "#E63946";
+
+type Tab = "home" | "learn" | "library" | "stats";
+const JP_TABS: NavTab<Tab>[] = [
+  { key: "home", ko: "홈", ja: "ホーム", icon: <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" /> },
+  { key: "learn", ko: "학습", ja: "学習", icon: <><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></> },
+  { key: "library", ko: "단어장", ja: "単語帳", icon: <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /> },
+  { key: "stats", ko: "분석", ja: "分析", icon: <path d="M3 3v18h18M8 16V9m5 7V5m5 11v-4" /> },
+];
 
 type Mode = "skim" | "review" | "quiz";
 interface Session { category: string; mode: Mode; wordIds?: string[] }
@@ -69,7 +78,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
     const exit = () => setSession(null);
 
     return (
-      <div className="mx-auto min-h-screen max-w-md" style={{ background: "var(--bg)" }}>
+      <AppShell>
         {session.mode === "skim" && (
           <VocabStudy
             category={category} words={all} showFurigana={showFurigana}
@@ -87,84 +96,31 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
         {session.mode === "quiz" && (
           <QuizMode category={category} words={pool} onGrade={grade} onExit={exit} onReview={() => go("review")} />
         )}
-        <BottomNav tab="home" onChange={(t) => { setSession(null); setTab(t); }} accentColor="#E63946" />
-      </div>
+        <BottomNav tab="home" tabs={JP_TABS} onChange={(t) => { setSession(null); setTab(t); }} accent={JP_ACCENT} />
+      </AppShell>
     );
   }
 
   const totalWords = VOCAB.length;
   const knownPct = totalWords ? Math.round((knownCount(progress) / totalWords) * 100) : 0;
   const dday = daysUntilGoal(progress);
-  const WD = lang === "ja" ? ["日", "月", "火", "水", "木", "金", "土"] : ["일", "월", "화", "수", "목", "금", "토"];
-  const now = new Date();
-  const week = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(now);
-    d.setDate(now.getDate() - now.getDay() + i);
-    return d;
-  });
   const studied = (d: Date) => (progress.daily[d.toISOString().slice(0, 10)] ?? 0) > 0;
-  const r = 7, circ = 2 * Math.PI * r;
+
+  const title = (
+    <button className="flex items-center gap-1 text-xl font-extrabold" style={{ color: "var(--text-1)" }}>
+      JLPT
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text-3)" }}><path d="m6 9 6 6 6-6" /></svg>
+    </button>
+  );
 
   return (
-    <div className="mx-auto min-h-screen max-w-md" style={{ background: "var(--bg)" }}>
-      {/* 헤더 — 레벨 · 진도칩 · 아바타 · 주간 스트립 */}
-      <header className="sticky top-0 z-30" style={{ background: "var(--bg)", paddingTop: "env(safe-area-inset-top)" }}>
-        <div className="flex items-center gap-2 px-4 pb-2 pt-3">
-          {onBack && (
-            <button onClick={onBack} aria-label={tt(lang, "뒤로", "戻る")} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-              style={{ background: "var(--surface)", color: "var(--text-2)" }}>
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
-            </button>
-          )}
-          <button className="flex items-center gap-1 text-xl font-extrabold" style={{ color: "var(--text-1)" }}>
-            JLPT
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text-3)" }}><path d="m6 9 6 6 6-6" /></svg>
-          </button>
-          <div className="ml-auto flex items-center gap-2">
-            <div className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5" style={{ border: "1px solid var(--border)" }}>
-              <svg viewBox="0 0 18 18" className="h-4 w-4 -rotate-90">
-                <circle cx="9" cy="9" r={r} fill="none" stroke="var(--surface)" strokeWidth="2.5" />
-                <circle cx="9" cy="9" r={r} fill="none" stroke="#E63946" strokeWidth="2.5" strokeLinecap="round"
-                  strokeDasharray={circ} strokeDashoffset={circ - (knownPct / 100) * circ} />
-              </svg>
-              <span className="text-xs font-bold" style={{ color: "var(--text-2)" }}>{knownPct}%</span>
-              {dday !== null && (
-                <span className="text-xs font-extrabold" style={{ color: "var(--text-1)" }}>
-                  {dday > 0 ? `D-${dday}` : dday === 0 ? "D-DAY" : `D+${-dday}`}
-                </span>
-              )}
-            </div>
-            <AccountButton />
-          </div>
-        </div>
-
-        {/* 주간 스트립 */}
-        <div className="px-4 pb-2">
-          <div className="grid grid-cols-7 text-center text-[11px]" style={{ color: "var(--text-3)" }}>
-            {WD.map((w) => <span key={w}>{w}</span>)}
-          </div>
-          <div className="mt-1 grid grid-cols-7 text-center">
-            {week.map((d, i) => {
-              const isToday = d.toDateString() === now.toDateString();
-              const did = studied(d);
-              return (
-                <div key={i} className="flex flex-col items-center gap-1 py-0.5">
-                  <span className="grid h-8 w-8 place-items-center rounded-full text-sm"
-                    style={{
-                      background: isToday ? "#E63946" : "transparent",
-                      color: isToday ? "#fff" : did ? "var(--text-1)" : "var(--text-3)",
-                      fontWeight: isToday ? 800 : did ? 700 : 500,
-                    }}>
-                    {d.getDate()}
-                  </span>
-                  <span className="h-1 w-1 rounded-full" style={{ background: did && !isToday ? "#10B981" : "transparent" }} />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        <div style={{ height: 1, background: "var(--border)" }} />
-      </header>
+    <AppShell>
+      <AppHeader
+        onBack={onBack}
+        title={title}
+        right={<><ProgressChip pct={knownPct} dday={dday} accent={JP_ACCENT} /><AccountButton /></>}
+        below={<WeekStrip accent={JP_ACCENT} studied={studied} />}
+      />
 
       {tab === "home" && (
         <Home
@@ -217,7 +173,7 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
         <Stats progress={progress} onSetGoal={setGoalDate} onSetDailyGoal={setDailyGoal} onReset={reset} onExport={exportJson} onImport={importJson} />
       )}
 
-      <BottomNav tab={tab} onChange={(t) => { setLearnView(null); setTab(t); }} accentColor="#E63946" />
-    </div>
+      <BottomNav tab={tab} tabs={JP_TABS} onChange={(t) => { setLearnView(null); setTab(t); }} accent={JP_ACCENT} />
+    </AppShell>
   );
 }
