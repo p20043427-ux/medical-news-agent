@@ -1,7 +1,9 @@
 // 의료교류 플랫폼 공통 타입 — 모든 항목은 한국어·일본어 양국어 동시 표기.
 // (은성의료재단 ↔ 가마치그룹 직원 상호방문용. 방향에 무관하게 양국어를 함께 노출)
 
-export type MedRole = "common" | "doctor" | "nurse" | "exam" | "pharmacy" | "admin";
+export type MedRole =
+  | "common" | "doctor" | "nurse" | "exam" | "pharmacy"
+  | "rehab" | "infection" | "qps" | "affairs" | "finance" | "purchasing" | "admin";
 
 export interface MedPhrase {
   ko: string;        // 한국어 문장

@@ -12,11 +12,17 @@ import { MED_ACCENT, BilingualRow } from "./common";
 const ROLES: { key: MedRole | "fav"; ko: string; ja: string; emoji: string }[] = [
   { key: "fav", ko: "즐겨찾기", ja: "お気に入り", emoji: "⭐" },
   { key: "common", ko: "공통", ja: "共通", emoji: "💬" },
-  { key: "doctor", ko: "의사", ja: "医師", emoji: "🩺" },
-  { key: "nurse", ko: "간호", ja: "看護", emoji: "💉" },
-  { key: "exam", ko: "검사", ja: "検査", emoji: "🔬" },
-  { key: "pharmacy", ko: "약제", ja: "薬剤", emoji: "💊" },
-  { key: "admin", ko: "원무", ja: "事務", emoji: "📋" },
+  { key: "doctor", ko: "진료부", ja: "診療部", emoji: "🩺" },
+  { key: "nurse", ko: "간호부", ja: "看護部", emoji: "💉" },
+  { key: "exam", ko: "진료지원(검사)", ja: "検査・放射線", emoji: "🔬" },
+  { key: "pharmacy", ko: "약제부", ja: "薬剤部", emoji: "💊" },
+  { key: "rehab", ko: "재활치료", ja: "リハビリ", emoji: "🦽" },
+  { key: "infection", ko: "감염관리", ja: "感染対策", emoji: "🦠" },
+  { key: "qps", ko: "의료질·안전", ja: "医療の質・安全", emoji: "🛡️" },
+  { key: "affairs", ko: "원무", ja: "医事課", emoji: "🧾" },
+  { key: "finance", ko: "재무", ja: "経理・財務", emoji: "💰" },
+  { key: "purchasing", ko: "구매", ja: "購買・調達", emoji: "📦" },
+  { key: "admin", ko: "인사총무·교류", ja: "人事総務・交流", emoji: "📋" },
 ];
 
 export default function MedicPhrasebookView({ uiLang }: { uiLang: UiLang }) {
