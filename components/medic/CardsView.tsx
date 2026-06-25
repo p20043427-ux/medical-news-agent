@@ -48,10 +48,12 @@ export default function MedicCardsView({ uiLang }: { uiLang: UiLang }) {
           <span className="text-7xl">{zoom.icon}</span>
           <div className="text-center" onClick={(e) => e.stopPropagation()}>
             <p className="text-3xl font-extrabold leading-snug" style={{ color: zoom.urgent ? "#E63946" : "var(--text-1)" }}>{zoom.ja}</p>
-            <p className="mt-1 font-mono text-sm" style={{ color: "var(--text-3)" }}>{zoom.jaReading}</p>
+            {zoom.jaPron && <p className="mt-1 text-lg font-bold" style={{ color: "#E63946" }}>🗣 {zoom.jaPron}</p>}
+            <p className="mt-0.5 font-mono text-sm" style={{ color: "var(--text-3)" }}>{zoom.jaReading}</p>
             <div className="my-4 h-px w-40 self-center" style={{ background: "var(--border)" }} />
             <p className="text-3xl font-extrabold leading-snug" style={{ color: zoom.urgent ? "#E63946" : "var(--text-1)" }}>{zoom.ko}</p>
-            <p className="mt-1 font-mono text-sm" style={{ color: "var(--text-3)" }}>{zoom.koRomaja}</p>
+            {zoom.koPron && <p className="mt-1 text-lg font-bold" style={{ color: "#2563EB" }}>🗣 {zoom.koPron}</p>}
+            <p className="mt-0.5 font-mono text-sm" style={{ color: "var(--text-3)" }}>{zoom.koRomaja}</p>
           </div>
           <div className="flex gap-3" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => speakJa(zoom.jaReading)} className="rounded-full px-5 py-3 text-sm font-bold text-white" style={{ background: "#E63946" }}>🔊 日本語</button>

@@ -21,19 +21,61 @@ const ROLES: { key: MedRole | "fav"; ko: string; ja: string; emoji: string }[] =
 
 export default function MedicPhrasebookView({ uiLang }: { uiLang: UiLang }) {
   const [role, setRole] = useState<MedRole | "fav">("common");
+  const [query, setQuery] = useState("");
   const { has, toggle, favs } = useFavorites("medic-phrase");
 
   const groups = role === "fav" ? [] : MED_PHRASEBOOK.filter((g) => g.role === role);
   const favPhrases = MED_PHRASEBOOK.flatMap((g) => g.phrases).filter((p) => favs.includes(p.ko));
+
+  const q = query.trim().toLowerCase();
+  const searchResults = q
+    ? MED_PHRASEBOOK.flatMap((g) => g.phrases).filter((p) =>
+        [p.ko, p.ja, p.koRomaja, p.jaReading, p.koPron, p.jaPron].some((s) => s?.toLowerCase().includes(q)))
+    : [];
+
+  function PhraseCard({ p }: { p: typeof MED_PHRASEBOOK[number]["phrases"][number] }) {
+    const fav = has(p.ko);
+    const note = uiLang === "ja" ? p.noteJa : p.noteKo;
+    return (
+      <div className="rounded-2xl p-4 shadow-sm" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+        <div className="mb-1 flex justify-end">
+          <button onClick={() => toggle(p.ko)} aria-label={tt(uiLang, "즐겨찾기", "お気に入り")} className="text-lg" style={{ color: fav ? "#f0932b" : "var(--text-3)" }}>{fav ? "★" : "☆"}</button>
+        </div>
+        <BilingualRow {...p} uiLang={uiLang} />
+        {note && (
+          <p className="mt-2 rounded-lg px-2 py-1 text-[11px] leading-relaxed" style={{ background: `${MED_ACCENT}14`, color: "var(--text-2)" }}>💡 {note}</p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="pb-28 pt-3">
       <div className="px-4">
         <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{tt(uiLang, "의료 전문 회화집", "医療会話集")}</h1>
         <p className="mb-3 text-sm" style={{ color: "var(--text-3)" }}>{tt(uiLang, "직종·상황별 표현 · 한/일 문장을 눌러 발음 듣기", "職種・場面別の表現 · 韓/日の文をタップで発音")}</p>
+        <div className="flex items-center gap-2 rounded-2xl px-3.5 py-2.5" style={{ background: "var(--surface)" }}>
+          <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" style={{ color: "var(--text-3)" }} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={tt(uiLang, "회화 검색 (한국어·일본어·발음)", "会話を検索（韓国語・日本語・発音）")}
+            className="w-full bg-transparent text-sm outline-none" style={{ color: "var(--text-1)" }} />
+          {query && <button onClick={() => setQuery("")} aria-label={tt(uiLang, "지우기", "クリア")} className="shrink-0 text-sm" style={{ color: "var(--text-3)" }}>✕</button>}
+        </div>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto px-4 pb-3" style={{ scrollbarWidth: "none" }}>
+      {q ? (
+        <div className="mt-3 px-4">
+          <p className="mb-2 text-sm font-bold" style={{ color: "var(--text-1)" }}>{tt(uiLang, `검색 결과 ${searchResults.length}개`, `検索結果 ${searchResults.length}件`)}</p>
+          {searchResults.length === 0 ? (
+            <EmptyState emoji="🔍" title={tt(uiLang, "검색 결과가 없어요", "検索結果がありません")} description={tt(uiLang, "다른 검색어를 시도해 보세요.", "別のキーワードを試してください。")} />
+          ) : (
+            <div className="space-y-2.5">
+              {searchResults.map((p, i) => <PhraseCard key={i} p={p} />)}
+            </div>
+          )}
+        </div>
+      ) : (
+      <>
+      <div className="mt-1 flex gap-2 overflow-x-auto px-4 pb-3" style={{ scrollbarWidth: "none" }}>
         {ROLES.map((r) => (
           <Chip key={r.key} active={r.key === role} size="md" onClick={() => setRole(r.key)}
             accent={r.key === "fav" ? "#f0932b" : MED_ACCENT}>
@@ -84,6 +126,8 @@ export default function MedicPhrasebookView({ uiLang }: { uiLang: UiLang }) {
             </section>
           ))}
         </div>
+      )}
+      </>
       )}
     </div>
   );

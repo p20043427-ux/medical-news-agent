@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { MANNERS, VISIT_CHECKLIST } from "@/lib/medic/visit";
+import { MED_SIGNAGE } from "@/lib/medic/signage";
+import { speakKo } from "@/lib/ko/speech";
+import { speakJa } from "@/lib/jp/speech";
 import { Segmented } from "@/components/ui/segmented";
 import { tt, type UiLang } from "@/lib/i18n";
 import { MED_ACCENT } from "./common";
@@ -9,7 +12,7 @@ import { MED_ACCENT } from "./common";
 const CK_KEY = "medic-checklist";
 
 export default function MedicVisitView({ uiLang }: { uiLang: UiLang }) {
-  const [sub, setSub] = useState<"manners" | "checklist">("manners");
+  const [sub, setSub] = useState<"manners" | "checklist" | "signage">("manners");
   const [checked, setChecked] = useState<string[]>([]);
   const [open, setOpen] = useState<string | null>(MANNERS[0]?.key ?? null);
 
@@ -34,12 +37,48 @@ export default function MedicVisitView({ uiLang }: { uiLang: UiLang }) {
         <p className="mb-3 text-sm" style={{ color: "var(--text-3)" }}>{tt(uiLang, "교류 매너 가이드와 준비 체크리스트", "交流マナーガイドと準備チェックリスト")}</p>
         <Segmented value={sub} onChange={setSub} accent={MED_ACCENT}
           options={[
-            { value: "manners", label: tt(uiLang, "🤝 매너 가이드", "🤝 マナーガイド") },
-            { value: "checklist", label: tt(uiLang, `✅ 체크리스트 (${doneCount}/${VISIT_CHECKLIST.length})`, `✅ チェックリスト (${doneCount}/${VISIT_CHECKLIST.length})`) },
+            { value: "manners", label: tt(uiLang, "🤝 매너", "🤝 マナー") },
+            { value: "signage", label: tt(uiLang, "🪧 표지판", "🪧 標識") },
+            { value: "checklist", label: tt(uiLang, `✅ 준비 (${doneCount}/${VISIT_CHECKLIST.length})`, `✅ 準備 (${doneCount}/${VISIT_CHECKLIST.length})`) },
           ]} />
       </div>
 
-      {sub === "manners" ? (
+      {sub === "signage" && (
+        <div className="mt-3 space-y-5 px-4">
+          <p className="text-xs leading-relaxed" style={{ color: "var(--text-3)" }}>
+            {tt(uiLang, "방문국 병원의 표지를 읽고 뜻을 바로 파악하세요. 발음을 눌러 들을 수 있어요.", "訪問先病院の標識を読んで意味をすぐ把握。発音をタップで聞けます。")}
+          </p>
+          {MED_SIGNAGE.map((g) => (
+            <section key={g.key}>
+              <h2 className="mb-2 flex items-center gap-2 text-sm font-extrabold" style={{ color: "var(--text-1)" }}>
+                <span>{g.emoji}</span><span>{uiLang === "ja" ? g.titleJa : g.titleKo}</span>
+              </h2>
+              <div className="grid grid-cols-2 gap-2">
+                {g.signs.map((s, i) => (
+                  <div key={i} className="rounded-2xl p-3" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+                    <div className="mb-1 flex items-center gap-1.5">
+                      <span className="text-lg">{s.emoji}</span>
+                      <span className="shrink-0 rounded px-1 py-0.5 text-[9px] font-bold" style={{ background: "#E6394618", color: "#E63946" }}>日</span>
+                    </div>
+                    <button onClick={() => speakJa(s.jaReading)} className="block w-full text-left">
+                      <span className="block text-base font-bold leading-tight" style={{ color: "var(--text-1)" }}>{s.ja}</span>
+                      <span className="block text-[12px] font-semibold" style={{ color: "#E63946" }}>🗣 {s.jaPron}</span>
+                    </button>
+                    <div className="my-1.5 h-px" style={{ background: "var(--border)" }} />
+                    <button onClick={() => speakKo(s.ko)} className="block w-full text-left">
+                      <span className="inline-block shrink-0 rounded px-1 py-0.5 text-[9px] font-bold" style={{ background: "#2563EB18", color: "#2563EB" }}>한</span>
+                      <span className="block text-base font-bold leading-tight" style={{ color: "var(--text-1)" }}>{s.ko}</span>
+                      <span className="block text-[12px] font-semibold" style={{ color: "#2563EB" }}>🗣 {s.koPron}</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
+
+      {sub === "manners" && (
         <div className="mt-3 space-y-2.5 px-4">
           {MANNERS.map((s) => {
             const isOpen = open === s.key;
@@ -66,7 +105,9 @@ export default function MedicVisitView({ uiLang }: { uiLang: UiLang }) {
             );
           })}
         </div>
-      ) : (
+      )}
+
+      {sub === "checklist" && (
         <div className="mt-3 px-4">
           <ul className="space-y-2">
             {VISIT_CHECKLIST.map((it) => {

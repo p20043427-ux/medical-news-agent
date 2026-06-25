@@ -44,10 +44,13 @@ export default function MedicApp({ onBack }: { onBack?: () => void }) {
             <AccountButton />
           </div>
         </div>
-        <div className="px-4 pb-2">
-          <p className="rounded-xl px-3 py-1.5 text-[11px] leading-snug" style={{ background: `${MED_ACCENT}12`, color: "var(--text-2)" }}>
+        <div className="flex flex-wrap items-center gap-1.5 px-4 pb-2">
+          <p className="flex-1 rounded-xl px-3 py-1.5 text-[11px] leading-snug" style={{ background: `${MED_ACCENT}12`, color: "var(--text-2)" }}>
             {tt(lang, "은성의료재단 ↔ 가마치그룹 직원 상호방문 지원", "蒲池グループ ↔ 恩成医療財団 職員相互訪問サポート")}
           </p>
+          <span className="shrink-0 rounded-full px-2 py-1 text-[10px] font-bold" style={{ background: "#F59E0B22", color: "#B45309" }}>
+            {tt(lang, "⚠ 감수 전 초안", "⚠ 監修前ドラフト")}
+          </span>
         </div>
         <div style={{ height: 1, background: "var(--border)" }} />
       </header>

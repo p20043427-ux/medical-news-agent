@@ -55,9 +55,11 @@ export default function MedicGlossaryView({ uiLang }: { uiLang: UiLang }) {
                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                   <span className="text-base font-bold" style={{ color: "var(--text-1)" }}>{t.ja}</span>
                   <span className="font-mono text-[11px]" style={{ color: "var(--text-3)" }}>{t.jaReading}</span>
+                  {t.jaPron && <span className="text-[12px] font-semibold" style={{ color: "#E63946" }}>🗣 {t.jaPron}</span>}
                 </div>
                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                   <span className="text-base font-bold" style={{ color: "var(--text-2)" }}>{t.ko}</span>
+                  {t.koPron && <span className="text-[12px] font-semibold" style={{ color: "#2563EB" }}>🗣 {t.koPron}</span>}
                   <span className="font-mono text-[11px]" style={{ color: "var(--text-3)" }}>{t.koRomaja}</span>
                 </div>
                 {(t.exampleKo || t.exampleJa) && (

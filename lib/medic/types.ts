@@ -6,8 +6,10 @@ export type MedRole = "common" | "doctor" | "nurse" | "exam" | "pharmacy" | "adm
 export interface MedPhrase {
   ko: string;        // 한국어 문장
   koRomaja: string;  // 한국어 로마자 (개정 로마자 표기)
+  koPron?: string;   // 한국어 발음을 일본어 가타카나로 표기 (일본 직원이 읽고 말하기용)
   ja: string;        // 일본어 문장 (한자 포함 가능)
   jaReading: string; // 일본어 전체 가나 읽기 (TTS·후리가나용)
+  jaPron?: string;   // 일본어 발음을 한국어 한글로 표기 (한국 직원이 읽고 말하기용)
   noteKo?: string;   // 사용 메모 (한국어)
   noteJa?: string;   // 사용 메모 (일본어)
 }
@@ -24,8 +26,10 @@ export interface MedPhraseGroup {
 export interface MedTerm {
   ko: string;        // 한국어 용어
   koRomaja: string;  // 한국어 로마자
+  koPron?: string;   // 한국어 발음을 가타카나로 표기
   ja: string;        // 일본어 용어
   jaReading: string; // 일본어 읽기 (가나)
+  jaPron?: string;   // 일본어 발음을 한글로 표기
   exampleKo?: string; // 예문 (한국어, 선택)
   exampleJa?: string; // 예문 (일본어, 선택)
 }
@@ -41,8 +45,10 @@ export interface MedTermCategory {
 export interface MedCard {
   ko: string;        // 한국어 (크게 표시)
   koRomaja: string;
+  koPron?: string;   // 한국어 발음을 가타카나로 표기
   ja: string;        // 일본어 (크게 표시)
   jaReading: string;
+  jaPron?: string;   // 일본어 발음을 한글로 표기
   icon: string;      // 이모지 아이콘
   urgent?: boolean;  // 긴급 강조
 }
