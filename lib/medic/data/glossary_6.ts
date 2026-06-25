@@ -23,7 +23,7 @@ export const GLOSSARY_6: MedTermCategory[] = [
         exampleKo: "의료질 향상을 위해 지표를 관리합니다.",
         exampleJa: "医療の質の向上のために指標を管理します。",
       },
-      { ko: "질지표", koRomaja: "jiljipyo", ja: "品質指標", jaReading: "ひんしつしひょう", koPron: "チルジピョ", jaPron: "힌시츠시효우" },
+      { ko: "질지표", koRomaja: "jiljipyo", ja: "医療の質指標", jaReading: "いりょうのしつしひょう", koPron: "チルジピョ", jaPron: "이료우노 시츠시효우" },
       {
         ko: "환자안전",
         koRomaja: "hwanja anjeon",
@@ -34,9 +34,9 @@ export const GLOSSARY_6: MedTermCategory[] = [
         exampleKo: "환자안전이 최우선입니다.",
         exampleJa: "患者安全が最優先です。",
       },
-      { ko: "안전사고", koRomaja: "anjeon sago", ja: "安全事故", jaReading: "あんぜんじこ", koPron: "アンジョンサゴ", jaPron: "안젠지코" },
+      { ko: "안전사고", koRomaja: "anjeon sago", ja: "医療事故", jaReading: "いりょうじこ", koPron: "アンジョンサゴ", jaPron: "이료우지코" },
       { ko: "근접오류", koRomaja: "geunjeop oryu", ja: "ヒヤリハット", jaReading: "ひやりはっと", koPron: "クンジョボリュ", jaPron: "히야리핫토" },
-      { ko: "적신호사건", koRomaja: "jeoksinho sageon", ja: "重大事故", jaReading: "じゅうだいじこ", koPron: "チョクシノサゴン", jaPron: "쥬우다이지코" },
+      { ko: "적신호사건", koRomaja: "jeoksinho sageon", ja: "警鐘事例", jaReading: "けいしょうじれい", koPron: "チョクシノサゴン", jaPron: "케이쇼우지레이" },
       {
         ko: "근본원인분석",
         koRomaja: "geunbon wonin bunseok",
