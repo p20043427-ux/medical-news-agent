@@ -7,6 +7,9 @@ import {
   USEFUL_APPS,
   LOST_ITEMS_GUIDE,
 } from "@/lib/travel/emergency";
+import { kv } from "@/lib/platform/kv";
+
+const CK_KEY = "travel-checklist";
 
 /* ── 색상 상수 ────────────────────────────────────────────── */
 const ACCENT = "#E63946";
@@ -68,12 +71,17 @@ function TabBar({
 function ChecklistTab() {
   /* 각 아이템 id → 체크 여부를 로컬 state로 관리 */
   const allIds = CHECKLIST.flatMap((g) => g.items.map((i) => i.id));
-  const [checked, setChecked] = useState<Record<string, boolean>>(
-    Object.fromEntries(allIds.map((id) => [id, false]))
-  );
+  const [checked, setChecked] = useState<Record<string, boolean>>(() => {
+    const saved = kv.getJSON<Record<string, boolean>>(CK_KEY, {});
+    return Object.fromEntries(allIds.map((id) => [id, saved[id] ?? false]));
+  });
 
   const toggle = (id: string) =>
-    setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
+    setChecked((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      kv.setJSON(CK_KEY, next);
+      return next;
+    });
 
   /* 전체 진행률 */
   const total   = allIds.length;

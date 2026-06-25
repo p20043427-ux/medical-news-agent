@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MED_PHRASEBOOK } from "@/lib/medic/phrasebook";
 import type { MedRole } from "@/lib/medic/types";
 import { useFavorites } from "@/lib/favorites";
@@ -25,10 +25,12 @@ const ROLES: { key: MedRole | "fav"; ko: string; ja: string; emoji: string }[] =
   { key: "admin", ko: "인사총무·교류", ja: "人事総務・交流", emoji: "📋" },
 ];
 
-export default function MedicPhrasebookView({ uiLang }: { uiLang: UiLang }) {
+export default function MedicPhrasebookView({ uiLang, focusRole }: { uiLang: UiLang; focusRole?: MedRole | null }) {
   const [role, setRole] = useState<MedRole | "fav">("common");
   const [query, setQuery] = useState("");
   const { has, toggle, favs } = useFavorites("medic-phrase");
+
+  useEffect(() => { if (focusRole) { setRole(focusRole); setQuery(""); } }, [focusRole]);
 
   const groups = role === "fav" ? [] : MED_PHRASEBOOK.filter((g) => g.role === role);
   const favPhrases = MED_PHRASEBOOK.flatMap((g) => g.phrases).filter((p) => favs.includes(p.ko));
