@@ -4,11 +4,51 @@
 
 :root {
   color-scheme: light;
+  /* 단일 소스: 색 값은 --ds-* (HSL)에서 정의하고, 레거시 토큰은 그 위에 alias 한다. */
+  --bg: hsl(var(--ds-background));
+  --card: hsl(var(--ds-card));
+  --surface: hsl(var(--ds-muted));
+  --text-1: hsl(var(--ds-foreground));
+  --text-2: hsl(var(--ds-muted-foreground));
+  --text-3: hsl(var(--ds-subtle));
+  --border: hsl(var(--ds-border));
+  /* 일본여행(travel) 레거시 토큰 alias → 공통 디자인 토큰에 매핑(다크모드 자동 대응) */
+  --color-bg: var(--bg);
+  --color-surface: var(--card);
+  --color-text: var(--text-1);
+  --color-muted: var(--text-3);
+  --color-border: var(--border);
+  --jp-from: #E63946;
+  --jp-to: #F4A261;
+  --en-from: #4361EE;
+  --en-to: #7209B7;
+  --xp: #F59E0B;
+  --success: hsl(var(--ds-success));
+  --danger: #EF4444;
+  --hard: #F97316;
+}
+
+html.dark {
+  color-scheme: dark;
+  /* 다크 값은 --ds-* html.dark 블록에서 단일 정의 → 레거시 alias 가 자동 반영 */
 }
 
 body {
-  background: #f5f6f8;
+  background: var(--bg);
+  color: var(--text-1);
+  transition: background 0.2s, color 0.2s;
+  /* 한국어/일본어 최적화 폰트 스택 — Pretendard(있으면) → iOS/시스템 한글 → 일본어 폴백 */
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    "Apple SD Gothic Neo", system-ui, "Segoe UI", Roboto, "Noto Sans KR",
+    "Hiragino Kaku Gothic ProN", "Noto Sans JP", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-variant-numeric: tabular-nums; /* 숫자 폭 고정 → 카운터·점수·진도 정렬 */
+  word-break: keep-all;        /* 한국어 단어 중간에서 줄바꿈되지 않도록 */
+  overflow-wrap: anywhere;     /* 단, 너무 긴 라틴 단어는 넘치지 않게 분리 */
 }
+
 
 /* ───── 버튼 디자인 시스템 ─────
    깊이감(레이어드 그림자 + 미세 그라데이션 + 상단 하이라이트) + 프레스 상태 */
@@ -85,91 +125,247 @@ body {
   }
 }
 
-
-/* ───── 다크 모드 ─────
-   컴포넌트는 라이트용 Tailwind 클래스를 쓰고, .dark 스코프에서 팔레트를 덮어쓴다. */
-html.dark {
-  color-scheme: dark;
-}
-html.dark body {
-  background: #0b1120;
-  color: #e2e8f0;
+/* ── 카드 ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
 }
 
-.dark .bg-\[\#f5f6f8\] {
-  background-color: #0b1120;
+/* ── 그라데이션 버튼 ── */
+.btn-jp {
+  background: linear-gradient(135deg, var(--jp-from), var(--jp-to));
 }
-.dark .bg-white {
-  background-color: #1e293b;
-}
-.dark .bg-white\/90 {
-  background-color: rgb(30 41 59 / 0.92);
-}
-.dark .bg-white\/85,
-.dark .bg-white\/80 {
-  background-color: rgb(30 41 59 / 0.85);
-}
-.dark .bg-slate-50,
-.dark .bg-slate-50\/60 {
-  background-color: #111a2e;
-}
-.dark .bg-slate-100 {
-  background-color: #334155;
-}
-.dark .bg-slate-200\/70 {
-  background-color: #334155;
-}
-.dark .bg-slate-900 {
-  background-color: #475569;
+.btn-en {
+  background: linear-gradient(135deg, var(--en-from), var(--en-to));
 }
 
-/* 텍스트 */
-.dark .text-slate-900 {
-  color: #f1f5f9;
+/* ── 다크모드 Tailwind 오버라이드 ── */
+html.dark .bg-\[\#F8F9FB\],
+html.dark .bg-\[\#f5f6f8\] { background-color: var(--bg) !important; }
+html.dark .bg-white { background-color: var(--card) !important; }
+html.dark .bg-white\/90 { background-color: rgb(26 27 46 / 0.92) !important; }
+html.dark .bg-white\/80 { background-color: rgb(26 27 46 / 0.85) !important; }
+html.dark .bg-slate-50,
+html.dark .bg-slate-50\/60 { background-color: var(--surface) !important; }
+html.dark .bg-slate-100 { background-color: #2A2D4A !important; }
+html.dark .bg-slate-200\/70 { background-color: #2A2D4A !important; }
+
+html.dark .text-slate-900 { color: var(--text-1) !important; }
+html.dark .text-slate-800 { color: var(--text-1) !important; }
+html.dark .text-slate-700,
+html.dark .text-slate-600 { color: var(--text-2) !important; }
+html.dark .text-slate-500,
+html.dark .text-slate-400 { color: var(--text-3) !important; }
+
+html.dark .border-slate-200,
+html.dark .border-slate-300 { border-color: var(--border) !important; }
+html.dark .border-slate-100 { border-color: var(--border) !important; }
+html.dark .ring-black\/5 { --tw-ring-color: rgb(255 255 255 / 0.06) !important; }
+
+/* ── 다크모드 카드 입체감: 어두운 배경에서 안 보이는 그림자를 깊은 그림자 + 헤어라인 테두리로 대체 ── */
+html.dark .shadow-sm {
+  box-shadow: 0 1px 2px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.05) !important;
 }
-.dark .text-slate-800 {
-  color: #e2e8f0;
+html.dark .shadow,
+html.dark .shadow-md {
+  box-shadow: 0 6px 18px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.05) !important;
 }
-.dark .text-slate-700,
-.dark .text-slate-600 {
-  color: #cbd5e1;
-}
-.dark .text-slate-500,
-.dark .text-slate-400 {
-  color: #94a3b8;
-}
-.dark .text-slate-300 {
-  color: #64748b;
+html.dark .shadow-lg,
+html.dark .shadow-xl,
+html.dark .shadow-2xl {
+  box-shadow: 0 14px 36px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.06) !important;
 }
 
-/* 테두리 / 링 */
-.dark .border-slate-300 {
-  border-color: #475569;
-}
-.dark .border-slate-200 {
-  border-color: #334155;
-}
-.dark .border-slate-100,
-.dark .divide-slate-100 > * + * {
-  border-color: #273449;
-}
-.dark .ring-black\/5 {
-  --tw-ring-color: rgb(255 255 255 / 0.08);
-}
-
-/* 하단 액션 페이드 그라데이션 (스키밍/복습/퀴즈) */
-.dark .from-\[\#f5f6f8\] {
-  --tw-gradient-from: #0b1120 var(--tw-gradient-from-position);
-  --tw-gradient-to: rgb(11 17 32 / 0) var(--tw-gradient-to-position);
+html.dark .from-\[\#f5f6f8\],
+html.dark .from-\[\#F8F9FB\] {
+  --tw-gradient-from: var(--bg) var(--tw-gradient-from-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
-.dark .via-\[\#f5f6f8\] {
-  --tw-gradient-to: rgb(11 17 32 / 0) var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), #0b1120 var(--tw-gradient-via-position),
-    var(--tw-gradient-to);
+html.dark .via-\[\#f5f6f8\],
+html.dark .via-\[\#F8F9FB\] {
+  --tw-gradient-stops: var(--tw-gradient-from), var(--bg) var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
 
-/* 카드 아트 위 글래스 배지는 밝게 유지 */
-.dark .bg-white\/80.text-xl {
-  background-color: rgb(30 41 59 / 0.7);
+/* ── XP 바 애니메이션 ── */
+@keyframes xp-shine {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
 }
+.xp-bar-fill {
+  background: linear-gradient(90deg, var(--xp), #FBBF24, var(--xp));
+  background-size: 200% auto;
+  animation: xp-shine 2s linear infinite;
+}
+
+/* ── 카드 flip 애니메이션 ── */
+.perspective { perspective: 1000px; }
+.flip-card { transition: transform 0.45s; transform-style: preserve-3d; }
+.flip-card.flipped { transform: rotateY(180deg); }
+.flip-front, .flip-back { backface-visibility: hidden; }
+.flip-back { transform: rotateY(180deg); }
+
+/* ── 스와이프 ── */
+@keyframes swipe-left {
+  to { transform: translateX(-120%) rotate(-15deg); opacity: 0; }
+}
+@keyframes swipe-right {
+  to { transform: translateX(120%) rotate(15deg); opacity: 0; }
+}
+.swipe-out-left { animation: swipe-left 0.3s forwards; }
+.swipe-out-right { animation: swipe-right 0.3s forwards; }
+
+/* ── 단어장 모달 슬라이드업 ── */
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* ── 가로 스크롤 스크롤바 숨김 ── */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ── 진행바 ── */
+.progress-bar {
+  height: 6px;
+  border-radius: 9999px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.6s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── 버튼 디자인 시스템 (카드 수준 깊이감) ── */
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 1rem;
+  font-weight: 800;
+  transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease, background-color 0.14s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.ui-btn:active { transform: translateY(1px) scale(0.985); }
+.ui-btn:disabled { opacity: 0.45; filter: saturate(0.55); box-shadow: none; transform: none; }
+
+/* 브랜드 그라데이션 (일본어=빨강·주황) — 주요 CTA */
+.ui-btn-brand {
+  color: #fff;
+  background-image: linear-gradient(135deg, var(--jp-from), var(--jp-to));
+  box-shadow: 0 12px 26px -10px rgba(230, 57, 70, 0.55), 0 2px 6px -2px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+}
+.ui-btn-brand:active { box-shadow: 0 6px 14px -10px rgba(230, 57, 70, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+
+/* 영어=파랑·보라 */
+.ui-btn-brand-en {
+  color: #fff;
+  background-image: linear-gradient(135deg, var(--en-from), var(--en-to));
+  box-shadow: 0 12px 26px -10px rgba(67, 97, 238, 0.55), 0 2px 6px -2px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* 다크 프라이머리 */
+.ui-btn-dark {
+  color: #fff;
+  background-image: linear-gradient(135deg, #2d3436, #1a1a2e);
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* 보조 — 카드와 동일 질감 */
+.ui-btn-surface {
+  color: var(--text-1);
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 18px -12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.dark .ui-btn-surface { box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.04); }
+
+/* 성공(알고 있어요) */
+.ui-btn-success {
+  color: #065f46;
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  border: 1px solid #6ee7b7;
+  box-shadow: 0 10px 22px -12px rgba(5, 150, 105, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.dark .ui-btn-success { color: #6ee7b7; background: linear-gradient(135deg, #064e3b, #065f46); border-color: #047857; }
+
+/* 위험/오답 */
+.ui-btn-rose {
+  color: #fff;
+  background-image: linear-gradient(135deg, #fb7185, #e11d48);
+  box-shadow: 0 12px 24px -12px rgba(225, 29, 72, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+
+/* ============================================================
+   디자인 시스템 v2 — 시맨틱 토큰 (HSL, --ds-* 네임스페이스)
+   기존 --card/--border/--success(hex) 와 충돌하지 않도록 분리.
+   tailwind.config 의 colors 와 연결 → bg-primary / text-muted-foreground 등 사용 가능.
+   ============================================================ */
+:root {
+  --ds-background: 220 27.3% 97.8%;       /* = 레거시 --bg #F8F9FB */
+  --ds-foreground: 240 27.8% 14.1%;       /* = --text-1 #1A1A2E */
+  --ds-card: 0 0% 100%;                    /* = --card #FFFFFF */
+  --ds-card-foreground: 240 27.8% 14.1%;
+  --ds-muted: 220 27.3% 95.7%;            /* = --surface #F1F3F7 */
+  --ds-muted-foreground: 218 16.9% 34.9%; /* = --text-2 #4A5568 */
+  --ds-subtle: 220 9% 46%;                /* = --text-3 #6B7280 — WCAG AA 5:1 */
+  --ds-primary: 353 78% 52%;          /* 일본어 브랜드 (#E63946) */
+  --ds-primary-foreground: 0 0% 100%;
+  --ds-secondary: 28 87% 62%;         /* 주황 (#F4A261) */
+  --ds-secondary-foreground: 240 25% 14%;
+  --ds-accent: 243 75% 59%;           /* 영어 브랜드 (#4361EE) */
+  --ds-accent-foreground: 0 0% 100%;
+  --ds-success: 160.1 84.1% 39.4%;        /* = --success #10B981 */
+  --ds-warning: 25 95% 48%;
+  --ds-destructive: 0 78% 54%;
+  --ds-border: 214.3 31.8% 91.4%;         /* = --border #E2E8F0 */
+  --ds-input: 214.3 31.8% 91.4%;
+  --ds-ring: 353 78% 52%;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --shadow-sm: 0 1px 2px hsl(240 25% 14% / 0.06);
+  --shadow-md: 0 8px 24px -12px hsl(240 25% 14% / 0.25);
+}
+html.dark {
+  --ds-background: 240 26.8% 8%;           /* = 레거시 --bg #0F0F1A */
+  --ds-foreground: 240 30.4% 95.5%;        /* = --text-1 #F0F0F7 */
+  --ds-card: 237 27.8% 14.1%;              /* = --card #1A1B2E */
+  --ds-card-foreground: 240 30.4% 95.5%;
+  --ds-muted: 237.9 28% 19.6%;            /* = --surface #242540 */
+  --ds-muted-foreground: 225 20.3% 69%;   /* = --text-2 #A0A8C0 */
+  --ds-subtle: 224.2 17.4% 42.7%;         /* = --text-3 #5A6480 */
+  --ds-border: 234.4 27.6% 22.7%;         /* = --border #2A2D4A */
+  --ds-input: 234.4 27.6% 22.7%;
+  --ds-ring: 353 78% 62%;
+}
+
+/* ── 접근성 베이스라인 ── */
+:where(a, button, [role="button"], [role="switch"], input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid hsl(var(--ds-ring));
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── 완료 보상 팝 애니메이션 ── */
+@keyframes reward-pop {
+  0%   { transform: scale(.5); opacity: 0; }
+  60%  { transform: scale(1.18); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-reward { animation: reward-pop .55s cubic-bezier(.34,1.56,.64,1) both; }

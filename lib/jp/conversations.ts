@@ -1,9 +1,26 @@
-import type { Conversation } from "./types";
+import type { Conversation, ConversationCategory } from "./types";
 
-// 생활 회화 시나리오 (JLPT N5 수준)
+export const CONVERSATION_CATEGORIES: { key: ConversationCategory; label: string; emoji: string }[] = [
+  { key: "greeting", label: "인사", emoji: "👋" },
+  { key: "food", label: "식당·카페", emoji: "🍽️" },
+  { key: "shopping", label: "쇼핑", emoji: "🛍️" },
+  { key: "transport", label: "교통", emoji: "🚕" },
+  { key: "service", label: "서비스", emoji: "🏨" },
+  { key: "medical", label: "병원·약국", emoji: "🏥" },
+  { key: "daily", label: "일상", emoji: "💬" },
+];
+
+// 생활 회화 시나리오 (JLPT N5~N4)
 export const CONVERSATIONS: Conversation[] = [
   {
     id: "c1", title: "첫 인사·자기소개", situation: "처음 만난 사람과 인사를 나눠요.", emoji: "🤝",
+    level: "N5", category: "greeting",
+    keyPhrases: [
+      { jp: "はじめまして", reading: "はじめまして", ko: "처음 뵙겠습니다" },
+      { jp: "どうぞよろしく", reading: "どうぞよろしく", ko: "잘 부탁드립니다" },
+      { jp: "こちらこそ", reading: "こちらこそ", ko: "저야말로" },
+    ],
+    cultureTip: "첫 만남에선 악수보다 가볍게 고개 숙여 인사(お辞儀)하는 게 자연스러워요.",
     lines: [
       { speaker: "A", tokens: [{ t: "はじめまして。" }, { t: "田中", r: "たなか" }, { t: "です。" }], ko: "처음 뵙겠습니다. 다나카입니다." },
       { speaker: "B", tokens: [{ t: "はじめまして。キムです。どうぞよろしく。" }], ko: "처음 뵙겠습니다. 김입니다. 잘 부탁드립니다." },
@@ -14,6 +31,13 @@ export const CONVERSATIONS: Conversation[] = [
   },
   {
     id: "c2", title: "카페에서 주문", situation: "카페에서 음료를 주문해요.", emoji: "☕",
+    level: "N5", category: "food",
+    keyPhrases: [
+      { jp: "〜をください", reading: "〜をください", ko: "~을 주세요" },
+      { jp: "〜でお願いします", reading: "〜でおねがいします", ko: "~로 부탁드려요" },
+      { jp: "少々お待ちください", reading: "しょうしょうおまちください", ko: "잠시만 기다려 주세요" },
+    ],
+    cultureTip: "「いらっしゃいませ(어서 오세요)」에는 굳이 대답하지 않아도 괜찮아요.",
     lines: [
       { speaker: "점원", tokens: [{ t: "いらっしゃいませ。ご" }, { t: "注文", r: "ちゅうもん" }, { t: "は？" }], ko: "어서 오세요. 주문은요?" },
       { speaker: "나", tokens: [{ t: "コーヒーを" }, { t: "一", r: "ひと" }, { t: "つください。" }], ko: "커피 하나 주세요." },
@@ -24,6 +48,13 @@ export const CONVERSATIONS: Conversation[] = [
   },
   {
     id: "c3", title: "길 묻기", situation: "역으로 가는 길을 물어봐요.", emoji: "🗺️",
+    level: "N5", category: "transport",
+    keyPhrases: [
+      { jp: "すみません", reading: "すみません", ko: "실례합니다" },
+      { jp: "〜はどこですか", reading: "〜はどこですか", ko: "~는 어디예요?" },
+      { jp: "右に曲がってください", reading: "みぎにまがってください", ko: "오른쪽으로 도세요" },
+    ],
+    cultureTip: "모르는 사람에게 말을 걸 땐 「すみません」으로 시작하면 정중해요.",
     lines: [
       { speaker: "나", tokens: [{ t: "すみません、" }, { t: "駅", r: "えき" }, { t: "はどこですか。" }], ko: "실례합니다, 역은 어디예요?" },
       { speaker: "행인", tokens: [{ t: "あの" }, { t: "信号", r: "しんごう" }, { t: "を" }, { t: "右", r: "みぎ" }, { t: "に" }, { t: "曲", r: "ま" }, { t: "がってください。" }], ko: "저 신호등을 오른쪽으로 도세요." },
@@ -34,6 +65,13 @@ export const CONVERSATIONS: Conversation[] = [
   },
   {
     id: "c4", title: "쇼핑·가격 묻기", situation: "가게에서 물건 값을 물어봐요.", emoji: "🛍️",
+    level: "N5", category: "shopping",
+    keyPhrases: [
+      { jp: "いくらですか", reading: "いくらですか", ko: "얼마예요?" },
+      { jp: "ちょっと高いですね", reading: "ちょっとたかいですね", ko: "좀 비싸네요" },
+      { jp: "これをください", reading: "これをください", ko: "이걸 주세요" },
+    ],
+    cultureTip: "일본은 정찰제가 일반적이라 가격 흥정은 거의 하지 않아요.",
     lines: [
       { speaker: "나", tokens: [{ t: "これはいくらですか。" }], ko: "이건 얼마예요?" },
       { speaker: "점원", tokens: [{ t: "それは" }, { t: "千", r: "せん" }, { t: "五百", r: "ごひゃく" }, { t: "円", r: "えん" }, { t: "です。" }], ko: "그건 1,500엔이에요." },
@@ -44,6 +82,13 @@ export const CONVERSATIONS: Conversation[] = [
   },
   {
     id: "c5", title: "식당에서", situation: "식당에서 메뉴를 주문해요.", emoji: "🍜",
+    level: "N5", category: "food",
+    keyPhrases: [
+      { jp: "ご注文はお決まりですか", reading: "ごちゅうもんはおきまりですか", ko: "주문 정하셨어요?" },
+      { jp: "〜をお願いします", reading: "〜をおねがいします", ko: "~을 부탁드려요" },
+      { jp: "〜で大丈夫です", reading: "〜でだいじょうぶです", ko: "~로 괜찮아요" },
+    ],
+    cultureTip: "물(お水)과 물수건(おしぼり)은 보통 무료로 제공돼요.",
     lines: [
       { speaker: "점원", tokens: [{ t: "ご" }, { t: "注文", r: "ちゅうもん" }, { t: "はお" }, { t: "決", r: "き" }, { t: "まりですか。" }], ko: "주문 정하셨어요?" },
       { speaker: "나", tokens: [{ t: "ラーメンと" }, { t: "餃子", r: "ぎょうざ" }, { t: "をお" }, { t: "願", r: "ねが" }, { t: "いします。" }], ko: "라멘과 만두를 부탁드려요." },
@@ -54,6 +99,13 @@ export const CONVERSATIONS: Conversation[] = [
   },
   {
     id: "c6", title: "약속 잡기", situation: "친구와 만날 약속을 정해요.", emoji: "📅",
+    level: "N5", category: "daily",
+    keyPhrases: [
+      { jp: "一緒に〜ませんか", reading: "いっしょに〜ませんか", ko: "같이 ~하지 않을래요?" },
+      { jp: "何時に会いますか", reading: "なんじにあいますか", ko: "몇 시에 만날까요?" },
+      { jp: "また後で", reading: "またあとで", ko: "이따 봐요" },
+    ],
+    cultureTip: "일본에선 약속 시간 엄수가 중요해요. 늦으면 미리 연락이 예의예요.",
     lines: [
       { speaker: "A", tokens: [{ t: "週末", r: "しゅうまつ" }, { t: "、" }, { t: "一緒", r: "いっしょ" }, { t: "に" }, { t: "映画", r: "えいが" }, { t: "を" }, { t: "見", r: "み" }, { t: "ませんか。" }], ko: "주말에 같이 영화 보지 않을래요?" },
       { speaker: "B", tokens: [{ t: "いいですね。" }, { t: "何時", r: "なんじ" }, { t: "に" }, { t: "会", r: "あ" }, { t: "いますか。" }], ko: "좋아요. 몇 시에 만날까요?" },
@@ -64,6 +116,13 @@ export const CONVERSATIONS: Conversation[] = [
   },
   {
     id: "c7", title: "병원·몸 상태", situation: "몸이 안 좋을 때 표현해요.", emoji: "🏥",
+    level: "N5", category: "medical",
+    keyPhrases: [
+      { jp: "どうしましたか", reading: "どうしましたか", ko: "어디가 안 좋으세요?" },
+      { jp: "〜が痛いです", reading: "〜がいたいです", ko: "~가 아파요" },
+      { jp: "お大事に", reading: "おだいじに", ko: "몸조리하세요" },
+    ],
+    cultureTip: "「お大事に」는 아픈 사람에게 건네는 ‘몸조리하세요’ 인사예요.",
     lines: [
       { speaker: "의사", tokens: [{ t: "どうしましたか。" }], ko: "어디가 안 좋으세요?" },
       { speaker: "나", tokens: [{ t: "頭", r: "あたま" }, { t: "が" }, { t: "痛", r: "いた" }, { t: "いです。" }], ko: "머리가 아파요." },
@@ -74,12 +133,166 @@ export const CONVERSATIONS: Conversation[] = [
   },
   {
     id: "c8", title: "전화 통화", situation: "친구에게 전화를 걸어요.", emoji: "📞",
+    level: "N5", category: "daily",
+    keyPhrases: [
+      { jp: "もしもし", reading: "もしもし", ko: "여보세요" },
+      { jp: "今、話してもいいですか", reading: "いま、はなしてもいいですか", ko: "지금 통화 괜찮아요?" },
+      { jp: "〜んですが", reading: "〜んですが", ko: "~인데요 (부드러운 운)" },
+    ],
+    cultureTip: "전화는 「もしもし」로 시작하고, 용건은 부드럽게 「〜んですが」로 꺼내요.",
     lines: [
       { speaker: "나", tokens: [{ t: "もしもし、キムですが。" }], ko: "여보세요, 김인데요." },
       { speaker: "친구", tokens: [{ t: "あ、キムさん。どうしましたか。" }], ko: "아, 김 씨. 무슨 일이에요?" },
       { speaker: "나", tokens: [{ t: "今", r: "いま" }, { t: "、" }, { t: "話", r: "はな" }, { t: "してもいいですか。" }], ko: "지금 통화 괜찮아요?" },
       { speaker: "친구", tokens: [{ t: "はい、" }, { t: "大丈夫", r: "だいじょうぶ" }, { t: "ですよ。" }], ko: "네, 괜찮아요." },
       { speaker: "나", tokens: [{ t: "明日", r: "あした" }, { t: "の" }, { t: "予定", r: "よてい" }, { t: "を" }, { t: "聞", r: "き" }, { t: "きたいんですが。" }], ko: "내일 일정을 묻고 싶은데요." },
+    ],
+  },
+
+  // ───── 신규 시나리오 (Batch 1) ─────
+  {
+    id: "c9", title: "편의점 계산", situation: "편의점에서 계산해요.", emoji: "🏪",
+    level: "N5", category: "shopping",
+    keyPhrases: [
+      { jp: "温めますか", reading: "あたためますか", ko: "데워 드릴까요?" },
+      { jp: "袋はご利用ですか", reading: "ふくろはごりようですか", ko: "봉투 필요하세요?" },
+      { jp: "〜になります", reading: "〜になります", ko: "~입니다 (금액 안내)" },
+    ],
+    cultureTip: "일본은 비닐봉투(レジ袋)가 유료예요. 필요 없으면 「大丈夫です」.",
+    lines: [
+      { speaker: "점원", tokens: [{ t: "いらっしゃいませ。" }], ko: "어서 오세요." },
+      { speaker: "나", tokens: [{ t: "これ、お" }, { t: "願", r: "ねが" }, { t: "いします。" }], ko: "이거 주세요." },
+      { speaker: "점원", tokens: [{ t: "お" }, { t: "弁当", r: "べんとう" }, { t: "、" }, { t: "温", r: "あたた" }, { t: "めますか。" }], ko: "도시락 데워 드릴까요?" },
+      { speaker: "나", tokens: [{ t: "はい、お" }, { t: "願", r: "ねが" }, { t: "いします。" }], ko: "네, 부탁드려요." },
+      { speaker: "점원", tokens: [{ t: "袋", r: "ふくろ" }, { t: "はご" }, { t: "利用", r: "りよう" }, { t: "ですか。" }], ko: "봉투 필요하세요?" },
+      { speaker: "나", tokens: [{ t: "いいえ、" }, { t: "大丈夫", r: "だいじょうぶ" }, { t: "です。" }], ko: "아니요, 괜찮아요." },
+      { speaker: "점원", tokens: [{ t: "五百", r: "ごひゃく" }, { t: "円", r: "えん" }, { t: "になります。" }], ko: "500엔입니다." },
+    ],
+  },
+  {
+    id: "c10", title: "택시 타기", situation: "택시로 목적지까지 가요.", emoji: "🚕",
+    level: "N5", category: "transport",
+    keyPhrases: [
+      { jp: "〜までお願いします", reading: "〜までおねがいします", ko: "~까지 가주세요" },
+      { jp: "どのくらいかかりますか", reading: "どのくらいかかりますか", ko: "얼마나 걸려요?" },
+      { jp: "ここで止めてください", reading: "ここでとめてください", ko: "여기서 세워 주세요" },
+    ],
+    cultureTip: "일본 택시는 뒷문이 자동으로 열려요. 직접 열지 않아도 돼요.",
+    lines: [
+      { speaker: "나", tokens: [{ t: "東京駅", r: "とうきょうえき" }, { t: "までお" }, { t: "願", r: "ねが" }, { t: "いします。" }], ko: "도쿄역까지 가주세요." },
+      { speaker: "기사", tokens: [{ t: "はい、わかりました。" }], ko: "네, 알겠습니다." },
+      { speaker: "나", tokens: [{ t: "どのくらいかかりますか。" }], ko: "얼마나 걸려요?" },
+      { speaker: "기사", tokens: [{ t: "二十分", r: "にじゅっぷん" }, { t: "ぐらいです。" }], ko: "20분 정도예요." },
+      { speaker: "나", tokens: [{ t: "ここで" }, { t: "止", r: "と" }, { t: "めてください。" }], ko: "여기서 세워 주세요." },
+      { speaker: "기사", tokens: [{ t: "千", r: "せん" }, { t: "二百", r: "にひゃく" }, { t: "円", r: "えん" }, { t: "です。" }], ko: "1,200엔입니다." },
+    ],
+  },
+  {
+    id: "c11", title: "호텔 체크인", situation: "호텔에서 체크인해요.", emoji: "🏨",
+    level: "N4", category: "service",
+    keyPhrases: [
+      { jp: "予約しました", reading: "よやくしました", ko: "예약했습니다" },
+      { jp: "〜は何時からですか", reading: "〜はなんじからですか", ko: "~는 몇 시부터예요?" },
+      { jp: "ごゆっくりどうぞ", reading: "ごゆっくりどうぞ", ko: "편히 쉬세요" },
+    ],
+    cultureTip: "체크인 시 외국인은 여권(パスポート) 제시가 필요해요.",
+    lines: [
+      { speaker: "직원", tokens: [{ t: "いらっしゃいませ。ご" }, { t: "予約", r: "よやく" }, { t: "のお" }, { t: "名前", r: "なまえ" }, { t: "は。" }], ko: "어서 오세요. 예약하신 성함은요?" },
+      { speaker: "나", tokens: [{ t: "キムで" }, { t: "予約", r: "よやく" }, { t: "しました。" }], ko: "김으로 예약했습니다." },
+      { speaker: "직원", tokens: [{ t: "確認", r: "かくにん" }, { t: "いたします。" }, { t: "少々", r: "しょうしょう" }, { t: "お" }, { t: "待", r: "ま" }, { t: "ちください。" }], ko: "확인하겠습니다. 잠시만 기다려 주세요." },
+      { speaker: "직원", tokens: [{ t: "お" }, { t: "部屋", r: "へや" }, { t: "は" }, { t: "七階", r: "ななかい" }, { t: "です。" }], ko: "방은 7층입니다." },
+      { speaker: "나", tokens: [{ t: "朝食", r: "ちょうしょく" }, { t: "は" }, { t: "何時", r: "なんじ" }, { t: "からですか。" }], ko: "조식은 몇 시부터예요?" },
+      { speaker: "직원", tokens: [{ t: "七時", r: "しちじ" }, { t: "からです。ごゆっくりどうぞ。" }], ko: "7시부터입니다. 편히 쉬세요." },
+    ],
+  },
+  {
+    id: "c12", title: "약국에서", situation: "약국에서 증상을 말하고 약을 사요.", emoji: "💊",
+    level: "N4", category: "medical",
+    keyPhrases: [
+      { jp: "風邪を引いたみたいです", reading: "かぜをひいたみたいです", ko: "감기에 걸린 것 같아요" },
+      { jp: "熱と咳があります", reading: "ねつとせきがあります", ko: "열과 기침이 있어요" },
+      { jp: "一日三回飲んでください", reading: "いちにちさんかいのんでください", ko: "하루 세 번 드세요" },
+    ],
+    cultureTip: "약은 보통 식후(食後)에 복용해요. 복용법을 꼭 확인하세요.",
+    lines: [
+      { speaker: "약사", tokens: [{ t: "どうされましたか。" }], ko: "어디가 안 좋으세요?" },
+      { speaker: "나", tokens: [{ t: "風邪", r: "かぜ" }, { t: "を" }, { t: "引", r: "ひ" }, { t: "いたみたいです。" }], ko: "감기에 걸린 것 같아요." },
+      { speaker: "약사", tokens: [{ t: "熱", r: "ねつ" }, { t: "はありますか。" }], ko: "열은 있으세요?" },
+      { speaker: "나", tokens: [{ t: "少", r: "すこ" }, { t: "し" }, { t: "熱", r: "ねつ" }, { t: "と" }, { t: "咳", r: "せき" }, { t: "があります。" }], ko: "조금 열과 기침이 있어요." },
+      { speaker: "약사", tokens: [{ t: "この" }, { t: "薬", r: "くすり" }, { t: "を" }, { t: "一日", r: "いちにち" }, { t: "三回", r: "さんかい" }, { t: "飲", r: "の" }, { t: "んでください。" }], ko: "이 약을 하루 세 번 드세요." },
+      { speaker: "나", tokens: [{ t: "わかりました。ありがとうございます。" }], ko: "알겠습니다. 감사합니다." },
+    ],
+  },
+  {
+    id: "c13", title: "미용실에서", situation: "미용실에서 머리를 잘라요.", emoji: "💇",
+    level: "N4", category: "service",
+    keyPhrases: [
+      { jp: "短くしてください", reading: "みじかくしてください", ko: "짧게 해주세요" },
+      { jp: "そのままでお願いします", reading: "そのままでおねがいします", ko: "그대로 해주세요" },
+      { jp: "どうなさいますか", reading: "どうなさいますか", ko: "어떻게 하시겠어요?" },
+    ],
+    cultureTip: "「なさいます」는 する의 존경어예요. 미용실·접객에서 자주 들려요.",
+    lines: [
+      { speaker: "미용사", tokens: [{ t: "今日", r: "きょう" }, { t: "はどうなさいますか。" }], ko: "오늘은 어떻게 하시겠어요?" },
+      { speaker: "나", tokens: [{ t: "少", r: "すこ" }, { t: "し" }, { t: "短", r: "みじか" }, { t: "くしてください。" }], ko: "조금 짧게 해주세요." },
+      { speaker: "미용사", tokens: [{ t: "前髪", r: "まえがみ" }, { t: "はどうしますか。" }], ko: "앞머리는 어떻게 할까요?" },
+      { speaker: "나", tokens: [{ t: "前髪", r: "まえがみ" }, { t: "はそのままでお" }, { t: "願", r: "ねが" }, { t: "いします。" }], ko: "앞머리는 그대로 해주세요." },
+      { speaker: "미용사", tokens: [{ t: "シャンプーもなさいますか。" }], ko: "샴푸도 하시겠어요?" },
+      { speaker: "나", tokens: [{ t: "はい、お" }, { t: "願", r: "ねが" }, { t: "いします。" }], ko: "네, 부탁드려요." },
+    ],
+  },
+  {
+    id: "c14", title: "식당 예약 (전화)", situation: "전화로 식당을 예약해요.", emoji: "📲",
+    level: "N4", category: "food",
+    keyPhrases: [
+      { jp: "予約をお願いしたいんですが", reading: "よやくをおねがいしたいんですが", ko: "예약하고 싶은데요" },
+      { jp: "何名様ですか", reading: "なんめいさまですか", ko: "몇 분이세요?" },
+      { jp: "何時がよろしいですか", reading: "なんじがよろしいですか", ko: "몇 시가 괜찮으세요?" },
+    ],
+    cultureTip: "「何名様(なんめいさま)」는 손님 인원수를 묻는 정중한 표현이에요.",
+    lines: [
+      { speaker: "점원", tokens: [{ t: "はい、さくらレストランです。" }], ko: "네, 사쿠라 레스토랑입니다." },
+      { speaker: "나", tokens: [{ t: "予約", r: "よやく" }, { t: "をお" }, { t: "願", r: "ねが" }, { t: "いしたいんですが。" }], ko: "예약하고 싶은데요." },
+      { speaker: "점원", tokens: [{ t: "何名様", r: "なんめいさま" }, { t: "ですか。" }], ko: "몇 분이세요?" },
+      { speaker: "나", tokens: [{ t: "大人", r: "おとな" }, { t: "二人", r: "ふたり" }, { t: "です。" }], ko: "어른 두 명이요." },
+      { speaker: "점원", tokens: [{ t: "何時", r: "なんじ" }, { t: "がよろしいですか。" }], ko: "몇 시가 괜찮으세요?" },
+      { speaker: "나", tokens: [{ t: "七時", r: "しちじ" }, { t: "にお" }, { t: "願", r: "ねが" }, { t: "いします。" }], ko: "7시로 부탁드려요." },
+      { speaker: "점원", tokens: [{ t: "かしこまりました。" }], ko: "알겠습니다." },
+    ],
+  },
+  {
+    id: "c15", title: "환불·교환", situation: "산 물건을 교환하거나 환불해요.", emoji: "🔁",
+    level: "N4", category: "shopping",
+    keyPhrases: [
+      { jp: "返品したいんですが", reading: "へんぴんしたいんですが", ko: "반품하고 싶은데요" },
+      { jp: "レシートはお持ちですか", reading: "レシートはおもちですか", ko: "영수증 있으세요?" },
+      { jp: "交換でお願いします", reading: "こうかんでおねがいします", ko: "교환으로 해주세요" },
+    ],
+    cultureTip: "환불·교환에는 영수증(レシート)이 보통 꼭 필요해요.",
+    lines: [
+      { speaker: "나", tokens: [{ t: "すみません、これを" }, { t: "返品", r: "へんぴん" }, { t: "したいんですが。" }], ko: "실례합니다, 이걸 반품하고 싶은데요." },
+      { speaker: "점원", tokens: [{ t: "レシートはお" }, { t: "持", r: "も" }, { t: "ちですか。" }], ko: "영수증 있으세요?" },
+      { speaker: "나", tokens: [{ t: "はい、あります。" }], ko: "네, 있어요." },
+      { speaker: "점원", tokens: [{ t: "サイズの" }, { t: "交換", r: "こうかん" }, { t: "ですか、" }, { t: "返金", r: "へんきん" }, { t: "ですか。" }], ko: "사이즈 교환이세요, 환불이세요?" },
+      { speaker: "나", tokens: [{ t: "交換", r: "こうかん" }, { t: "でお" }, { t: "願", r: "ねが" }, { t: "いします。" }], ko: "교환으로 해주세요." },
+      { speaker: "점원", tokens: [{ t: "かしこまりました。" }], ko: "알겠습니다." },
+    ],
+  },
+  {
+    id: "c16", title: "날씨·가벼운 잡담", situation: "날씨로 가볍게 대화를 시작해요.", emoji: "🌤️",
+    level: "N5", category: "daily",
+    keyPhrases: [
+      { jp: "いい天気ですね", reading: "いいてんきですね", ko: "날씨 좋네요" },
+      { jp: "〜しようと思っています", reading: "〜しようとおもっています", ko: "~하려고 해요" },
+      { jp: "楽しんでください", reading: "たのしんでください", ko: "즐겁게 보내세요" },
+    ],
+    cultureTip: "날씨 이야기는 어색함을 푸는 가장 무난한 시작 주제예요.",
+    lines: [
+      { speaker: "A", tokens: [{ t: "今日", r: "きょう" }, { t: "はいい" }, { t: "天気", r: "てんき" }, { t: "ですね。" }], ko: "오늘은 날씨가 좋네요." },
+      { speaker: "B", tokens: [{ t: "そうですね。" }, { t: "暖", r: "あたた" }, { t: "かいです。" }], ko: "그러게요. 따뜻해요." },
+      { speaker: "A", tokens: [{ t: "週末", r: "しゅうまつ" }, { t: "はどこか" }, { t: "行", r: "い" }, { t: "きますか。" }], ko: "주말엔 어디 가세요?" },
+      { speaker: "B", tokens: [{ t: "公園", r: "こうえん" }, { t: "で" }, { t: "散歩", r: "さんぽ" }, { t: "しようと" }, { t: "思", r: "おも" }, { t: "っています。" }], ko: "공원에서 산책하려고 해요." },
+      { speaker: "A", tokens: [{ t: "いいですね。" }, { t: "楽", r: "たの" }, { t: "しんでください。" }], ko: "좋네요. 즐겁게 보내세요." },
     ],
   },
 ];

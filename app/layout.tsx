@@ -1,44 +1,50 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import ServiceWorker from "@/components/jp/ServiceWorker";
+import { Toaster } from "@/lib/ui/toast";
 
 export const metadata: Metadata = {
-  title: "일본어 회화 — JLPT N5 단어·생활 회화 학습",
-  description:
-    "JLPT N5 단어와 생활 회화, 필수 동사를 카드와 음성(TTS)으로 학습하는 일본어 공부 웹앱.",
+  title: "LinguaFlow — 일본어 · 영어 학습",
+  description: "SM-2 알고리즘 기반 일본어·영어 어휘·문법·회화를 체계적으로 학습하는 상업 수준 언어 앱.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "일본어 N5",
+    title: "LinguaFlow",
   },
 };
 
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  viewportFit: "cover" as const,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f5f6f8" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b1120" },
+    { media: "(prefers-color-scheme: light)", color: "#F8F9FB" },
+    { media: "(prefers-color-scheme: dark)", color: "#0F0F1A" },
   ],
 };
 
-// 다크 모드 깜빡임(FOUC) 방지: 페인트 전에 테마 클래스 적용
-const themeInit = `(function(){try{var t=localStorage.getItem('jp-app-theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
+const themeInit = `(function(){try{var t=localStorage.getItem('app-theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');var s=localStorage.getItem('app-text-scale');if(s)document.documentElement.style.fontSize=(s==='sm'?'15px':s==='lg'?'18px':'16px');}catch(e){}})();`;
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+        {/* Pretendard 동적 서브셋 — 차단 시 시스템 폰트로 우아하게 폴백 */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
       </head>
-      <body className="min-h-screen text-slate-800 antialiased">
+      <body className="min-h-screen antialiased" style={{ background: "var(--bg)", color: "var(--text-1)" }}>
         {children}
+        <Toaster />
         <ServiceWorker />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

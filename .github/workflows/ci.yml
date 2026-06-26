@@ -1,0 +1,41 @@
+name: CI
+
+# main 으로의 push 와 모든 PR 에서 타입체크 + 빌드를 강제해
+# 회귀가 프로덕션(배포)에 직행하는 것을 막는다.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# 같은 ref 의 이전 실행은 취소 (중복 빌드 절약)
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Type-check & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+        env:
+          # 빌드 자체는 키 없이 통과(정적). 런타임 전용 값은 Vercel 에서 주입.
+          NEXT_TELEMETRY_DISABLED: "1"

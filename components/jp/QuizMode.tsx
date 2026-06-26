@@ -5,15 +5,10 @@ import type { Word, Category } from "@/lib/jp/types";
 import type { Grade } from "@/lib/jp/progress";
 import { VOCAB } from "@/lib/jp/vocab";
 import SpeakerButton from "./SpeakerButton";
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+import { Button, Progress } from "@/components/ui";
+import { shuffle } from "@/lib/learn/shuffle";
+import { track } from "@/lib/analytics";
+import { useUiLang, tt } from "@/lib/i18n";
 
 interface Q {
   word: Word;
@@ -49,6 +44,7 @@ export default function QuizMode({
   onExit: () => void;
   onReview: () => void;
 }) {
+  const lang = useUiLang();
   const [pool, setPool] = useState<Word[]>(words);
   const questions = useMemo(() => buildQuestions(pool), [pool]);
 
@@ -70,8 +66,10 @@ export default function QuizMode({
   }
 
   function next() {
-    if (qi + 1 >= questions.length) setFinished(true);
-    else {
+    if (qi + 1 >= questions.length) {
+      track("quiz_finish", { lang: "jp", category: category.key, score: correct, total: questions.length });
+      setFinished(true);
+    } else {
       setQi((i) => i + 1);
       setPicked(null);
     }
@@ -81,16 +79,18 @@ export default function QuizMode({
     const score = Math.round((correct / questions.length) * 100);
     return (
       <div className="flex flex-col items-center justify-center gap-4 px-6 py-16 text-center">
-        <div className="text-6xl">{score >= 80 ? "🏆" : score >= 50 ? "👍" : "💪"}</div>
-        <h2 className="text-2xl font-bold text-slate-900">퀴즈 결과</h2>
+        <div className="animate-reward text-6xl">{score >= 80 ? "🏆" : score >= 50 ? "👍" : "💪"}</div>
+        <h2 className="text-2xl font-bold text-slate-900">{tt(lang, "퀴즈 결과", "クイズ結果")}</h2>
         <p className="text-5xl font-extrabold text-slate-900">
           {correct}
           <span className="text-2xl font-medium text-slate-400"> / {questions.length}</span>
         </p>
-        <p className="text-slate-500">정답률 {score}%</p>
+        <p className="text-slate-500">{tt(lang, `정답률 ${score}%`, `正答率 ${score}%`)}</p>
         <div className="mt-2 grid w-full max-w-xs gap-2.5">
           {wrong.length > 0 && (
-            <button
+            <Button
+              variant="destructive"
+              size="free"
               onClick={() => {
                 setPool(wrong);
                 setQi(0);
@@ -99,16 +99,16 @@ export default function QuizMode({
                 setWrong([]);
                 setFinished(false);
               }}
-              className="btn btn-rose py-3.5"
+              className="py-3.5"
             >
-              오답 {wrong.length}개 다시 풀기
-            </button>
+              {tt(lang, `오답 ${wrong.length}개 다시 풀기`, `不正解 ${wrong.length}個を再挑戦`)}
+            </Button>
           )}
-          <button onClick={onReview} className="btn btn-outline py-3.5">
-            🔁 복습 카드
-          </button>
+          <Button variant="surface" size="free" onClick={onReview} className="py-3.5">
+            {tt(lang, "🔁 복습 카드", "🔁 復習カード")}
+          </Button>
           <button onClick={onExit} className="rounded-2xl py-2 text-sm font-semibold text-slate-400">
-            홈으로
+            {tt(lang, "홈으로", "ホームへ")}
           </button>
         </div>
       </div>
@@ -118,8 +118,8 @@ export default function QuizMode({
   if (!q) {
     return (
       <div className="px-6 py-20 text-center text-slate-400">
-        퀴즈를 만들 단어가 부족해요.
-        <button onClick={onExit} className="mt-4 block w-full rounded-2xl bg-slate-900 py-3 font-bold text-white">홈으로</button>
+        {tt(lang, "퀴즈를 만들 단어가 부족해요.", "クイズを作るには単語が足りません。")}
+        <Button variant="brand" size="free" onClick={onExit} className="mt-4 w-full py-3">{tt(lang, "홈으로", "ホームへ")}</Button>
       </div>
     );
   }
@@ -127,11 +127,11 @@ export default function QuizMode({
   return (
     <div className="flex min-h-[calc(100vh-4rem)] flex-col">
       <div className="flex items-center px-4 pb-2 pt-2">
-        <button onClick={onExit} aria-label="뒤로" className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100">
+        <button onClick={onExit} aria-label={tt(lang, "뒤로", "戻る")} className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100">
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
         </button>
         <div className="mx-auto flex items-center gap-2">
-          <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-bold text-white">📝 퀴즈</span>
+          <span className="rounded-full px-3 py-1 text-xs font-bold text-white" style={{ background: "linear-gradient(135deg,#E63946,#c0392b)" }}>{tt(lang, "📝 퀴즈", "📝 クイズ")}</span>
           <span className="rounded-full bg-white px-2.5 py-1 text-sm font-bold text-slate-500 shadow-sm">
             {qi + 1} / {questions.length}
           </span>
@@ -140,17 +140,15 @@ export default function QuizMode({
       </div>
 
       <div className="px-5 pb-4">
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200/70">
-          <div className="h-full rounded-full bg-slate-900 transition-all" style={{ width: `${(qi / questions.length) * 100}%` }} />
-        </div>
+        <Progress value={(qi / questions.length) * 100} indicatorStyle={{ background: "linear-gradient(90deg,#E63946,#F4A261)" }} />
       </div>
 
       {/* 문제 */}
       <div className="px-4">
         <div className="flex flex-col items-center gap-3 rounded-3xl bg-white p-8 shadow-lg ring-1 ring-black/5">
-          <span className="text-xs font-semibold text-slate-400">알맞은 뜻을 고르세요</span>
+          <span className="text-xs font-semibold text-slate-400">{tt(lang, "알맞은 뜻을 고르세요", "正しい意味を選んでください")}</span>
           <div className="flex items-center gap-2">
-            <h2 className="text-4xl font-extrabold text-amber-500">{q.word.word}</h2>
+            <h2 className="text-4xl font-extrabold" style={{ color: "#E63946" }}>{q.word.word}</h2>
             <SpeakerButton text={q.word.reading} size={40} />
           </div>
           <p className="text-sm text-slate-400">[{q.word.reading}]</p>
@@ -185,9 +183,9 @@ export default function QuizMode({
 
       {/* 다음 */}
       <div className="sticky bottom-16 z-10 mt-auto bg-gradient-to-t from-[#f5f6f8] via-[#f5f6f8] to-transparent px-4 pb-4 pt-6">
-        <button onClick={next} disabled={!picked} className="btn btn-primary w-full py-4">
-          {qi + 1 >= questions.length ? "결과 보기" : "다음"}
-        </button>
+        <Button variant="brand" size="free" onClick={next} disabled={!picked} className="w-full py-4">
+          {qi + 1 >= questions.length ? tt(lang, "결과 보기", "結果を見る") : tt(lang, "다음", "次へ")}
+        </Button>
       </div>
     </div>
   );

@@ -2,13 +2,13 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "일본어 회화 — JLPT N5",
-    short_name: "일본어 N5",
-    description: "JLPT N5 단어·생활 회화·필수 동사를 카드와 음성으로 학습하는 일본어 공부 앱",
+    name: "LinguaFlow",
+    short_name: "LinguaFlow",
+    description: "일본어 · 영어 SM-2 언어 학습 앱",
     start_url: "/",
     display: "standalone",
-    background_color: "#f5f6f8",
-    theme_color: "#f5f6f8",
+    background_color: "#0F0F1A",
+    theme_color: "#0F0F1A",
     lang: "ko",
     orientation: "portrait",
     icons: [

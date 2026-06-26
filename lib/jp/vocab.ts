@@ -1,21 +1,26 @@
 import type { Word, Category } from "./types";
 import { EXTRAS } from "./extras";
 import { EXTRA_VOCAB } from "./vocab-extra";
+import { VOCAB_B1 } from "./vocab-b1";
+import { VOCAB_B2 } from "./vocab-b2";
+import { VOCAB_B3 } from "./vocab-b3";
+import { VOCAB_B4 } from "./vocab-b4";
+import { VOCAB_B5 } from "./vocab-b5";
 
 export const VOCAB_CATEGORIES: Category[] = [
-  { key: "greeting", label: "인사·표현", emoji: "👋" },
-  { key: "people", label: "사람·가족", emoji: "👨‍👩‍👧" },
-  { key: "number", label: "숫자·수량", emoji: "🔢" },
-  { key: "time", label: "시간·날짜", emoji: "🕒" },
-  { key: "food", label: "음식·식사", emoji: "🍙" },
-  { key: "place", label: "장소·교통", emoji: "🚉" },
-  { key: "adjective", label: "형용사", emoji: "✨" },
-  { key: "daily", label: "생활·사물", emoji: "🏠" },
-  { key: "nature", label: "자연·날씨", emoji: "🌿" },
-  { key: "body", label: "신체·건강", emoji: "🩺" },
-  { key: "hobby", label: "취미·활동", emoji: "🎵" },
-  { key: "color", label: "색·모양", emoji: "🎨" },
-  { key: "adverb", label: "부사·기타", emoji: "💬" },
+  { key: "greeting", label: "인사·표현", labelJa: "あいさつ・表現", emoji: "👋" },
+  { key: "people", label: "사람·가족", labelJa: "人・家族", emoji: "👨‍👩‍👧" },
+  { key: "number", label: "숫자·수량", labelJa: "数・数量", emoji: "🔢" },
+  { key: "time", label: "시간·날짜", labelJa: "時間・日付", emoji: "🕒" },
+  { key: "food", label: "음식·식사", labelJa: "食べ物・食事", emoji: "🍙" },
+  { key: "place", label: "장소·교통", labelJa: "場所・交通", emoji: "🚉" },
+  { key: "adjective", label: "형용사", labelJa: "形容詞", emoji: "✨" },
+  { key: "daily", label: "생활·사물", labelJa: "生活・物", emoji: "🏠" },
+  { key: "nature", label: "자연·날씨", labelJa: "自然・天気", emoji: "🌿" },
+  { key: "body", label: "신체·건강", labelJa: "体・健康", emoji: "🩺" },
+  { key: "hobby", label: "취미·활동", labelJa: "趣味・活動", emoji: "🎵" },
+  { key: "color", label: "색·모양", labelJa: "色・形", emoji: "🎨" },
+  { key: "adverb", label: "부사·기타", labelJa: "副詞・その他", emoji: "💬" },
 ];
 
 const RAW_VOCAB: Word[] = [
@@ -428,7 +433,19 @@ function highlightExample(w: Word): Word {
   return { ...w, example: { ...w.example, tokens } };
 }
 
-// 본 데이터 + 확장 데이터에 유사어·팁(extras)·레벨 기본값(N5)·예문 강조를 병합한다.
-export const VOCAB: Word[] = [...RAW_VOCAB, ...EXTRA_VOCAB].map((w) =>
-  highlightExample({ level: "N5", ...w, ...EXTRAS[w.id] }),
-);
+// 표제어(word) 기준 중복 제거 — 먼저 등장한 항목을 유지한다.
+function dedupeByWord(list: Word[]): Word[] {
+  const seen = new Set<string>();
+  return list.filter((w) => (seen.has(w.word) ? false : (seen.add(w.word), true)));
+}
+
+// 본 데이터 + 확장 배치(B1~B5)에 유사어·팁(extras)·레벨 기본값(N5)·예문 강조를 병합한다.
+export const VOCAB: Word[] = dedupeByWord([
+  ...RAW_VOCAB,
+  ...EXTRA_VOCAB,
+  ...VOCAB_B1,
+  ...VOCAB_B2,
+  ...VOCAB_B3,
+  ...VOCAB_B4,
+  ...VOCAB_B5,
+]).map((w) => highlightExample({ level: "N5", ...w, ...EXTRAS[w.id] }));

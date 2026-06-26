@@ -1,11 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { CONVERSATIONS } from "@/lib/jp/conversations";
-import type { Conversation } from "@/lib/jp/types";
+import { useEffect, useMemo, useState } from "react";
+import { CONVERSATIONS, CONVERSATION_CATEGORIES } from "@/lib/jp/conversations";
+import type { Conversation, ConversationCategory } from "@/lib/jp/types";
 import Furigana, { tokensToText } from "./Furigana";
 import SpeakerButton from "./SpeakerButton";
 import { speakJa } from "@/lib/jp/speech";
+import { Button } from "@/components/ui";
+import { track } from "@/lib/analytics";
+import { bumpActivity } from "@/lib/daily-activity";
+import { useUiLang, tt } from "@/lib/i18n";
+
+const ACCENT = "linear-gradient(135deg,#E63946,#F4A261)";
 
 export default function ConversationView({
   showFurigana,
@@ -14,68 +20,96 @@ export default function ConversationView({
   showFurigana: boolean;
   onToggleFurigana: () => void;
 }) {
+  const lang = useUiLang();
   const [active, setActive] = useState<Conversation | null>(null);
   const [showKo, setShowKo] = useState(true);
+  const [cat, setCat] = useState<ConversationCategory | "all">("all");
+  const [read, setRead] = useState<string[]>([]);
 
+  useEffect(() => {
+    try { setRead(JSON.parse(localStorage.getItem("jp-conv-read") || "[]")); } catch { /* ignore */ }
+  }, []);
+  function markRead(id: string) {
+    setRead((prev) => {
+      if (prev.includes(id)) return prev;
+      const next = [...prev, id];
+      try { localStorage.setItem("jp-conv-read", JSON.stringify(next)); } catch { /* ignore */ }
+      bumpActivity("jp", "conversation");
+      return next;
+    });
+  }
+
+  // 실제 데이터에 존재하는 카테고리만 노출
+  const cats = useMemo(
+    () => CONVERSATION_CATEGORIES.filter((c) => CONVERSATIONS.some((v) => v.category === c.key)),
+    [],
+  );
+  const list = useMemo(
+    () => (cat === "all" ? CONVERSATIONS : CONVERSATIONS.filter((c) => c.category === cat)),
+    [cat],
+  );
+
+  function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
+    return (
+      <button
+        onClick={onClick}
+        className="shrink-0 rounded-full px-3 py-1.5 text-xs font-bold transition active:scale-95"
+        style={on ? { background: "#E63946", color: "#fff" } : { background: "var(--surface)", color: "var(--text-3)" }}
+      >
+        {children}
+      </button>
+    );
+  }
+
+  // ───── 상세 ─────
   if (active) {
     return (
-      <div className="px-4 pb-24 pt-2">
+      <div className="px-4 pb-28 pt-2">
         <div className="mb-4 flex items-center gap-3">
           <button
             onClick={() => setActive(null)}
-            aria-label="뒤로"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100"
+            aria-label={tt(lang, "뒤로", "戻る")}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+            style={{ background: "var(--surface)", color: "var(--text-2)" }}
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
           </button>
           <div className="min-w-0 flex-1">
-            <h2 className="truncate text-lg font-bold text-slate-900">
+            <h2 className="truncate text-lg font-bold" style={{ color: "var(--text-1)" }}>
               {active.emoji} {active.title}
             </h2>
-            <p className="truncate text-xs text-slate-400">{active.situation}</p>
+            <p className="truncate text-xs" style={{ color: "var(--text-3)" }}>{active.situation}</p>
           </div>
-          <button
-            onClick={() => setShowKo((s) => !s)}
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${showKo ? "bg-slate-900 text-white" : "border border-slate-300 bg-white text-slate-500"}`}
-          >
-            한글
-          </button>
-          <button
-            onClick={onToggleFurigana}
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${showFurigana ? "bg-slate-900 text-white" : "border border-slate-300 bg-white text-slate-500"}`}
-          >
-            ふり
-          </button>
+          <Chip on={showKo} onClick={() => setShowKo((s) => !s)}>{tt(lang, "한글", "韓国語")}</Chip>
+          <Chip on={showFurigana} onClick={onToggleFurigana}>ふり</Chip>
         </div>
 
-        {/* 전체 듣기 */}
-        <button
-          onClick={() =>
-            speakJa(active.lines.map((l) => tokensToText(l.tokens)).join(" 。 "))
-          }
-          className="btn btn-primary mb-4 w-full py-3"
+        <Button
+          variant="brand"
+          size="free"
+          onClick={() => speakJa(active.lines.map((l) => tokensToText(l.tokens)).join(" 。 "))}
+          className="mb-4 w-full py-3"
         >
-          ▶ 대화 전체 듣기
-        </button>
+          {tt(lang, "▶ 대화 전체 듣기", "▶ 会話を通して聞く")}
+        </Button>
 
+        {/* 대화 */}
         <div className="space-y-3">
           {active.lines.map((line, i) => {
             const mine = i % 2 === 1;
             return (
-              <div
-                key={i}
-                className={`flex ${mine ? "justify-end" : "justify-start"}`}
-              >
-                <div className={`max-w-[85%] ${mine ? "items-end" : "items-start"}`}>
-                  <span className="mb-1 block px-1 text-xs text-slate-400">
+              <div key={i} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                <div className="max-w-[85%]">
+                  <span className="mb-1 block px-1 text-xs" style={{ color: "var(--text-3)" }}>
                     {line.speaker}
                   </span>
                   <div
-                    className={`rounded-3xl px-4 py-3 shadow-sm ${
+                    className="rounded-3xl px-4 py-3"
+                    style={
                       mine
-                        ? "rounded-br-md bg-slate-900 text-white"
-                        : "rounded-bl-md bg-white text-slate-800"
-                    }`}
+                        ? { background: ACCENT, color: "#fff", borderBottomRightRadius: 8 }
+                        : { background: "var(--card)", color: "var(--text-1)", border: "1px solid var(--border)", borderBottomLeftRadius: 8 }
+                    }
                   >
                     <div className="flex items-start gap-2">
                       <p className="text-lg leading-relaxed">
@@ -84,13 +118,11 @@ export default function ConversationView({
                       <SpeakerButton
                         text={tokensToText(line.tokens)}
                         size={30}
-                        className={mine ? "border-white/30 bg-white/15 text-white" : ""}
+                        className={mine ? "border-white/30 bg-white/20 text-white" : ""}
                       />
                     </div>
                     {showKo && (
-                      <p
-                        className={`mt-1.5 text-sm ${mine ? "text-white/70" : "text-slate-500"}`}
-                      >
+                      <p className="mt-1.5 text-sm" style={{ color: mine ? "rgba(255,255,255,.8)" : "var(--text-3)" }}>
                         {line.ko}
                       </p>
                     )}
@@ -100,36 +132,94 @@ export default function ConversationView({
             );
           })}
         </div>
+
+        {/* 오늘의 핵심 표현 */}
+        {active.keyPhrases && active.keyPhrases.length > 0 && (
+          <div className="mt-6">
+            <p className="mb-2 px-1 text-sm font-extrabold" style={{ color: "var(--text-1)" }}>
+              {tt(lang, "✏️ 오늘의 표현", "✏️ 今日の表現")}
+            </p>
+            <div className="space-y-2">
+              {active.keyPhrases.map((p, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 rounded-2xl p-3"
+                  style={{ background: "var(--card)", border: "1px solid var(--border)" }}
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold" style={{ color: "var(--text-1)" }}>{p.jp}</p>
+                    <p className="text-xs" style={{ color: "var(--text-3)" }}>{p.ko}</p>
+                  </div>
+                  <SpeakerButton text={p.reading} size={32} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 문화 팁 */}
+        {active.cultureTip && (
+          <div className="mt-4 rounded-2xl p-4" style={{ background: "#E6394612" }}>
+            <p className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>
+              💡 {active.cultureTip}
+            </p>
+          </div>
+        )}
       </div>
     );
   }
 
+  // ───── 목록 ─────
   return (
-    <div className="px-4 pb-24 pt-2">
-      <h1 className="mb-1 text-2xl font-bold text-slate-900">생활 회화</h1>
-      <p className="mb-5 text-sm text-slate-400">
-        상황별 필수 회화를 듣고 따라 말해 보세요.
+    <div className="px-4 pb-28 pt-2">
+      <h1 className="mb-1 text-2xl font-extrabold" style={{ color: "var(--text-1)" }}>{tt(lang, "생활 회화", "生活会話")}</h1>
+      <p className="mb-2 text-sm" style={{ color: "var(--text-3)" }}>
+        {tt(lang, "상황별 필수 회화를 듣고 따라 말해 보세요.", "場面別の必須会話を聞いて真似してみましょう。")}
       </p>
+      {read.length > 0 && (
+        <p className="mb-3 inline-block rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "#10B98114", color: "#10B981" }}>
+          {tt(lang, "✓ 읽음", "✓ 既読")} {read.length} / {CONVERSATIONS.length}
+        </p>
+      )}
+
+      {/* 카테고리 필터 */}
+      <div className="no-scrollbar mb-4 flex gap-2 overflow-x-auto pb-1">
+        <Chip on={cat === "all"} onClick={() => setCat("all")}>{tt(lang, "전체", "すべて")}</Chip>
+        {cats.map((c) => (
+          <Chip key={c.key} on={cat === c.key} onClick={() => setCat(c.key)}>
+            {c.emoji} {c.label}
+          </Chip>
+        ))}
+      </div>
+
       <div className="space-y-3">
-        {CONVERSATIONS.map((c) => (
+        {list.map((c) => (
           <button
             key={c.id}
-            onClick={() => {
-              setActive(c);
-              setShowKo(true);
-            }}
-            className="flex w-full items-center gap-4 rounded-2xl bg-white p-4 text-left shadow-sm ring-1 ring-black/5 transition active:scale-[0.98]"
+            onClick={() => { track("conversation_open", { id: c.id, level: c.level ?? "N5" }); markRead(c.id); setActive(c); setShowKo(true); }}
+            className="flex w-full items-center gap-4 rounded-2xl p-4 text-left transition active:scale-[0.98]"
+            style={{ background: "var(--card)", border: "1px solid var(--border)" }}
           >
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-2xl">
+            <span
+              className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-2xl"
+              style={{ background: "var(--surface)" }}
+            >
               {c.emoji}
+              {read.includes(c.id) && <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full text-[11px] font-bold text-white" style={{ background: "#10B981", border: "2px solid var(--card)" }}>✓</span>}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block font-bold text-slate-900">{c.title}</span>
-              <span className="block truncate text-sm text-slate-400">
-                {c.situation}
+              <span className="flex items-center gap-1.5">
+                <span className="truncate font-bold" style={{ color: "var(--text-1)" }}>{c.title}</span>
+                <span
+                  className="shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-extrabold"
+                  style={{ background: "var(--surface)", color: "var(--text-3)" }}
+                >
+                  {c.level ?? "N5"}
+                </span>
               </span>
+              <span className="block truncate text-sm" style={{ color: "var(--text-3)" }}>{c.situation}</span>
             </span>
-            <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0 text-slate-300" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+            <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" style={{ color: "var(--text-3)" }} fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
           </button>
         ))}
       </div>
