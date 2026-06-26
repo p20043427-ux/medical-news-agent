@@ -2,6 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { sm2Core, DEFAULT_EF } from "@/lib/learn/sm2";
+import { todayKey, addDays, bumpDaily, GRADE_Q, GRADE_XP } from "@/lib/learn/schedule";
+import { kv } from "@/lib/platform/kv";
+
+// 외부 컴포넌트가 이 모듈에서 todayKey 를 import 하므로 재export 로 공개 API 유지.
+export { todayKey };
 
 const KEY = "ko-app-progress-v1";
 
@@ -23,21 +28,14 @@ export interface KoProgress {
 }
 
 export type KoGrade = "again" | "hard" | "good" | "easy";
-const GRADE_Q: Record<KoGrade, number> = { again: 0, hard: 3, good: 4, easy: 5 };
-const GRADE_XP: Record<KoGrade, number> = { again: 2, hard: 10, good: 15, easy: 20 };
-
-export function todayKey(d: Date = new Date()): string { return d.toISOString().slice(0, 10); }
-function addDays(n: number): string { const d = new Date(); d.setDate(d.getDate() + n); return todayKey(d); }
 
 const EMPTY: KoProgress = { cards: {}, daily: {}, startedAt: todayKey(), xp: 0, bookmarks: [], mistakes: [] };
 
 function load(): KoProgress {
-  if (typeof window === "undefined") return EMPTY;
-  try { const raw = window.localStorage.getItem(KEY); if (raw) return { ...EMPTY, ...JSON.parse(raw) as KoProgress }; } catch { /* ignore */ }
+  try { const raw = kv.get(KEY); if (raw) return { ...EMPTY, ...JSON.parse(raw) as KoProgress }; } catch { /* ignore */ }
   return EMPTY;
 }
-function save(p: KoProgress) { try { window.localStorage.setItem(KEY, JSON.stringify(p)); } catch { /* ignore */ } }
-function bumpDaily(d: Record<string, number>) { const k = todayKey(); return { ...d, [k]: (d[k] ?? 0) + 1 }; }
+function save(p: KoProgress) { kv.set(KEY, JSON.stringify(p)); }
 
 export function isKoLearned(p: KoProgress, id: string): boolean {
   const c = p.cards[id]; return !!c && c.reps >= 1 && c.interval >= 3;

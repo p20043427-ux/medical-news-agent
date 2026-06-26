@@ -23,6 +23,7 @@ import LibraryView from "./LibraryView";
 import { useReminderScheduler } from "@/lib/reminder";
 import { AppSkeleton } from "@/components/ui";
 import { useUiLang, tt } from "@/lib/i18n";
+import { kv } from "@/lib/platform/kv";
 
 const FURIGANA_KEY = "jp-app-furigana";
 const JP_ACCENT = "#E63946";
@@ -48,14 +49,14 @@ export default function JapaneseApp({ onBack }: { onBack?: () => void }) {
   const [showFurigana, setShowFurigana] = useState(true);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(FURIGANA_KEY);
+    const saved = kv.get(FURIGANA_KEY);
     if (saved !== null) setShowFurigana(saved === "1");
   }, []);
 
   const toggleFurigana = () =>
     setShowFurigana((s) => {
       const next = !s;
-      window.localStorage.setItem(FURIGANA_KEY, next ? "1" : "0");
+      kv.set(FURIGANA_KEY, next ? "1" : "0");
       return next;
     });
 

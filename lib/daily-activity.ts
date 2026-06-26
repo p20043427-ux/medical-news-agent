@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { kv } from "@/lib/platform/kv";
 
 // 일일 활동 카운터(미션용) — 언어별, 날짜 바뀌면 자동 리셋.
 export type ActivityType = "conversation" | "exam" | "roleplay";
@@ -12,17 +13,14 @@ const EVENT = "daily-activity-changed";
 const today = () => new Date().toISOString().slice(0, 10);
 
 export function getActivity(lang: "jp" | "en"): Activity {
-  if (typeof window === "undefined") return { ...EMPTY };
-  try {
-    const o = JSON.parse(window.localStorage.getItem(key(lang)) || "{}");
-    return o.date === today() ? { ...EMPTY, ...o.act } : { ...EMPTY };
-  } catch { return { ...EMPTY }; }
+  const o = kv.getJSON<{ date?: string; act?: Partial<Activity> }>(key(lang), {});
+  return o.date === today() ? { ...EMPTY, ...o.act } : { ...EMPTY };
 }
 
 export function bumpActivity(lang: "jp" | "en", type: ActivityType) {
   const cur = getActivity(lang);
   cur[type] = (cur[type] || 0) + 1;
-  try { window.localStorage.setItem(key(lang), JSON.stringify({ date: today(), act: cur })); } catch { /* ignore */ }
+  kv.setJSON(key(lang), { date: today(), act: cur });
   window.dispatchEvent(new CustomEvent(EVENT, { detail: lang }));
 }
 

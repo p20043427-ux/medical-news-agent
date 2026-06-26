@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { kv } from "@/lib/platform/kv";
 
 // 전역 UI 언어(한국어/일본어). 콘텐츠가 아니라 인터페이스 문구에 적용.
 export type UiLang = "ko" | "ja";
@@ -9,12 +10,11 @@ const KEY = "ui-lang";
 const EVENT = "ui-lang-changed";
 
 export function getUiLang(): UiLang {
-  if (typeof window === "undefined") return "ko";
-  try { return window.localStorage.getItem(KEY) === "ja" ? "ja" : "ko"; } catch { return "ko"; }
+  return kv.get(KEY) === "ja" ? "ja" : "ko";
 }
 
 export function setUiLang(l: UiLang) {
-  try { window.localStorage.setItem(KEY, l); } catch { /* ignore */ }
+  kv.set(KEY, l);
   if (typeof document !== "undefined") document.documentElement.lang = l;
   window.dispatchEvent(new CustomEvent(EVENT));
 }

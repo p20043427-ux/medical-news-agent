@@ -7,6 +7,7 @@ import { speakKo } from "@/lib/ko/speech";
 import { speakJa } from "@/lib/jp/speech";
 import { Segmented } from "@/components/ui/segmented";
 import { tt, type UiLang } from "@/lib/i18n";
+import { kv } from "@/lib/platform/kv";
 import { MED_ACCENT } from "./common";
 
 const CK_KEY = "medic-checklist";
@@ -17,13 +18,13 @@ export default function MedicVisitView({ uiLang }: { uiLang: UiLang }) {
   const [open, setOpen] = useState<string | null>(MANNERS[0]?.key ?? null);
 
   useEffect(() => {
-    try { setChecked(JSON.parse(window.localStorage.getItem(CK_KEY) || "[]")); } catch { /* ignore */ }
+    setChecked(kv.getJSON<string[]>(CK_KEY, []));
   }, []);
 
   function toggleCheck(id: string) {
     setChecked((prev) => {
       const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
-      try { window.localStorage.setItem(CK_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      kv.setJSON(CK_KEY, next);
       return next;
     });
   }

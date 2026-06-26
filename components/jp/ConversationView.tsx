@@ -10,6 +10,7 @@ import { Button } from "@/components/ui";
 import { track } from "@/lib/analytics";
 import { bumpActivity } from "@/lib/daily-activity";
 import { useUiLang, tt } from "@/lib/i18n";
+import { kv } from "@/lib/platform/kv";
 
 const ACCENT = "linear-gradient(135deg,#E63946,#F4A261)";
 
@@ -27,13 +28,13 @@ export default function ConversationView({
   const [read, setRead] = useState<string[]>([]);
 
   useEffect(() => {
-    try { setRead(JSON.parse(localStorage.getItem("jp-conv-read") || "[]")); } catch { /* ignore */ }
+    setRead(kv.getJSON<string[]>("jp-conv-read", []));
   }, []);
   function markRead(id: string) {
     setRead((prev) => {
       if (prev.includes(id)) return prev;
       const next = [...prev, id];
-      try { localStorage.setItem("jp-conv-read", JSON.stringify(next)); } catch { /* ignore */ }
+      kv.setJSON("jp-conv-read", next);
       bumpActivity("jp", "conversation");
       return next;
     });

@@ -3,6 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { queueRemotePush, HYDRATED_EVENT } from "@/lib/sync";
 import { sm2Core, DEFAULT_EF } from "@/lib/learn/sm2";
+import { todayKey, addDays, bumpDaily, GRADE_Q, GRADE_XP } from "@/lib/learn/schedule";
+import { kv } from "@/lib/platform/kv";
+
+// 외부 컴포넌트가 이 모듈에서 todayKey 를 import 하므로 재export 로 공개 API 유지.
+export { todayKey };
 
 const KEY = "jp-app-progress-v3";
 
@@ -30,9 +35,6 @@ export interface Progress {
 
 export type Grade = "again" | "hard" | "good" | "easy";
 
-const GRADE_MAP: Record<Grade, number> = { again: 0, hard: 3, good: 4, easy: 5 };
-const XP_MAP: Record<Grade, number> = { again: 2, hard: 10, good: 15, easy: 20 };
-
 const EMPTY: Progress = {
   cards: {},
   daily: {},
@@ -42,16 +44,6 @@ const EMPTY: Progress = {
   bookmarks: [],
   mistakes: [],
 };
-
-export function todayKey(d: Date = new Date()): string {
-  return d.toISOString().slice(0, 10);
-}
-
-function addDays(days: number): string {
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  return todayKey(d);
-}
 
 // ── SM-2 알고리즘 ──
 function sm2(cur: CardState, q: number): { interval: number; easeFactor: number; box: number } {
@@ -63,7 +55,7 @@ function sm2(cur: CardState, q: number): { interval: number; easeFactor: number;
 function load(): Progress {
   if (typeof window === "undefined") return EMPTY;
   try {
-    const raw = window.localStorage.getItem(KEY);
+    const raw = kv.get(KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Progress;
       // 기존 카드에 SM-2 필드 기본값 보장
@@ -78,7 +70,7 @@ function load(): Progress {
       return { ...parsed, xp: parsed.xp ?? 0, achievements: parsed.achievements ?? [], bookmarks: parsed.bookmarks ?? [], mistakes: parsed.mistakes ?? [], cards };
     }
     // 이전 버전 마이그레이션
-    const old = window.localStorage.getItem("jp-app-progress-v2");
+    const old = kv.get("jp-app-progress-v2");
     if (old) {
       const o = JSON.parse(old) as { cards?: Record<string, Partial<CardState>>; daily?: Record<string, number>; startedAt?: string };
       const cards: Record<string, CardState> = {};
@@ -99,13 +91,8 @@ function load(): Progress {
 }
 
 function save(p: Progress) {
-  try { window.localStorage.setItem(KEY, JSON.stringify(p)); } catch { /* ignore */ }
+  kv.set(KEY, JSON.stringify(p));
   queueRemotePush("jp", p);
-}
-
-function bumpDaily(daily: Record<string, number>): Record<string, number> {
-  const k = todayKey();
-  return { ...daily, [k]: (daily[k] ?? 0) + 1 };
 }
 
 // ── 셀렉터 ──
@@ -160,8 +147,8 @@ function applyMarkNew(p: Progress, id: string, known: boolean): Progress {
 }
 
 function applyGrade(p: Progress, id: string, grade: Grade): Progress {
-  const q = GRADE_MAP[grade];
-  const xpGain = XP_MAP[grade];
+  const q = GRADE_Q[grade];
+  const xpGain = GRADE_XP[grade];
   const cur = p.cards[id] ?? { box: 0, due: todayKey(), reps: 0, lapses: 0, easeFactor: DEFAULT_EF, interval: 0 };
   const { interval, easeFactor, box } = sm2(cur, q);
   const lapses = grade === "again" ? cur.lapses + 1 : cur.lapses;

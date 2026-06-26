@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { kv } from "@/lib/platform/kv";
 
 // 로컬 학습 리마인더. 서버 없는 환경이라 '앱이 열려 있을 때' 예약 알림을 띄운다.
 const KEY = "study-reminder";
@@ -10,11 +11,10 @@ export interface Reminder { enabled: boolean; time: string } // time = "HH:MM"
 
 export function getReminder(): Reminder {
   const def: Reminder = { enabled: false, time: "20:00" };
-  if (typeof window === "undefined") return def;
-  try { return { ...def, ...JSON.parse(window.localStorage.getItem(KEY) || "{}") }; } catch { return def; }
+  return { ...def, ...kv.getJSON<Partial<Reminder>>(KEY, {}) };
 }
 export function setReminder(r: Reminder) {
-  try { window.localStorage.setItem(KEY, JSON.stringify(r)); } catch { /* ignore */ }
+  kv.setJSON(KEY, r);
 }
 
 export function notificationsSupported(): boolean {
@@ -57,16 +57,16 @@ export function useReminderScheduler() {
       target.setHours(h || 0, m || 0, 0, 0);
       if (target.getTime() <= now.getTime()) {
         // 오늘 시간이 지났으면: 아직 안 띄웠으면 한 번, 그리고 내일로 예약
-        if (window.localStorage.getItem(LAST) !== todayKey()) {
+        if (kv.get(LAST) !== todayKey()) {
           fireStudyNotification();
-          window.localStorage.setItem(LAST, todayKey());
+          kv.set(LAST, todayKey());
         }
         target.setDate(target.getDate() + 1);
       }
       const ms = Math.min(target.getTime() - now.getTime(), 2 ** 31 - 1);
       timer = window.setTimeout(() => {
         fireStudyNotification();
-        window.localStorage.setItem(LAST, todayKey());
+        kv.set(LAST, todayKey());
         schedule();
       }, Math.max(ms, 1000));
     }

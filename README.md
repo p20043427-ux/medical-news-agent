@@ -1,119 +1,95 @@
-# 🌸 일본어 회화 학습 웹앱 (Japanese Study App)
+# 🎓 LinguaFlow
 
-**JLPT N5 단어**와 **생활 회화**, **필수 동사**를 카드와 **음성(TTS)**으로 익히는 일본어 공부 웹앱입니다.
-첨부된 단어 암기 앱 디자인을 참고해 모바일 우선(mobile-first)으로 만들었습니다.
+**모바일 우선(mobile-first) PWA** 언어 학습 · 의료교류 · 여행 플랫폼.
+한 앱에서 **일본어 · 한국어 학습**, **한일 병원 의료교류 실무 도구**, **일본 여행 가이드**를 제공합니다.
+백엔드 없이 정적 데이터로 동작하며(진도 동기화만 선택적 Supabase), Vercel에 정적 배포됩니다.
 
-> 메인 화면(`/`)이 일본어 학습 앱입니다. 기존 의료 뉴스 Agent 는 [`/news`](#-의료-뉴스-agent-medical-news-agent) 로 이동했습니다.
+> 한국어/일본어 UI 전환(`tt(lang, …)`)을 지원하며, 모든 화면은 공통 디자인 시스템(`components/shell/`)을 따릅니다.
 
-## 주요 기능
+## 카테고리
+
+| 카테고리 | 설명 |
+|---|---|
+| 🇯🇵 **일본어** | JLPT N5·N4 단어 · 동사 활용 · 생활 회화 · 문법 · 모의시험 · 받아쓰기 · 롤플레이 |
+| 🇰🇷 **한국어** | TOPIK 1·2 단어 · 문법 · 회화 · 발음 · 모의시험 |
+| 🏥 **의료교류** | 은성의료재단 ↔ 가마치그룹 **직원 상호방문 지원** — 12개 부서별 전문 회화(372문장) · 의료용어 사전(324) · 포인트투토크 카드 · 병원 표지판 · 방문 실무(매너·체크리스트) |
+| ✈️ **일본 여행** | 도쿄·교토·오사카·후쿠오카·삿포로 도시 가이드 · 입국/교통 · 상황별 회화 · 준비물·실용정보 |
+
+> ⚠️ 의료교류의 임상 표현은 **양 병원 실무진 감수 후 사용**을 권장하는 초안(draft) 상태입니다. 앱 내에 "감수 전 초안" 배지로 표시됩니다.
+
+## 핵심 기능
 
 | 기능 | 설명 |
-|------|------|
-| 🏠 **홈 대시보드** | JLPT N5 진도율(원형 그래프), 오늘 학습량, 카테고리별 진행률 |
-| 🔤 **단어 카드** | 카테고리별 플래시카드 — 한자/후리가나/품사/한국어 뜻/예문, 스와이프형 학습(`알고 있어요` / `학습할게요`) |
-| 💬 **생활 회화** | 첫인사·카페·길찾기·쇼핑·식당·약속·병원·전화 등 상황별 대화, 말풍선 UI + 전체 듣기 |
-| 🔤 **필수 동사** | 생활 회화 동사 32개 — 그룹(1·2·3)별 활용형(ます·て·ない) + 예문 |
-| 🃏 **스와이프 학습** | 카드를 좌(알고 있어요)·우(학습할게요)로 밀어 분류하는 제스처 |
-| 🔁 **복습 + SRS** | Leitner 간격 반복(망각곡선)으로 다시/좋음/쉬움 채점 → 복습일 자동 산정 |
-| 📝 **퀴즈 모드** | 4지선다 점검 + 오답만 다시 풀기 |
-| 📊 **학습 분석** | 연속 학습일(🔥 스트릭), 최근 2주 학습량 그래프, 목표 시험일 D-day |
-| 🔊 **음성 발음** | 브라우저 내장 Web Speech API(`ja-JP`)로 단어·예문·대화 듣기 (API 키 불필요) |
-| ㊙️ **후리가나/뜻 숨기기** | 후리가나 토글, 뜻 보기 — 셀프 테스트용 |
-| 🎨 **애니 일러스트** | 외부 이미지 없이 SVG 로 그린 카테고리별 마스코트 카드 아트 |
-| 🌙 **다크 모드** | 라이트·다크·시스템 테마 (FOUC 방지 적용) |
+|---|---|
+| 🧠 **SM-2 간격 반복** | 망각곡선 기반 복습일 자동 산정 (`lib/learn/sm2.ts`, 일본어·한국어 공유) |
+| 🎴 **플래시카드 · 스와이프 학습** | 좌/우 스와이프로 알고 있어요/학습할게요 분류 |
+| 📝 **모의시험 · 퀴즈** | 회차별 모의시험 + 오답노트, 4지선다 퀴즈 |
+| 📊 **학습 분석** | 연속 학습일(스트릭), 최근 2주 학습량, 목표일 D-day |
+| ⭐ **즐겨찾기 · 진도** | 표현 즐겨찾기, 일일 미션, 학습 진도 추적 |
+| 🔊 **음성(TTS)** | 브라우저 Web Speech API(`ja-JP`/`ko-KR`) — API 키 불필요. 의료/여행은 한·일 양방향 발음 |
+| 🌙 **다크 모드** | 라이트·다크·시스템 (FOUC 방지 부트 스크립트) |
 | 📲 **PWA** | 홈 화면 설치 + 서비스워커 오프라인 캐시 |
-| 🔊 **음성 속도** | 0.5~1.2배 재생 속도 조절 |
-| ☁️ **진도 백업** | 진도 JSON 내보내기/가져오기 (기기 이전용) |
-| 💾 **진도 저장** | `localStorage` 기반 SRS 진도·스트릭 기록 (v1→v2 자동 마이그레이션) |
-
-학습 데이터는 모두 정적(`lib/jp/`)이라 백엔드 없이 동작합니다.
-
-- `lib/jp/vocab.ts` — N5 단어 + 카테고리 (인사·사람·숫자·시간·음식·장소·형용사·생활·부사)
-- `lib/jp/verbs.ts` — 필수 동사 + 활용형
-- `lib/jp/conversations.ts` — 생활 회화 시나리오
-- `components/jp/` — 화면 컴포넌트 (Home · 플래시카드 · 회화 · 동사 · 하단 탭)
-
-## 로컬 실행 (일본어 앱)
-
-```bash
-npm install
-npm run dev   # http://localhost:3000
-```
-
-일본어 앱은 환경변수가 필요 없습니다. (의료 뉴스 `/news` 만 Supabase/OpenRouter 키 필요)
-
----
-
-# 🩺 의료 뉴스 Agent (Medical News Agent)
-
-최신 **질병 정보**를 7개 소스에서 자동 수집하고 `openrouter/auto` LLM으로 **한국어 요약**하는 에이전트입니다.
-Next.js로 만들어 **Vercel**에 배포하고, 데이터는 **Supabase(Postgres)**에 저장합니다. 화면은 [`/news`](/news) 에서 볼 수 있습니다.
-
-🔗 **라이브 데모**: https://medical-news-agent-puce.vercel.app
-
-## 수집 소스
-
-| 소스 | 방식 |
-|------|------|
-| WHO (세계보건기구) | RSS (Disease Outbreak News / News) + Google News 폴백 |
-| CDC (미 질병통제예방센터) | RSS (Newsroom / MMWR) + Google News 폴백 |
-| NIH (미 국립보건원) | RSS + Google News 폴백 |
-| PubMed | NCBI E-utilities (esearch + efetch, 최근 발병/감염병 논문) |
-| Medical Xpress | RSS |
-| Google News — Health | RSS (Health 토픽) |
-| Reuters Health | Google News RSS (`site:reuters.com`) |
-
-> Reuters·NIH 등 공식 RSS가 불안정한 소스는 Google News RSS의 `site:` 검색을 폴백으로 사용합니다.
+| ☁️ **진도 백업·동기화** | JSON 내보내기/가져오기 + 로그인 시 Supabase 동기화(선택) |
 
 ## 아키텍처
 
 ```
-Vercel Cron (하루 1회, 00:00 UTC = 09:00 KST)
-        │
-        ▼
-/api/cron/crawl  ──►  lib/crawl.ts  runCrawl()
-        │                  │
-        │   1) 7개 소스 RSS/API 수집 → 신규 기사만 Supabase upsert (source_url 중복 제거)
-        │   2) 미요약 기사 → openrouter/auto 로 한국어 요약 + 질병/카테고리 태깅
-        ▼
-Supabase: articles, crawl_runs   ◄── 대시보드(/)에서 공개 읽기(RLS)
+app/                 Next.js App Router (정적 PWA)
+  page.tsx           4개 카테고리 진입점 (next/dynamic 코드 스플리팅)
+  layout.tsx         루트 레이아웃 · 테마 부트 스크립트
+  error.tsx          라우트 에러 경계
+  global-error.tsx   전역 에러 경계
+
+components/
+  shell/             공통 디자인 시스템 (AppShell·AppHeader·BottomNav)
+  jp/ ko/ medic/ travel/   카테고리별 화면
+  ui/                재사용 UI 프리미티브
+  auth/              계정 버튼·로그인
+
+lib/
+  jp/ ko/            학습 데이터(단어·문법·회화) + 진도(SM-2)
+  medic/             의료 회화·용어·카드·표지판·방문 실무 데이터
+  travel/            도시 가이드·회화·실용정보 데이터
+  learn/sm2.ts       SM-2 알고리즘 (공유 순수 함수)
+  platform/          RN 이식 seam — kv.ts(스토리지)·speak.ts(TTS)
+  i18n.ts            ko/ja UI 언어 전환
+  error.ts           에러 리포팅 seam (현재 Vercel Analytics)
+  sync.ts backup.ts  진도 원격 동기화·백업
 ```
 
-- **수집·요약 로직**: `lib/crawl.ts` — Cron 라우트와 대시보드 "지금 수집" 버튼(서버 액션)이 공유
-- **LLM**: `lib/llm.ts` — OpenRouter `openrouter/auto` (자동 모델 라우팅), JSON 응답 파싱
-- **DB 쓰기**: `service_role` 키로 RLS 우회 (서버 전용)
-- **DB 읽기**: 공개(anon/publishable) 키 + RLS `select` 정책
+### 설계 원칙
 
-## 환경변수
-
-`.env.example` 참고. Vercel 프로젝트 환경변수에 설정합니다.
-
-| 변수 | 설명 | 노출 |
-|------|------|------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase 프로젝트 URL | 공개 |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | publishable/anon 키 | 공개 |
-| `SUPABASE_SERVICE_ROLE_KEY` | service_role 키 (쓰기) | **서버 전용** |
-| `OPENROUTER_API_KEY` | OpenRouter API 키 | **서버 전용** |
-| `CRON_SECRET` | Cron 인증용 시크릿 | **서버 전용** |
+- **플랫폼 어댑터(seam)**: 모든 영속 데이터는 `lib/platform/kv.ts`를 통해 저장 → RN/Expo 이식 시 이 파일만 교체. TTS는 `lib/platform/speak.ts`.
+- **디자인 토큰 단일 소스**: `app/globals.css`의 `--ds-*`(HSL)에서 색을 정의하고 레거시 토큰은 alias. 다크 모드는 `html.dark`에서 토큰만 재정의해 자동 전파.
+- **코드 스플리팅**: 4개 카테고리 앱은 `next/dynamic(ssr:false)`으로 지연 로드 → 랜딩 First Load JS 173 kB.
 
 ## 로컬 실행
 
 ```bash
 npm install
-cp .env.example .env.local   # 값 채우기
-npm run dev                  # http://localhost:3000
+npm run dev          # http://localhost:3000
 ```
 
-수집을 수동 실행하려면 대시보드의 **지금 수집** 버튼을 누르거나:
+환경변수 없이 동작합니다. 진도 동기화(로그인)를 쓰려면 Supabase 키만 설정하면 됩니다.
+
+| 변수 | 설명 | 노출 |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase 프로젝트 URL | 공개 |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | publishable/anon 키 | 공개 |
+
+> 미설정 시 게스트 모드(로컬 저장)로 모든 기능이 정상 동작합니다.
+
+## 품질 관리
 
 ```bash
-curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/crawl
+npm run test:run     # Vitest 단위 테스트
+npx tsc --noEmit     # 타입 체크
+npm run build        # 프로덕션 빌드
 ```
 
-## DB 스키마
-
-`articles`(기사 + 한국어 요약/질병/카테고리), `crawl_runs`(수집 실행 로그).
-마이그레이션은 Supabase에 이미 적용되어 있습니다.
+- **CI**(`.github/workflows/ci.yml`): push/PR마다 타입체크 → 단위 테스트 → 빌드를 강제.
+- **테스트**: SM-2 알고리즘, kv 스토리지 어댑터, i18n, 즐겨찾기, 의료 데이터 무결성(`__tests__/lib/`).
+- **에러 트래킹**: `lib/error.ts` + App Router 에러 경계(`error.tsx`/`global-error.tsx`).
 
 ---
-배포: Vercel · DB: Supabase · 요약: OpenRouter (openrouter/auto)
+배포: Vercel · 진도 동기화(선택): Supabase · 음성: 브라우저 Web Speech API

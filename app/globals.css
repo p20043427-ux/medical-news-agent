@@ -49,6 +49,82 @@ body {
   overflow-wrap: anywhere;     /* 단, 너무 긴 라틴 단어는 넘치지 않게 분리 */
 }
 
+
+/* ───── 버튼 디자인 시스템 ─────
+   깊이감(레이어드 그림자 + 미세 그라데이션 + 상단 하이라이트) + 프레스 상태 */
+@layer components {
+  .btn {
+    @apply relative inline-flex items-center justify-center gap-1.5 rounded-2xl font-bold;
+    transition: transform 0.13s ease, box-shadow 0.13s ease, background-color 0.13s,
+      opacity 0.13s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:active {
+    transform: translateY(1px) scale(0.985);
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    box-shadow: none;
+    transform: none;
+  }
+
+  /* 기본 진한 버튼 */
+  .btn-primary {
+    @apply text-white;
+    background-image: linear-gradient(180deg, #3c485e 0%, #0f172a 100%);
+    box-shadow: 0 10px 24px -10px rgba(2, 6, 23, 0.55),
+      0 2px 6px -2px rgba(2, 6, 23, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+  .btn-primary:active {
+    box-shadow: 0 4px 10px -8px rgba(2, 6, 23, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  .dark .btn-primary {
+    background-image: linear-gradient(180deg, #5b6b86 0%, #334155 100%);
+    box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.7),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  /* 어두운 배경 위 흰색 알약 (홈 CTA 등) */
+  .btn-light {
+    @apply text-slate-900;
+    background-image: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+    box-shadow: 0 14px 28px -12px rgba(2, 6, 23, 0.45),
+      0 2px 6px -2px rgba(2, 6, 23, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+  .btn-light:active {
+    box-shadow: 0 6px 14px -10px rgba(2, 6, 23, 0.45);
+  }
+
+  /* 외곽선(보조) 버튼 */
+  .btn-outline {
+    @apply bg-white text-slate-700;
+    border: 1px solid #e5e9f0;
+    box-shadow: 0 6px 16px -10px rgba(2, 6, 23, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+  .dark .btn-outline {
+    background: #1e293b;
+    color: #cbd5e1;
+    border-color: #334155;
+    box-shadow: 0 6px 16px -10px rgba(0, 0, 0, 0.5);
+  }
+
+  /* 채점용 컬러 버튼 */
+  .btn-rose {
+    @apply text-white;
+    background-image: linear-gradient(180deg, #fb7185 0%, #e11d48 100%);
+    box-shadow: 0 10px 22px -12px rgba(225, 29, 72, 0.65),
+      inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  }
+  .btn-emerald {
+    @apply text-white;
+    background-image: linear-gradient(180deg, #34d399 0%, #059669 100%);
+    box-shadow: 0 10px 22px -12px rgba(5, 150, 105, 0.65),
+      inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  }
+}
+
 /* ── 카드 ── */
 .card {
   background: var(--card);

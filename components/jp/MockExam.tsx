@@ -7,6 +7,7 @@ import { bumpActivity } from "@/lib/daily-activity";
 import { speakJa } from "@/lib/jp/speech";
 import { Button } from "@/components/ui";
 import { useUiLang, tt, type UiLang } from "@/lib/i18n";
+import { kv } from "@/lib/platform/kv";
 
 const SECTIONS: Section[] = ["문자·어휘", "문법", "독해", "청해"];
 const SECTION_JA: Record<string, string> = { "문자·어휘": "文字・語彙", "문법": "文法", "독해": "読解", "청해": "聴解" };
@@ -35,13 +36,11 @@ function fmt(sec: number) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 function getBest(): Record<string, number> {
-  try { return JSON.parse(window.localStorage.getItem("jp-exam-best") || "{}"); } catch { return {}; }
+  return kv.getJSON<Record<string, number>>("jp-exam-best", {});
 }
 function saveBest(id: string, pct: number) {
-  try {
-    const b = getBest();
-    if (!b[id] || pct > b[id]) { b[id] = pct; window.localStorage.setItem("jp-exam-best", JSON.stringify(b)); }
-  } catch { /* ignore */ }
+  const b = getBest();
+  if (!b[id] || pct > b[id]) { b[id] = pct; kv.setJSON("jp-exam-best", b); }
 }
 
 const getHistory = () => getExamHistory("jp");

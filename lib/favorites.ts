@@ -1,18 +1,18 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { kv } from "@/lib/platform/kv";
 
-// 표현 즐겨찾기 — 언어별 네임스페이스로 localStorage에 저장. key는 표현 텍스트(안정적).
+// 표현 즐겨찾기 — 언어별 네임스페이스로 저장(kv). key는 표현 텍스트(안정적).
 const storageKey = (ns: string) => `fav-${ns}`;
 const EVENT = "favorites-changed";
 
 export function getFavorites(ns: string): string[] {
-  if (typeof window === "undefined") return [];
-  try { return JSON.parse(window.localStorage.getItem(storageKey(ns)) || "[]"); } catch { return []; }
+  return kv.getJSON<string[]>(storageKey(ns), []);
 }
 
 function setFavorites(ns: string, list: string[]) {
-  try { window.localStorage.setItem(storageKey(ns), JSON.stringify(list)); } catch { /* ignore */ }
+  kv.setJSON(storageKey(ns), list);
   window.dispatchEvent(new CustomEvent(EVENT, { detail: ns }));
 }
 

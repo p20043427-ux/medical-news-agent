@@ -8,6 +8,7 @@ import {
 import { useTheme, type Theme } from "@/lib/jp/theme";
 import { getRate, setRate as saveRate, speakJa } from "@/lib/jp/speech";
 import { useUiLang, tt } from "@/lib/i18n";
+import { kv } from "@/lib/platform/kv";
 import { getExamHistory, type ExamAttempt } from "@/lib/exam-history";
 import { buildBackup, restoreBackup } from "@/lib/backup";
 import { getRoleplay } from "@/lib/roleplay-progress";
@@ -43,18 +44,18 @@ export default function Stats({
   useEffect(() => {
     setExamHist(getExamHistory("jp"));
     setRpDone(Object.keys(getRoleplay("jp-roleplay")).length);
-    try { const b = JSON.parse(localStorage.getItem("jp-exam-best") || "{}"); const vals = Object.values(b).map(Number); setExamBest(vals.length ? Math.max(...vals) : 0); } catch { /* ignore */ }
+    const b = kv.getJSON<Record<string, number>>("jp-exam-best", {}); const vals = Object.values(b).map(Number); setExamBest(vals.length ? Math.max(...vals) : 0);
   }, []);
   const fileRef = useRef<HTMLInputElement>(null);
   const dailyGoal = progress.dailyGoal ?? 20;
 
   useEffect(() => {
-    const s = (window.localStorage.getItem("app-text-scale") as "sm" | "md" | "lg") || "md";
+    const s = (kv.get("app-text-scale") as "sm" | "md" | "lg") || "md";
     setTextScale(s);
   }, []);
   function changeTextScale(s: "sm" | "md" | "lg") {
     setTextScale(s);
-    window.localStorage.setItem("app-text-scale", s);
+    kv.set("app-text-scale", s);
     document.documentElement.style.fontSize = s === "sm" ? "15px" : s === "lg" ? "18px" : "16px";
   }
 
