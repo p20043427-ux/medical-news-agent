@@ -1,15 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import JapaneseApp from "@/components/jp/JapaneseApp";
-import KoreanApp from "@/components/ko/KoreanApp";
-import MedicApp from "@/components/medic/MedicApp";
-import TravelApp from "@/components/travel/TravelApp";
+import dynamic from "next/dynamic";
 import { AuthProvider } from "@/lib/auth";
 import AccountButton from "@/components/auth/AccountButton";
 import { track } from "@/lib/analytics";
 import Onboarding, { shouldOnboard } from "@/components/Onboarding";
 import { useUiLang, setUiLang, tt, type UiLang } from "@/lib/i18n";
+
+// 카테고리 앱은 진입 시점에만 로드한다(코드 스플리팅).
+// 랜딩 화면 초기 번들에서 4개 앱 + 대용량 데이터(회화/단어/도시)를 제외해
+// First Load JS를 대폭 줄인다. ssr:false → 정적 PWA, 클라이언트 전용.
+const loading = () => (
+  <div className="flex min-h-screen items-center justify-center" style={{ background: "var(--bg)" }}>
+    <div className="animate-pulse text-4xl">✨</div>
+  </div>
+);
+const JapaneseApp = dynamic(() => import("@/components/jp/JapaneseApp"), { ssr: false, loading });
+const KoreanApp = dynamic(() => import("@/components/ko/KoreanApp"), { ssr: false, loading });
+const MedicApp = dynamic(() => import("@/components/medic/MedicApp"), { ssr: false, loading });
+const TravelApp = dynamic(() => import("@/components/travel/TravelApp"), { ssr: false, loading });
 
 type Lang = "jp" | "ko" | "medic" | "travel";
 
