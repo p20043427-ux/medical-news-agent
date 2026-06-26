@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { kv } from "@/lib/platform/kv";
 
 export type Theme = "light" | "dark" | "system";
-const KEY = "jp-app-theme";
+// layout.tsx의 FOUC 방지 부트 스크립트와 동일한 키를 사용해야
+// 새로고침 시 사용자가 고른 테마가 즉시 적용된다.
+const KEY = "app-theme";
 
 export function getStoredTheme(): Theme {
-  if (typeof window === "undefined") return "system";
-  return (window.localStorage.getItem(KEY) as Theme) ?? "system";
+  return (kv.get(KEY) as Theme) ?? "system";
 }
 
 function resolve(theme: Theme): boolean {
@@ -26,12 +28,14 @@ export function useTheme() {
   const [theme, setTheme] = useState<Theme>("system");
 
   useEffect(() => {
-    setTheme(getStoredTheme());
+    const stored = getStoredTheme();
+    setTheme(stored);
+    applyTheme(stored); // 부트 스크립트 누락 시 방어적으로 재적용
   }, []);
 
   const change = (t: Theme) => {
     setTheme(t);
-    window.localStorage.setItem(KEY, t);
+    kv.set(KEY, t);
     applyTheme(t);
   };
 

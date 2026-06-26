@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { queueRemotePush, HYDRATED_EVENT } from "@/lib/sync";
 import { sm2Core, DEFAULT_EF } from "@/lib/learn/sm2";
+import { kv } from "@/lib/platform/kv";
 
 const KEY = "jp-app-progress-v3";
 
@@ -63,7 +64,7 @@ function sm2(cur: CardState, q: number): { interval: number; easeFactor: number;
 function load(): Progress {
   if (typeof window === "undefined") return EMPTY;
   try {
-    const raw = window.localStorage.getItem(KEY);
+    const raw = kv.get(KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Progress;
       // 기존 카드에 SM-2 필드 기본값 보장
@@ -78,7 +79,7 @@ function load(): Progress {
       return { ...parsed, xp: parsed.xp ?? 0, achievements: parsed.achievements ?? [], bookmarks: parsed.bookmarks ?? [], mistakes: parsed.mistakes ?? [], cards };
     }
     // 이전 버전 마이그레이션
-    const old = window.localStorage.getItem("jp-app-progress-v2");
+    const old = kv.get("jp-app-progress-v2");
     if (old) {
       const o = JSON.parse(old) as { cards?: Record<string, Partial<CardState>>; daily?: Record<string, number>; startedAt?: string };
       const cards: Record<string, CardState> = {};
@@ -99,7 +100,7 @@ function load(): Progress {
 }
 
 function save(p: Progress) {
-  try { window.localStorage.setItem(KEY, JSON.stringify(p)); } catch { /* ignore */ }
+  kv.set(KEY, JSON.stringify(p));
   queueRemotePush("jp", p);
 }
 

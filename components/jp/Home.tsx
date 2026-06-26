@@ -10,6 +10,7 @@ import { useRoleplay } from "@/lib/roleplay-progress";
 import { useDailyActivity } from "@/lib/daily-activity";
 import DailyMissions from "@/components/DailyMissions";
 import { useUiLang, tt } from "@/lib/i18n";
+import { kv } from "@/lib/platform/kv";
 import { useEffect, useState } from "react";
 import WordImage from "./WordImage";
 import { Button, Progress } from "@/components/ui";
@@ -34,7 +35,7 @@ export default function Home({ progress, onStudyCategory, onReviewDue }: {
   const rpDone = Object.keys(rpData).length;
   const rpTotal = CONVERSATIONS.length;
   const [convRead, setConvRead] = useState(0);
-  useEffect(() => { try { setConvRead((JSON.parse(localStorage.getItem("jp-conv-read") || "[]") as string[]).length); } catch { /* ignore */ } }, []);
+  useEffect(() => { setConvRead(kv.getJSON<string[]>("jp-conv-read", []).length); }, []);
   const todayPhrase = ALL_PHRASES[dailyIndex(todayKey(), ALL_PHRASES.length)];
   const goal = progress.dailyGoal ?? 20;
   const todayCount = progress.daily?.[todayKey()] ?? 0;

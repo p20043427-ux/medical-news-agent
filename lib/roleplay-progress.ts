@@ -1,18 +1,18 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { kv } from "@/lib/platform/kv";
 
-// 롤플레이 완료 기록 — ns별(jp/en) localStorage. 값 = 최소 실수 횟수(베스트).
+// 롤플레이 완료 기록 — ns별(jp/en) 저장(kv). 값 = 최소 실수 횟수(베스트).
 const storageKey = (ns: string) => `roleplay-${ns}`;
 const EVENT = "roleplay-changed";
 
 export function getRoleplay(ns: string): Record<string, number> {
-  if (typeof window === "undefined") return {};
-  try { return JSON.parse(window.localStorage.getItem(storageKey(ns)) || "{}"); } catch { return {}; }
+  return kv.getJSON<Record<string, number>>(storageKey(ns), {});
 }
 
 function persist(ns: string, v: Record<string, number>) {
-  try { window.localStorage.setItem(storageKey(ns), JSON.stringify(v)); } catch { /* ignore */ }
+  kv.setJSON(storageKey(ns), v);
   window.dispatchEvent(new CustomEvent(EVENT, { detail: ns }));
 }
 

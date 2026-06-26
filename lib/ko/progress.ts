@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { sm2Core, DEFAULT_EF } from "@/lib/learn/sm2";
+import { kv } from "@/lib/platform/kv";
 
 const KEY = "ko-app-progress-v1";
 
@@ -32,11 +33,10 @@ function addDays(n: number): string { const d = new Date(); d.setDate(d.getDate(
 const EMPTY: KoProgress = { cards: {}, daily: {}, startedAt: todayKey(), xp: 0, bookmarks: [], mistakes: [] };
 
 function load(): KoProgress {
-  if (typeof window === "undefined") return EMPTY;
-  try { const raw = window.localStorage.getItem(KEY); if (raw) return { ...EMPTY, ...JSON.parse(raw) as KoProgress }; } catch { /* ignore */ }
+  try { const raw = kv.get(KEY); if (raw) return { ...EMPTY, ...JSON.parse(raw) as KoProgress }; } catch { /* ignore */ }
   return EMPTY;
 }
-function save(p: KoProgress) { try { window.localStorage.setItem(KEY, JSON.stringify(p)); } catch { /* ignore */ } }
+function save(p: KoProgress) { kv.set(KEY, JSON.stringify(p)); }
 function bumpDaily(d: Record<string, number>) { const k = todayKey(); return { ...d, [k]: (d[k] ?? 0) + 1 }; }
 
 export function isKoLearned(p: KoProgress, id: string): boolean {

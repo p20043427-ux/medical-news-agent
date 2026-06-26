@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useUiLang, tt } from "@/lib/i18n";
+import { kv } from "@/lib/platform/kv";
 
 const KEY = "app-onboarded-v2";
 
 export function shouldOnboard(): boolean {
-  if (typeof window === "undefined") return false;
-  return !window.localStorage.getItem(KEY);
+  return !kv.get(KEY);
 }
 
 const SLIDES: { emoji: string; title: [string, string]; desc: [string, string]; grad: string }[] = [
@@ -56,7 +56,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const s = SLIDES[i];
 
   function finish() {
-    try { window.localStorage.setItem(KEY, "1"); } catch { /* ignore */ }
+    kv.set(KEY, "1");
     onDone();
   }
 

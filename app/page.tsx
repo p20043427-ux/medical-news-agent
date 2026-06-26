@@ -7,6 +7,7 @@ import AccountButton from "@/components/auth/AccountButton";
 import { track } from "@/lib/analytics";
 import Onboarding, { shouldOnboard } from "@/components/Onboarding";
 import { useUiLang, setUiLang, tt, type UiLang } from "@/lib/i18n";
+import { kv } from "@/lib/platform/kv";
 
 // 카테고리 앱은 진입 시점에만 로드한다(코드 스플리팅).
 // 랜딩 화면 초기 번들에서 4개 앱 + 대용량 데이터(회화/단어/도시)를 제외해
@@ -38,13 +39,13 @@ function RootInner() {
 
   useEffect(() => {
     setMounted(true);
-    const saved = window.localStorage.getItem("app-lang") as Lang | null;
+    const saved = kv.get("app-lang") as Lang | null;
     if (saved === "jp" || saved === "ko" || saved === "medic" || saved === "travel") setLang(saved);
     else if (shouldOnboard()) setOnboarding(true);
   }, []);
 
   function selectLang(l: Lang) {
-    window.localStorage.setItem("app-lang", l);
+    kv.set("app-lang", l);
     track("select_language", { lang: l });
     setLang(l);
   }

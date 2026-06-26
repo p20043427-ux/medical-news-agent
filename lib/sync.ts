@@ -1,6 +1,7 @@
 "use client";
 
 import { getSupabase } from "./supabase/client";
+import { kv } from "@/lib/platform/kv";
 
 export type Lang = "jp" | "en";
 
@@ -57,12 +58,8 @@ export async function hydrateFromRemote(): Promise<void> {
   for (const row of data as { lang: Lang; data: unknown }[]) {
     const key = STORAGE_KEYS[row.lang];
     if (key && row.data) {
-      try {
-        window.localStorage.setItem(key, JSON.stringify(row.data));
-        changed = true;
-      } catch {
-        /* ignore */
-      }
+      kv.set(key, JSON.stringify(row.data));
+      changed = true;
     }
   }
   if (changed) window.dispatchEvent(new Event(HYDRATED_EVENT));
@@ -84,7 +81,7 @@ export async function pushLocalIfRemoteEmpty(): Promise<void> {
 
   for (const lang of ["jp", "en"] as Lang[]) {
     if (existing.has(lang)) continue;
-    const raw = window.localStorage.getItem(STORAGE_KEYS[lang]);
+    const raw = kv.get(STORAGE_KEYS[lang]);
     if (!raw) continue;
     try {
       await sb.from("user_progress").upsert(

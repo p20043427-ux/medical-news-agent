@@ -6,6 +6,7 @@ import { getExamHistory, pushExamHistory } from "@/lib/exam-history";
 import { speakKo } from "@/lib/ko/speech";
 import { Button } from "@/components/ui";
 import { tt, type UiLang } from "@/lib/i18n";
+import { kv } from "@/lib/platform/kv";
 
 const SECTIONS: KoSection[] = ["어휘", "문법", "읽기", "듣기"];
 const SECTION_JA: Record<string, string> = { "어휘": "語彙", "문법": "文法", "읽기": "読解", "듣기": "聴解" };
@@ -28,8 +29,8 @@ const DIFFS: { key: KoDifficulty; label: [string, string]; desc: [string, string
 ];
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
-function getBest(): Record<string, number> { try { return JSON.parse(localStorage.getItem("ko-exam-best") || "{}"); } catch { return {}; } }
-function saveBest(id: string, pct: number) { try { const b = getBest(); if (!b[id] || pct > b[id]) { b[id] = pct; localStorage.setItem("ko-exam-best", JSON.stringify(b)); } } catch { /* ignore */ } }
+function getBest(): Record<string, number> { return kv.getJSON<Record<string, number>>("ko-exam-best", {}); }
+function saveBest(id: string, pct: number) { const b = getBest(); if (!b[id] || pct > b[id]) { b[id] = pct; kv.setJSON("ko-exam-best", b); } }
 const getHistory = () => getExamHistory("ko");
 
 export default function KoMockExam({ lang, onExit, onMistake }: { lang: UiLang; onExit: () => void; onMistake?: (ids: string[]) => void }) {

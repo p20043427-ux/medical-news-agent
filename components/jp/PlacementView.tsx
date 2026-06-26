@@ -4,6 +4,7 @@ import { useState } from "react";
 import { VOCAB } from "@/lib/jp/vocab";
 import PlacementTest, { type PlacementQ, type PlacementResult } from "@/components/PlacementTest";
 import { useUiLang, tt, type UiLang } from "@/lib/i18n";
+import { kv } from "@/lib/platform/kv";
 
 function shuffle<T>(a: T[]): T[] {
   const r = [...a];
@@ -38,5 +39,5 @@ export default function PlacementView({ onExit }: { onExit: () => void }) {
   const lang = useUiLang();
   const [qs] = useState(build);
   return <PlacementTest questions={qs} getResult={(c, t) => result(c, t, lang)} accent="#E63946" onExit={onExit}
-    onDone={(r) => { try { localStorage.setItem("placement-jp", JSON.stringify(r)); } catch { /* ignore */ } }} />;
+    onDone={(r) => kv.setJSON("placement-jp", r)} />;
 }

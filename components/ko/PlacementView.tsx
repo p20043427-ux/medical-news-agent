@@ -4,6 +4,7 @@ import { useState } from "react";
 import { KO_VOCAB } from "@/lib/ko/vocab";
 import PlacementTest, { type PlacementQ, type PlacementResult } from "@/components/PlacementTest";
 import { tt, type UiLang } from "@/lib/i18n";
+import { kv } from "@/lib/platform/kv";
 
 function shuffle<T>(a: T[]): T[] {
   const r = [...a];
@@ -43,5 +44,5 @@ function result(correct: number, total: number, lang: UiLang): PlacementResult {
 export default function KoPlacementView({ lang, onExit }: { lang: UiLang; onExit: () => void }) {
   const [qs] = useState(() => build(lang));
   return <PlacementTest questions={qs} getResult={(c, t) => result(c, t, lang)} accent="#2563EB" onExit={onExit}
-    onDone={(r) => { try { localStorage.setItem("placement-ko", JSON.stringify(r)); } catch { /* ignore */ } }} />;
+    onDone={(r) => kv.setJSON("placement-ko", r)} />;
 }
