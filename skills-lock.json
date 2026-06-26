@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "harness": {
+      "source": "revfactory/harness",
+      "sourceType": "github",
+      "skillPath": "skills/harness/SKILL.md",
+      "computedHash": "06574bab299b16f4e3c71b368fabe8882d590e79b3168d661a038b8990a7ee57"
+    }
+  }
+}
